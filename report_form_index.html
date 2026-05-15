@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo Cáo Giao Ban Bệnh Viện</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #ecf0f1;
+            --accent-color: #3498db;
+            --border-color: #bdc3c7;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            color: var(--primary-color);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+            color: #d35400;
+            margin-bottom: 5px;
+        }
+        .date-header {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: var(--secondary-color);
+        }
+        .header-yellow { background-color: #ffff00; }
+        .header-cyan { background-color: #00ffff; }
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            border: none;
+            text-align: center;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: 2px solid var(--accent-color);
+            background-color: #fff9c4;
+        }
+        .section-title {
+            background-color: #eee;
+            font-weight: bold;
+            text-align: left !important;
+        }
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 25px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #219150;
+        }
+        @media print {
+            .btn-container { display: none; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; width: 100%; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GIAO BAN</h1>
+        <div class="date-header">Ngày: <input type="date" id="reportDate" value="2026-05-18"></div>
+
+        <form id="reportForm">
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2">STT</th>
+                        <th rowspan="2">TÊN KHOA</th>
+                        <th colspan="3">ĐANG ĐIỀU TRỊ</th>
+                        <th colspan="7" class="header-cyan">KẾT THÚC ĐIỀU TRỊ</th>
+                        <th rowspan="2" class="header-yellow">BỆNH CÒN LẠI</th>
+                    </tr>
+                    <tr>
+                        <th>Bệnh cũ</th>
+                        <th>Bệnh mới</th>
+                        <th>Khoa khác đến</th>
+                        <th class="header-cyan">Chuyển khoa</th>
+                        <th class="header-cyan">Xuất viện</th>
+                        <th class="header-cyan">Xin về (Ổn)</th>
+                        <th class="header-cyan">Xin về (Nặng)</th>
+                        <th class="header-cyan">Bỏ viện</th>
+                        <th class="header-cyan">Tử vong</th>
+                        <th class="header-cyan">Chuyển viện</th>
+                    </tr>
+                </thead>
+                <tbody id="departmentTableBody">
+                    <!-- Javascript will populate this -->
+                </tbody>
+            </table>
+
+            <h3>CHỈ SỐ CẬN LÂM SÀNG & KHÁM BỆNH</h3>
+            <table id="clinicalTable">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>NỘI DUNG</th>
+                        <th>TỔNG</th>
+                        <th>HSCC</th>
+                        <th>GMHS</th>
+                        <th>NGOẠI</th>
+                        <th>SẢN</th>
+                        <th>NỘI TH</th>
+                        <th>NỘI TMLH</th>
+                        <th>NHI</th>
+                        <th>NHIỄM</th>
+                        <th>YHCT</th>
+                        <th>LCK</th>
+                        <th>KKB</th>
+                    </tr>
+                </thead>
+                <tbody id="clinicalTableBody">
+                    <!-- Javascript will populate this -->
+                </tbody>
+            </table>
+
+            <div class="btn-container">
+                <button type="button" onclick="window.print()">In Báo Cáo</button>
+                <button type="submit">Lưu Báo Cáo</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const departments = [
+            "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC",
+            "KHOA NGOẠI TỔNG HỢP",
+            "KHOA NHI",
+            "KHOA NỘI TIM MẠCH - LÃO HỌC",
+            "KHOA NỘI TỔNG HỢP",
+            "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC",
+            "KHOA PHỤ SẢN",
+            "KHOA TRUYỀN NHIỄM",
+            "KHOA Y DƯỢC CỔ TRUYỀN",
+            "KHOA LIÊN CHUYÊN KHOA",
+            "TỔNG LƯỢT KHÁM NGOẠI TRÚ"
+        ];
+
+        const clinicalItems = [
+            "PROCALCITONIN",
+            "BNP",
+            "KHÍ MÁU ĐỘNG MẠCH",
+            "SỐ LẦN NỘI SOI THỰC QUẢN - DẠ DÀY - TÁ TRÀNG"
+        ];
+
+        const doubleRowItems = [
+            { name: "SỐ LẦN CHỤP XQ", subs: ["NGOẠI TRÚ", "NỘI TRÚ"] },
+            { name: "SỐ LẦN SIÊU ÂM", subs: ["NGOẠI TRÚ", "NỘI TRÚ"] },
+            { name: "SỐ LẦN XÉT NGHIỆM", subs: ["NGOẠI TRÚ", "NỘI TRÚ"] }
+        ];
+
+        // Populate Department Table
+        const deptBody = document.getElementById('departmentTableBody');
+        departments.forEach((dept, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${index + 1}</td>
+                <td style="text-align:left">${dept}</td>
+                ${'<td><input type="number" value="0"></td>'.repeat(11)}
+            `;
+            deptBody.appendChild(row);
+        });
+
+        // Populate Clinical Table
+        const clinicalBody = document.getElementById('clinicalTableBody');
+        let stt = 12;
+        clinicalItems.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${stt++}</td>
+                <td style="text-align:left">${item}</td>
+                ${'<td><input type="number" value="0"></td>'.repeat(12)}
+            `;
+            clinicalBody.appendChild(row);
+        });
+
+        doubleRowItems.forEach(item => {
+            item.subs.forEach((sub, subIdx) => {
+                const row = document.createElement('tr');
+                if(subIdx === 0) {
+                    row.innerHTML = `
+                        <td rowspan="2">${stt++}</td>
+                        <td style="text-align:left">${item.name}<br><small>(${sub})</small></td>
+                        ${'<td><input type="number" value="0"></td>'.repeat(12)}
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <td style="text-align:left"><small>(${sub})</small></td>
+                        ${'<td><input type="number" value="0"></td>'.repeat(12)}
+                    `;
+                }
+                clinicalBody.appendChild(row);
+            });
+        });
+
+        document.getElementById('reportForm').onsubmit = (e) => {
+            e.preventDefault();
+            alert('Dữ liệu đã được ghi nhận (Demo). Bạn có thể kết nối với Firebase hoặc Google Sheets API để lưu trữ thực tế.');
+        };
+    </script>
+</body>
+</html>
