@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Giao ban Bệnh viện</title>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      --success: #22c55e;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-card h1 {
+      font-size: 24px;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .login-card p {
+      color: #64748b;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 24px;
+    }
+
+    .top-bar h2 { margin: 0; font-size: 20px; color: var(--primary); }
+
+    .section-card {
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
+      color: var(--text);
+    }
+
+    .grid-inputs {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #475569;
+    }
+
+    input[type="password"],
+    input[type="number"] {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all 0.2s;
+      background: #f1f5f9;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
+    }
+
+    .btn-group { display: flex; gap: 12px; margin-bottom: 32px; }
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 14px;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #16a34a; }
+    .btn-logout { background: #ef4444; color: white; padding: 8px 16px; }
+    .btn-logout:hover { background: #dc2626; }
+
+    .table-responsive {
+      overflow-x: auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 32px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+    }
+
+    th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 600;
+    }
+
+    tr:hover { background-color: #f8fafc; }
+    .cell-highlight { background-color: #fef08a !important; font-weight: bold; color: #b45309; }
+    .row-total { background-color: #ecfdf5 !important; font-weight: bold; }
+
+    @media(max-width: 768px) {
+      .top-bar { flex-direction: column; gap: 12px; text-align: center; }
+      .grid-inputs { grid-template-columns: 1fr; }
+      .btn-group { flex-direction: column; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <div class="top-bar">
+      <div>
+        <small style="color:#64748b; font-weight: 500;">TÀI KHOẢN ĐANG ĐĂNG NHẬP:</small>
+        <h2 id="khoaName">Đang tải tên khoa...</h2>
+      </div>
+      <button class="btn-logout" onclick="logout()">Đăng xuất</button>
+    </div>
+
+    <div class="section-card">
+      <h3 class="section-title">I. BÁO CÁO SỐ LIỆU LÂM SÀNG (BỆNH NHÂN)</h3>
+      <div class="grid-inputs">
+        <div class="form-group"><label>Bệnh cũ hôm trước</label><input type="number" id="benhCu" value="0" min="0"></div>
+        <div class="form-group"><label>Bệnh nhân mới vào</label><input type="number" id="benhMoi" value="0" min="0"></div>
+        <div class="form-group"><label>Khoa khác chuyển đến</label><input type="number" id="chuyenKhoa" value="0" min="0"></div>
+        <div class="form-group"><label>Xuất viện</label><input type="number" id="xuatVien" value="0" min="0"></div>
+        <div class="form-group"><label>Xin về</label><input type="number" id="xinVe" value="0" min="0"></div>
+        <div class="form-group"><label>Bỏ viện</label><input type="number" id="boVe" value="0" min="0"></div>
+        <div class="form-group"><label>Tử vong</label><input type="number" id="tuVong" value="0" min="0"></div>
+        <div class="form-group"><label>Chuyển viện khác</label><input type="number" id="chuyenVien" value="0" min="0"></div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <h3 class="section-title">II. THỐNG KÊ HOẠT ĐỘNG CẬN LÂM SÀNG</h3>
+      <div class="grid-inputs">
+        <div class="form-group"><label>PROCALCITONIN</label><input type="number" id="procalcitonin" value="0" min="0"></div>
+        <div class="form-group"><label>BNP</label><input type="number" id="bnp" value="0" min="0"></div>
+        <div class="form-group"><label>KHÍ MÁU ĐỘNG MẠCH</label><input type="number" id="khiMauDongMach" value="0" min="0"></div>
+        <div class="form-group"><label>NỘI SOI DẠ DÀY/TÁ TRÀNG</label><input type="number" id="noiSoi" value="0" min="0"></div>
+        <div class="form-group"><label>CHỤP XQ NGOẠI TRÚ</label><input type="number" id="xqNgoaiTru" value="0" min="0"></div>
+        <div class="form-group"><label>CHỤP XQ NỘI TRÚ</label><input type="number" id="xqNoiTru" value="0" min="0"></div>
+        <div class="form-group"><label>SIÊU ÂM NGOẠI TRÚ</label><input type="number" id="sieuAmNgoaiTru" value="0" min="0"></div>
+        <div class="form-group"><label>SIÊU ÂM NỘI TRÚ</label><input type="number" id="sieuAmNoiTru" value="0" min="0"></div>
+        <div class="form-group"><label>XÉT NGHIỆM NGOẠI TRÚ</label><input type="number" id="xnNgoaiTru" value="0" min="0"></div>
+        <div class="form-group"><label>XÉT NGHIỆM NỘI TRÚ</label><input type="number" id="xnNoiTru" value="0" min="0"></div>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-primary" onclick="submitReport()">GỬI / CẬP NHẬT BÁO CÁO</button>
+      <button class="btn-success" onclick="exportExcelAll()">XUẤT TOÀN BỘ FILE EXCEL BỆNH VIỆN</button>
+    </div>
+
+    <h3 style="margin-bottom: 12px; font-size: 18px; color: var(--text);">TỔNG HỢP TOÀN VIỆN HÔM NAY</h3>
+    
+    <div class="table-responsive">
+      <table id="reportTable">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th style="text-align: left; min-width: 250px;">TÊN KHOA LÂM SÀNG</th>
+            <th>BỆNH CŨ</th>
+            <th>BỆNH MỚI</th>
+            <th>CHUYỂN ĐẾN</th>
+            <th>XUẤT VIỆN</th>
+            <th>XIN VỀ</th>
+            <th>BỎ VIỆN</th>
+            <th>TỬ VONG</th>
+            <th>CHUYỂN VIỆN</th>
+            <th>BỆNH CÒN LẠI</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="table-responsive" style="margin-top: 24px;">
+      <table id="clsTable">
+        <thead>
+          <tr>
+            <th style="text-align: left; min-width: 300px;">DANH MỤC CẬN LÂM SÀNG</th>
+            <th style="background:#e2f0d9; color:#1e3a1e;">TỔNG VIỆN</th>
+            <th>HSCC</th>
+            <th>GMHS</th>
+            <th>NGOẠI</th>
+            <th>SẢN</th>
+            <th>NỘI TH</th>
+            <th>NỘI TM-LH</th>
+            <th>NHI</th>
+            <th>NHIỄM</th>
+            <th>YHCT</th>
+            <th>LCK</th>
+            <th>KKB</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Thư viện nạp ngoài bắt buộc để xuất file Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <!-- HỆ THỐNG SCRIPTS ĐÃ ĐƯỢC GỘP LẠI TOÀN BỘ TRÁNH LỖI ĐƯỜNG DẪN -->
+  <script>
+    // ==========================================
+    // 1. CẤU HÌNH API URL (Dán URL Google Web App của bạn vào đây)
+    // ==========================================
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxwNy4OfJ3LfDmkC3zcEJozwBCuRYFgGTuMqx5IeaDyDRRnKO5sDtHTyQqHPgoU2Lp4/exec';
+
+    // ==========================================
+    // 2. MÃ LOGIC HỆ THỐNG (DASHBOARD REALTIME)
+    // ==========================================
+    const userKhoa = localStorage.getItem('khoa');
+    const userToken = localStorage.getItem('token');
+
+    if (!userKhoa || !userToken) {
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('khoaName').innerText = userKhoa;
+
+    function value(id) {
+      return document.getElementById(id).value || 0;
+    }
+
+    async function submitReport() {
+      const data = {
+        token: userToken,
+        benhCu: value('benhCu'),
+        benhMoi: value('benhMoi'),
+        chuyenKhoa: value('chuyenKhoa'),
+        xuatVien: value('xuatVien'),
+        xinVe: value('xinVe'),
+        boVe: value('boVe'),
+        tuVong: value('tuVong'),
+        chuyenVien: value('chuyenVien'),
+        procalcitonin: value('procalcitonin'),
+        bnp: value('bnp'),
+        khiMauDongMach: value('khiMauDongMach'),
+        noiSoi: value('noiSoi'),
+        xqNgoaiTru: value('xqNgoaiTru'),
+        xqNoiTru: value('xqNoiTru'),
+        sieuAmNgoaiTru: value('sieuAmNgoaiTru'),
+        sieuAmNoiTru: value('sieuAmNoiTru'),
+        xnNgoaiTru: value('xnNgoaiTru'),
+        xnNoiTru: value('xnNoiTru')
+      };
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        alert(result.message);
+        if (result.success) loadData();
+      } catch (error) {
+        alert("Không thể kết nối đến máy chủ API!");
+      }
+    }
+
+    const KHOA_MAP = {
+      "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC": "HSCC",
+      "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC": "GMHS",
+      "KHOA NGOẠI TỔNG HỢP": "NGOẠI",
+      "KHOA PHỤ SẢN": "SẢN",
+      "KHOA NỘI TỔNG HỢP": "NỘI TH",
+      "KHOA NỘI TIM MẠCH - LÃO HỌC": "NỘI TM-LH",
+      "KHOA NHI": "NHI",
+      "KHOA TRUYỀN NHIỄM": "NHIỄM",
+      "KHOA Y DƯỢC CỔ TRUYỀN": "YHCT",
+      "KHOA LIÊN CHUYÊN KHOA": "LCK",
+      "TỔNG LƯỢT KHÁM NGOẠI TRÚ": "KKB"
+    };
+
+    async function loadData() {
+      try {
+        const response = await fetch(API_URL);
+        const allData = await response.json();
+        
+        const todayStr = new Date().toISOString().split('T')[0];
+        const data = allData.filter(item => item.ngay && item.ngay.split(' ')[0] === todayStr);
+
+        // --- KHỞI TẠO DỰNG BẢNG 1: SỐ LIỆU LÂM SÀNG ---
+        const tbody = document.querySelector('#reportTable tbody');
+        tbody.innerHTML = '';
+
+        let tong = { benhCu: 0, benhMoi: 0, chuyenKhoa: 0, xuatVien: 0, xinVe: 0, boVe: 0, tuVong: 0, chuyenVien: 0, conLai: 0 };
+        let clsData = {
+          procalcitonin: {}, bnp: {}, khiMauDongMach: {}, noiSoi: {},
+          xqNgoaiTru: {}, xqNoiTru: {}, sieuAmNgoaiTru: {}, sieuAmNoiTru: {}, xnNgoaiTru: {}, xnNoiTru: {}
+        };
+
+        // Tạo sẵn cấu trúc rỗng cho các khoa cận lâm sàng tránh lỗi undefined
+        const khoaOrder = ["HSCC", "GMHS", "NGOẠI", "SẢN", "NỘI TH", "NỘI TM-LH", "NHI", "NHIỄM", "YHCT", "LCK", "KKB"];
+        Object.keys(clsData).forEach(key => {
+          khoaOrder.forEach(k => { clsData[key][k] = 0; });
+        });
+
+        data.forEach((item, index) => {
+          tong.benhCu += Number(item.benhCu || 0);
+          tong.benhMoi += Number(item.benhMoi || 0);
+          tong.chuyenKhoa += Number(item.chuyenKhoa || 0);
+          tong.xuatVien += Number(item.xuatVien || 0);
+          tong.xinVe += Number(item.xinVe || 0);
+          tong.boVe += Number(item.boVe || 0);
+          tong.tuVong += Number(item.tuVong || 0);
+          tong.chuyenVien += Number(item.chuyenVien || 0);
+          tong.conLai += Number(item.conLai || 0);
+
+          tbody.innerHTML += `
+            <tr>
+              <td>${index + 1}</td>
+              <td style="text-align:left; font-weight:500;">${item.khoa}</td>
+              <td>${item.benhCu || 0}</td>
+              <td>${item.benhMoi || 0}</td>
+              <td>${item.chuyenKhoa || 0}</td>
+              <td>${item.xuatVien || 0}</td>
+              <td>${item.xinVe || 0}</td>
+              <td>${item.boVe || 0}</td>
+              <td>${item.tuVong || 0}</td>
+              <td>${item.chuyenVien || 0}</td>
+              <td class="cell-highlight">${item.conLai || 0}</td>
+            </tr>`;
+
+          let sName = KHOA_MAP[item.khoa];
+          if (sName) {
+            Object.keys(clsData).forEach(key => {
+              clsData[key][sName] = Number(item[key] || 0);
+            });
+          }
+        });
+
+        tbody.innerHTML += `
+          <tr class="row-total">
+            <td colspan="2">TỔNG TOÀN VIỆN</td>
+            <td>${tong.benhCu}</td><td>${tong.benhMoi}</td><td>${tong.chuyenKhoa}</td>
+            <td>${tong.xuatVien}</td><td>${tong.xinVe}</td><td>${tong.boVe}</td>
+            <td>${tong.tuVong}</td><td>${tong.chuyenVien}</td><td style="background:#fde047; color:#000;">${tong.conLai}</td>
+          </tr>`;
+
+        // --- KHỞI TẠO DỰNG BẢNG 2: SỐ LIỆU CẬN LÂM SÀNG ---
+        const clsSchema = [
+          { id: 'procalcitonin', label: 'PROCALCITONIN' },
+          { id: 'bnp', label: 'BNP' },
+          { id: 'khiMauDongMach', label: 'KHÍ MÁU ĐỘNG MẠCH' },
+          { id: 'noiSoi', label: 'NỘI SOI THỰC QUẢN - DẠ DÀY - TÁ TRÀNG' },
+          { id: 'xqNgoaiTru', label: 'SỐ LẦN CHỤP XQ NGOẠI TRÚ' },
+          { id: 'xqNoiTru', label: 'SỐ LẦN CHỤP XQ NỘI TRÚ' },
+          { id: 'sieuAmNgoaiTru', label: 'SỐ LẦN SIÊU ÂM NGOẠI TRÚ' },
+          { id: 'sieuAmNoiTru', label: 'SỐ LẦN SIÊU ÂM NỘI TRÚ' },
+          { id: 'xnNgoaiTru', label: 'SỐ LẦN XÉT NGHIỆM NGOẠI TRÚ' },
+          { id: 'xnNoiTru', label: 'SỐ LẦN XÉT NGHIỆM NỘI TRÚ' }
+        ];
+
+        const clsTbody = document.querySelector('#clsTable tbody');
+        clsTbody.innerHTML = '';
+
+        clsSchema.forEach(row => {
+          let sum = 0;
+          let htmlCols = '';
+          
+          khoaOrder.forEach(k => {
+            let v = clsData[row.id][k] || 0;
+            sum += v;
+            htmlCols += `<td>${v}</td>`;
+          });
+
+          clsTbody.innerHTML += `
+            <tr>
+              <td style="text-align:left; font-weight:500;">${row.label}</td>
+              <td style="font-weight:bold; background:#f0fdf4; color:#166534;">${sum}</td>
+              ${htmlCols}
+            </tr>`;
+        });
+
+      } catch (e) {
+        console.error("Lỗi xử lý dữ liệu realtime: ", e);
+      }
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
+
+    // Tự động tải dữ liệu ngay khi mở trang và lặp lại mỗi 10 giây
+    loadData();
+    setInterval(loadData, 10000);
+
+    // ==========================================
+    // 3. MÃ LOGIC XUẤT TỔNG HỢP EXCEL
+    // ==========================================
+    function exportExcelAll() {
+      const today = new Date().toISOString().split('T')[0];
+      const filename = `Bao_Cao_Giao_Ban_Tong_Hop_${today}.xlsx`;
+      
+      const wb = XLSX.utils.book_new();
+      
+      // Lấy dữ liệu Bảng Lâm Sàng
+      const table1 = document.getElementById('reportTable');
+      const ws = XLSX.utils.table_to_sheet(table1);
+      
+      // Tạo khoảng trống xuống hàng để ngăn cách 2 bảng
+      XLSX.utils.sheet_add_aoa(ws, [
+        [""], [""],
+        ["BÁO CÁO THỐNG KÊ HOẠT ĐỘNG CẬN LÂM SÀNG TOÀN VIỆN"]
+      ], { origin: -1 });
+      
+      // Nối tiếp dữ liệu Bảng Cận Lâm Sàng vào cùng 1 sheet
+      const table2 = document.getElementById('clsTable');
+      XLSX.utils.sheet_add_from_tags(table2, ws, { origin: -1 });
+
+      XLSX.utils.book_append_sheet(wb, ws, "GIAO BAN TỔNG HỢP");
+      XLSX.writeFile(wb, filename);
+    }
+  </script>
+</body>
+</html>
