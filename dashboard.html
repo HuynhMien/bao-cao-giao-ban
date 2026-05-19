@@ -3,165 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Tổng Hợp Giao Ban</title>
+    <title>Dashboard Tổng Hợp Giao Ban Bệnh Viện</title>
     <style>
         :root {
-            --primary: #0284c7;
-            --bg: #f1f5f9;
-            --text: #1e293b;
-            --border: #cbd5e1;
+            --primary-color: #1e3a8a;
+            --secondary-color: #0284c7;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
             padding: 20px;
         }
 
-        .container {
-            max-width: 1500px;
+        .dashboard-container {
+            max-width: 1600px;
             margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
-        /* Header & Filters */
-        .header {
+        /* Header & Thanh Điều Khiển */
+        .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        .header h1 {
+        .main-title {
             margin: 0;
-            font-size: 24px;
-            color: var(--primary);
+            font-size: 26px;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
-        .controls {
+        .user-status {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .control-panel {
             display: flex;
             gap: 15px;
             align-items: center;
         }
 
+        .date-picker-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #475569;
+        }
+
         input[type="date"] {
-            padding: 8px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="date"]:focus {
+            border-color: var(--secondary-color);
         }
 
         .btn {
-            padding: 8px 16px;
+            padding: 10px 18px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
             text-decoration: none;
             font-size: 14px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .btn-report { background-color: #0ea5e9; color: white; }
-        .btn-logout { background-color: #ef4444; color: white; }
+        .btn-nav {
+            background-color: #10b981;
+            color: white;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+        }
 
-        /* Tables Styles */
-        .table-responsive {
+        .btn-nav:hover {
+            background-color: #059669;
+        }
+
+        .btn-logout {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-logout:hover {
+            background-color: #dc2626;
+        }
+
+        /* Phân Đoạn Tiêu Đề */
+        .section-banner {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 12px 16px;
+            margin: 25px 0 15px 0;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Thiết Kế Bảng Số Liệu Hệ Thống */
+        .table-wrapper {
             overflow-x: auto;
-            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #ffffff;
+            margin-bottom: 10px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
-            background: white;
+            text-align: center;
         }
 
         th, td {
-            border: 1px solid var(--border);
-            padding: 8px 4px;
-            text-align: center;
+            border: 1px solid var(--border-color);
+            padding: 10px 6px;
+            vertical-align: middle;
         }
 
         th {
             background-color: #f8fafc;
-            font-weight: bold;
+            font-weight: 700;
             color: #334155;
             white-space: nowrap;
         }
 
-        .blue-header { background-color: #dbeafe; }
-        .green-header { background-color: #dcfce7; }
-        .yellow-header { background-color: #fef9c3; }
+        /* Đổ màu Header giống ảnh mẫu của bạn */
+        .header-blue { background-color: #e0f2fe; color: #0369a1; }
+        .header-green { background-color: #dcfce7; color: #15803d; }
+        .header-yellow { background-color: #fef9c3; color: #a16207; }
+        .header-orange { background-color: #ffedd5; color: #c2410c; }
 
-        .text-left { text-align: left; padding-left: 10px; }
-        .font-bold { font-weight: bold; }
-        .row-total { background-color: #f1f5f9; font-weight: bold; }
-        .highlight-red { color: #dc2626; font-weight: bold; }
+        .align-left { text-align: left; padding-left: 12px; font-weight: 500; }
+        .text-bold { font-weight: 700; }
+        .total-row { background-color: #f1f5f9; font-weight: 700; }
+        .critical-text { color: #e11d48; font-weight: 700; }
 
-        .section-title {
-            background-color: var(--primary);
-            color: white;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            font-size: 16px;
+        /* Hiệu ứng loading */
+        #loadingOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
         }
 
-        #loading {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255,255,255,0.9);
-            padding: 20px;
-            border: 1px solid var(--primary);
-            display: none;
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
+<div id="loadingOverlay">
+    <div class="spinner"></div>
+    <div>Đang kết nối cơ sở dữ liệu Google Sheets...</div>
+</div>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
         <div>
-            <h1>DASHBOARD GIAO BAN BỆNH VIỆN</h1>
-            <p id="displayKhoa" style="margin: 5px 0 0 0; font-size: 14px; color: #64748b;"></p>
+            <h1 class="main-title">Hệ Thống Dashboard Tổng Hợp Số Liệu Giao Ban</h1>
+            <p id="currentSessionUser" class="user-status"></p>
         </div>
-        <div class="controls">
-            <label>Xem ngày:</label>
-            <input type="date" id="filterDate" onchange="loadData()">
-            <a href="index.html" class="btn btn-report">ĐẾN TRANG NHẬP BÁO CÁO</a>
-            <button class="btn btn-logout" onclick="logout()">ĐĂNG XUẤT</button>
+        <div class="control-panel">
+            <div class="date-picker-group">
+                <label for="filterDate">Chọn Ngày Thống Kê:</label>
+                <input type="date" id="filterDate" onchange="fetchDataFromSheets()">
+            </div>
+            <a href="index.html" class="btn btn-nav">⏎ QUAY LẠI TRANG NHẬP BÁO CÁO</a>
+            <button class="btn btn-logout" onclick="handleSecureLogout()">ĐĂNG XUẤT</button>
         </div>
     </div>
 
-    <div class="section-title">I. SỐ LIỆU LÂM SÀNG (BỆNH NHÂN NỘI TRÚ)</div>
-    <div class="table-responsive">
+    <div class="section-banner">I. BÁO CÁO SỐ LIỆU LÂM SÀNG (BỆNH NHÂN NỘI TRÚ)</div>
+    <div class="table-wrapper">
         <table id="clinicalTable">
             <thead>
                 <tr>
-                    <th rowspan="2">STT</th>
-                    <th rowspan="2" style="min-width: 200px;">TÊN KHOA</th>
-                    <th colspan="3" class="blue-header">ĐANG ĐIỀU TRỊ</th>
-                    <th colspan="5" class="green-header">KẾT THÚC ĐIỀU TRỊ</th>
-                    <th rowspan="2" class="yellow-header">BỆNH CÒN LẠI</th>
+                    <th rowspan="2" style="width: 40px;">STT</th>
+                    <th rowspan="2" style="min-width: 280px;">TÊN KHOA</th>
+                    <th colspan="3" class="header-blue">ĐANG ĐIỀU TRỊ</th>
+                    <th colspan="5" class="header-green">KẾT THÚC ĐIỀU TRỊ</th>
+                    <th rowspan="2" class="header-yellow" style="width: 110px;">BỆNH CÒN LẠI</th>
                 </tr>
                 <tr>
-                    <th class="blue-header">BỆNH CŨ</th>
-                    <th class="blue-header">BỆNH MỚI</th>
-                    <th class="blue-header">CHUYỂN ĐẾN</th>
-                    <th class="green-header">XUẤT VIỆN</th>
-                    <th class="green-header">XIN VỀ</th>
-                    <th class="green-header">BỎ VIỆN</th>
-                    <th class="green-header">TỬ VONG</th>
-                    <th class="green-header">CHUYỂN VIỆN</th>
+                    <th class="header-blue" style="width: 100px;">BỆNH CŨ</th>
+                    <th class="header-blue" style="width: 100px;">BỆNH MỚI</th>
+                    <th class="header-blue" style="width: 110px;">CHUYỂN ĐẾN</th>
+                    <th class="header-green" style="width: 100px;">XUẤT VIỆN</th>
+                    <th class="header-green" style="width: 100px;">XIN VỀ</th>
+                    <th class="header-green" style="width: 100px;">BỎ VIỆN</th>
+                    <th class="header-green" style="width: 100px;">TỬ VONG</th>
+                    <th class="header-green" style="width: 110px;">CHUYỂN VIỆN</th>
                 </tr>
             </thead>
             <tbody>
@@ -169,24 +248,25 @@
         </table>
     </div>
 
-    <div class="section-title">II. THỐNG KÊ HOẠT ĐỘNG CẬN LÂM SÀNG</div>
-    <div class="table-responsive">
+    <div class="section-banner">II. THỐNG KÊ HOẠT ĐỘNG CẬN LÂM SÀNG (KHOA XÉT NGHIỆM VÀ KHOA CĐHA BÁO CÁO)</div>
+    <div class="table-wrapper">
         <table id="paraclinicalTable">
             <thead>
                 <tr>
-                    <th style="min-width: 250px;">DANH MỤC</th>
-                    <th style="background-color: #fef08a;">TỔNG VIỆN</th>
-                    <th>HSCC</th>
-                    <th>GMHS</th>
-                    <th>NGOẠI</th>
-                    <th>SẢN</th>
-                    <th>NỘI TH</th>
-                    <th>NỘI TM</th>
-                    <th>NHI</th>
-                    <th>NHIỄM</th>
-                    <th>YHCT</th>
-                    <th>LCK</th>
-                    <th>KKB</th>
+                    <th style="min-width: 320px;">DANH MỤC</th>
+                    <th style="width: 90px;">PHÂN LOẠI</th>
+                    <th class="header-orange" style="width: 100px;">TỔNG VIỆN</th>
+                    <th class="header-blue">HSCC</th>
+                    <th class="header-blue">GMHS</th>
+                    <th class="header-blue">NGOẠI</th>
+                    <th class="header-blue">SẢN</th>
+                    <th class="header-blue">NỘI TH</th>
+                    <th class="header-blue">NỘI TMLH</th>
+                    <th class="header-blue">NHI</th>
+                    <th class="header-blue">NHIỄM</th>
+                    <th class="header-blue">YHCT</th>
+                    <th class="header-blue">LCK</th>
+                    <th class="header-blue">KKB</th>
                 </tr>
             </thead>
             <tbody>
@@ -195,20 +275,18 @@
     </div>
 </div>
 
-<div id="loading">Đang tải dữ liệu...</div>
-
 <script>
-    // URL Web App của bạn
-    const API_URL = 'https://script.google.com/macros/s/AKfycbyAKCQygedBMlmV_NcMjRfc3tXvuDFqCQCh3LyltZwpUTRWxMNRDH4xGqIoNzpHRcIs/exec';
+    // URL Web App định danh chính xác từ Google Apps Script của bạn
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyAKCQygedBMlmV_NcMjRfc3tXvuDFqCQCh3LyltZwpUTRWxMNRDH4xGqIoNzpHRcIs/exec';
     
-    // Bản đồ tên khoa ngắn cho bảng Cận lâm sàng
-    const KHOA_SHORT = {
+    // Ánh xạ Key Mã Khoa của Form với Tiêu đề hàng dọc trên Google Sheet
+    const KHOA_MAP_CONFIG = {
         "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC": "HSCC",
         "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC": "GMHS",
         "KHOA NGOẠI TỔNG HỢP": "NGOẠI",
         "KHOA PHỤ SẢN": "SẢN",
         "KHOA NỘI TỔNG HỢP": "NỘI TH",
-        "KHOA NỘI TIM MẠCH - LÃO HỌC": "NỘI TM",
+        "KHOA NỘI TIM MẠCH - LÃO HỌC": "NỘI TMLH",
         "KHOA NHI": "NHI",
         "KHOA TRUYỀN NHIỄM": "NHIỄM",
         "KHOA Y DƯỢC CỔ TRUYỀN": "YHCT",
@@ -216,150 +294,179 @@
         "TỔNG LƯỢT KHÁM NGOẠI TRÚ": "KKB"
     };
 
-    // Kiểm tra đăng nhập
+    // Xác thực bảo mật phiên làm việc khi load trang
     window.onload = function() {
-        const khoa = localStorage.getItem('khoa');
-        if (!khoa) {
-            window.location.href = 'index.html';
+        const storedUser = localStorage.getItem('khoa');
+        if (!storedUser) {
+            window.location.href = 'index.html'; // Đẩy về trang đăng nhập nếu chưa authenticate
             return;
         }
-        document.getElementById('displayKhoa').innerText = "Tài khoản: " + khoa;
+        document.getElementById('currentSessionUser').innerText = "Tài khoản giám sát: " + storedUser;
         
-        // Mặc định chọn ngày hôm nay
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('filterDate').value = today;
+        // Thiết lập mặc định là ngày hiện tại của hệ thống máy tính
+        const currentDateStr = new Date().toISOString().split('T')[0];
+        document.getElementById('filterDate').value = currentDateStr;
         
-        loadData();
+        fetchDataFromSheets();
     };
 
-    async function loadData() {
-        const loading = document.getElementById('loading');
-        loading.style.display = 'block';
-        const selectedDate = document.getElementById('filterDate').value;
+    // Hàm gọi API đồng bộ dữ liệu Realtime
+    async function fetchDataFromSheets() {
+        const loader = document.getElementById('loadingOverlay');
+        loader.style.display = 'flex';
+        const targetDate = document.getElementById('filterDate').value;
 
         try {
-            const response = await fetch(API_URL);
-            const allData = await response.json();
+            const response = await fetch(APPS_SCRIPT_URL);
+            const rawJsonData = await response.json();
             
-            // Lọc dữ liệu theo ngày đã chọn
-            const dailyData = allData.filter(item => {
-                const itemDate = item.ngay.split(' ')[0]; // Lấy phần yyyy-mm-dd
-                return itemDate === selectedDate;
+            // Tiến hành lọc dữ liệu chuỗi thời gian trả về chính xác theo ngày chỉ định
+            const filteredData = rawJsonData.filter(entry => {
+                if(!entry.ngay) return false;
+                const datePart = entry.ngay.split(' ')[0]; // Tách lấy yyyy-MM-dd
+                return datePart === targetDate;
             });
 
-            renderClinicalTable(dailyData);
-            renderParaclinicalTable(dailyData);
+            buildClinicalSection(filteredData);
+            buildParaclinicalSection(filteredData);
 
-        } catch (error) {
-            console.error("Lỗi:", error);
-            alert("Không thể tải dữ liệu. Vui lòng kiểm tra kết nối mạng!");
+        } catch (err) {
+            console.error("Lỗi đồng bộ dữ liệu API:", err);
+            alert("Hệ thống nghẽn kết nối Google Sheets hoặc ngày này chưa có khoa nào báo cáo số liệu!");
         } finally {
-            loading.style.display = 'none';
+            loader.style.display = 'none';
         }
     }
 
-    function renderClinicalTable(data) {
+    // Xử lý Render Bảng I: Số liệu Lâm Sàng bệnh nhân
+    function buildClinicalSection(dayData) {
         const tbody = document.querySelector('#clinicalTable tbody');
         tbody.innerHTML = '';
         
-        // Danh sách khoa cố định để hiển thị kể cả khi chưa có báo cáo
-        const dskhoa = Object.values(KHOA_SHORT);
-        let stt = 1;
-        let totals = { bc: 0, bm: 0, cd: 0, xv: 0, xv_xin: 0, bv: 0, tv: 0, cv: 0, cl: 0 };
+        let indexNum = 1;
+        let sumRow = { bc: 0, bm: 0, cd: 0, xv: 0, xv_xin: 0, bv: 0, tv: 0, cv: 0, cl: 0 };
 
-        Object.keys(KHOA_SHORT).forEach(tenKhoaFull => {
-            const khoaData = data.find(d => d.khoa === tenKhoaFull) || {};
+        Object.keys(KHOA_MAP_CONFIG).forEach(fullKhoaName => {
+            const matchRecord = dayData.find(row => row.khoa === fullKhoaName) || {};
             
-            const bc = Number(khoaData.benhCu || 0);
-            const bm = Number(khoaData.benhMoi || 0);
-            const cd = Number(khoaData.chuyenKhoa || 0);
-            const xv = Number(khoaData.xuatVien || 0);
-            const xin = Number(khoaData.xinVe || 0);
-            const bv = Number(khoaData.boVe || 0);
-            const tv = Number(khoaData.tuVong || 0);
-            const cv = Number(khoaData.chuyenVien || 0);
-            const cl = Number(khoaData.conLai || 0);
+            const bc = Number(matchRecord.benhCu || 0);
+            const bm = Number(matchRecord.benhMoi || 0);
+            const cd = Number(matchRecord.chuyenKhoa || 0);
+            const xv = Number(matchRecord.xuatVien || 0);
+            const xin = Number(matchRecord.xinVe || 0);
+            const bv = Number(matchRecord.boVe || 0);
+            const tv = Number(matchRecord.tuVong || 0);
+            const cv = Number(matchRecord.chuyenVien || 0);
+            const cl = Number(matchRecord.conLai || 0);
 
-            // Cộng dồn tổng
-            totals.bc += bc; totals.bm += bm; totals.cd += cd;
-            totals.xv += xv; totals.xv_xin += xin; totals.bv += bv;
-            totals.tv += tv; totals.cv += cv; totals.cl += cl;
+            // Tính tổng cộng toàn viện dồn dòng
+            sumRow.bc += bc; sumRow.bm += bm; sumRow.cd += cd;
+            sumRow.xv += xv; sumRow.xv_xin += xin; sumRow.bv += bv;
+            sumRow.tv += tv; sumRow.cv += cv; sumRow.cl += cl;
 
             tbody.innerHTML += `
                 <tr>
-                    <td>${stt++}</td>
-                    <td class="text-left">${tenKhoaFull}</td>
+                    <td>${indexNum++}</td>
+                    <td class="align-left">${fullKhoaName}</td>
                     <td>${bc || '-'}</td>
                     <td>${bm || '-'}</td>
                     <td>${cd || '-'}</td>
                     <td>${xv || '-'}</td>
                     <td>${xin || '-'}</td>
                     <td>${bv || '-'}</td>
-                    <td class="${tv > 0 ? 'highlight-red' : ''}">${tv || '-'}</td>
+                    <td class="${tv > 0 ? 'critical-text' : ''}">${tv || '-'}</td>
                     <td>${cv || '-'}</td>
-                    <td class="font-bold">${cl || '-'}</td>
+                    <td class="text-bold">${cl || '-'}</td>
                 </tr>
             `;
         });
 
-        // Hàng tổng cộng
+        // Chèn dòng TỔNG CỘNG xuống cuối bảng I
         tbody.innerHTML += `
-            <tr class="row-total">
-                <td colspan="2">TỔNG CỘNG</td>
-                <td>${totals.bc}</td>
-                <td>${totals.bm}</td>
-                <td>${totals.cd}</td>
-                <td>${totals.xv}</td>
-                <td>${totals.xv_xin}</td>
-                <td>${totals.bv}</td>
-                <td class="highlight-red">${totals.tv}</td>
-                <td>${totals.cv}</td>
-                <td>${totals.cl}</td>
+            <tr class="total-row">
+                <td colspan="2">TỔNG CỘNG TÌNH HÌNH BỆNH NHÂN</td>
+                <td>${sumRow.bc}</td>
+                <td>${sumRow.bm}</td>
+                <td>${sumRow.cd}</td>
+                <td>${sumRow.xv}</td>
+                <td>${sumRow.xv_xin}</td>
+                <td>${sumRow.bv}</td>
+                <td class="critical-text">${sumRow.tv}</td>
+                <td>${sumRow.cv}</td>
+                <td style="color:#1e3a8a;">${sumRow.cl}</td>
             </tr>
         `;
     }
 
-    function renderParaclinicalTable(data) {
+    // Xử lý Render Bảng II: Số liệu Cận lâm sàng theo cấu trúc hàng dọc phân lớp Ngoại/Nội trú của bạn
+    function buildParaclinicalSection(dayData) {
         const tbody = document.querySelector('#paraclinicalTable tbody');
         tbody.innerHTML = '';
 
-        const metrics = [
-            { id: 'procalcitonin', label: '1. PROCALCITONIN' },
-            { id: 'bnp', label: '2. BNP' },
-            { id: 'khiMauDongMach', label: '3. KHÍ MÁU ĐỘNG MẠCH' },
-            { id: 'noiSoi', label: '4. NỘI SOI THỰC QUẢN - DẠ DÀY' },
-            { id: 'xqNgoaiTru', label: '5. X-QUANG NGOẠI TRÚ' },
-            { id: 'xqNoiTru', label: '6. X-QUANG NỘI TRÚ' },
-            { id: 'sieuAmNgoaiTru', label: '7. SIÊU ÂM NGOẠI TRÚ' },
-            { id: 'sieuAmNoiTru', label: '8. SIÊU ÂM NỘI TRÚ' },
-            { id: 'xnNgoaiTru', label: '9. XÉT NGHIỆM NGOẠI TRÚ' },
-            { id: 'xnNoiTru', label: '10. XÉT NGHIỆM NỘI TRÚ' }
+        // Định hình chuẩn cấu trúc các trường thông tin danh mục tương ứng với Code.gs
+        const paraclinicalSchema = [
+            { id: 'procalcitonin', label: '1. PROCALCITONIN', sub: 'TỔNG', isDouble: false },
+            { id: 'bnp', label: '2. BNP', sub: 'TỔNG', isDouble: false },
+            { id: 'khiMauDongMach', label: '3. KHÍ MÁU ĐỘNG MẠCH', sub: 'TỔNG', isDouble: false },
+            { id: 'noiSoi', label: '4. SỐ LẦN NỘI SOI THỰC QUẢN - DẠ DÀY - TÁ TRÀNG', sub: 'TỔNG', isDouble: false },
+            { id: 'xq', label: '5. SỐ LẦN CHỤP XQ', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'xqNgoaiTru', idNoi: 'xqNoiTru' },
+            { id: 'sieuAm', label: '6. SỐ LẦN SIÊU ÂM', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'sieuAmNgoaiTru', idNoi: 'sieuAmNoiTru' },
+            { id: 'xetNghiem', label: '7. SỐ LẦN XÉT NGHIỆM', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'xnNgoaiTru', idNoi: 'xnNoiTru' }
         ];
 
-        metrics.forEach(m => {
-            let rowHtml = `<td class="text-left font-bold">${m.label}</td>`;
-            let rowSum = 0;
-            let khoaCols = '';
+        paraclinicalSchema.forEach(metric => {
+            if (!metric.isDouble) {
+                // Đối với các chỉ số đơn lẻ (Procalcitonin, BNP, Khí máu, Nội soi)
+                let cellHtml = `<td class="align-left text-bold">${metric.label}</td><td>${metric.sub}</td>`;
+                let totalSum = 0;
+                let khoaDataCols = '';
 
-            Object.keys(KHOA_SHORT).forEach(tenKhoaFull => {
-                const khoaData = data.find(d => d.khoa === tenKhoaFull) || {};
-                const val = Number(khoaData[m.id] || 0);
-                rowSum += val;
-                khoaCols += `<td>${val || '-'}</td>`;
-            });
+                Object.keys(KHOA_MAP_CONFIG).forEach(fullKhoaName => {
+                    const matchRecord = dayData.find(row => row.khoa === fullKhoaName) || {};
+                    const value = Number(matchRecord[metric.id] || 0);
+                    totalSum += value;
+                    khoaDataCols += `<td>${value || '-'}</td>`;
+                });
 
-            rowHtml += `<td class="font-bold" style="background-color: #fefce8;">${rowSum}</td>` + khoaCols;
-            tbody.innerHTML += `<tr>${rowHtml}</tr>`;
+                cellHtml += `<td class="text-bold" style="background-color:#fffbeb;">${totalSum}</td>` + khoaDataCols;
+                tbody.innerHTML += `<tr>${cellHtml}</tr>`;
+            } else {
+                // Đối với các chỉ số phân lớp gồm 2 hàng Ngoại trú và Nội trú (XQ, Siêu âm, Xét nghiệm)
+                
+                // --- XỬ LÝ HÀNG NGOẠI TRÚ ---
+                let rowNgoaiHtml = `<td rowspan="2" class="align-left text-bold">${metric.label}</td><td>NGOẠI TRÚ</td>`;
+                let sumNgoai = 0;
+                let colsNgoaiHtml = '';
+
+                Object.keys(KHOA_MAP_CONFIG).forEach(fullKhoaName => {
+                    const matchRecord = dayData.find(row => row.khoa === fullKhoaName) || {};
+                    const value = Number(matchRecord[metric.idNgoai] || 0);
+                    sumNgoai += value;
+                    colsNgoaiHtml += `<td>${value || '-'}</td>`;
+                });
+                rowNgoaiHtml += `<td class="text-bold" style="background-color:#fffbeb;">${sumNgoai}</td>` + colsNgoaiHtml;
+                tbody.innerHTML += `<tr>${rowNgoaiHtml}</tr>`;
+
+                // --- XỬ LÝ HÀNG NỘI TRÚ ---
+                let rowNoiHtml = `<td>NỘI TRÚ</td>`;
+                let sumNoi = 0;
+                let colsNoiHtml = '';
+
+                Object.keys(KHOA_MAP_CONFIG).forEach(fullKhoaName => {
+                    const matchRecord = dayData.find(row => row.khoa === fullKhoaName) || {};
+                    const value = Number(matchRecord[metric.idNoi] || 0);
+                    sumNoi += value;
+                    colsNoiHtml += `<td>${value || '-'}</td>`;
+                });
+                rowNoiHtml += `<td class="text-bold" style="background-color:#fffbeb;">${sumNoi}</td>` + colsNoiHtml;
+                tbody.innerHTML += `<tr>${rowNoiHtml}</tr>`;
+            }
         });
     }
 
-    function logout() {
-        localStorage.clear();
-        window.location.href = 'index.html';
-    }
-
-    function logout() {
-        localStorage.clear();
+    // Hàm thực thi đăng xuất an toàn hệ thống
+    function handleSecureLogout() {
+        localStorage.removeItem('khoa');
         window.location.href = 'index.html';
     }
 </script>
