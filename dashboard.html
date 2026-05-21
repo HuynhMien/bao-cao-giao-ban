@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tổng Hợp Giao Ban Bệnh Viện</title>
+    <title>Dashboard Tổng Hợp Giao Ban Bệnh Viện</title>
     <style>
         :root {
             --primary-color: #1e3a8a;
@@ -12,146 +12,41 @@
             --text-color: #1e293b;
             --border-color: #cbd5e1;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-        }
-
-        .dashboard-container {
-            max-width: 1600px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 3px solid var(--primary-color);
-            padding-bottom: 20px;
-            margin-bottom: 25px;
-        }
-
-        .main-title {
-            margin: 0;
-            font-size: 24px;
-            color: var(--primary-color);
-            text-transform: uppercase;
-            font-weight: 700;
-        }
-
-        .user-status {
-            margin: 5px 0 0 0;
-            font-size: 14px;
-            color: #64748b;
-        }
-
-        .control-panel {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .date-picker-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-        }
-
-        input[type="date"] {
-            padding: 8px 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 6px;
-        }
-
-        .btn {
-            padding: 10px 18px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            text-decoration: none;
-            font-size: 13px;
-        }
-
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
+        .dashboard-container { max-width: 1600px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-color); padding-bottom: 20px; margin-bottom: 25px; }
+        .main-title { margin: 0; font-size: 24px; color: var(--primary-color); text-transform: uppercase; font-weight: 700; }
+        .user-status { margin: 5px 0 0 0; font-size: 14px; color: #64748b; }
+        .control-panel { display: flex; gap: 15px; align-items: center; }
+        .date-picker-group { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        input[type="date"] { padding: 8px 12px; border: 2px solid var(--border-color); border-radius: 6px; }
+        .btn { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; font-size: 13px; }
         .btn-nav { background-color: #10b981; color: white; }
         .btn-logout { background-color: #ef4444; color: white; }
-
-        .section-banner {
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 12px 16px;
-            margin: 25px 0 15px 0;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 700;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            text-align: center;
-        }
-
-        th, td {
-            border: 1px solid var(--border-color);
-            padding: 10px 6px;
-        }
-
-        th {
-            background-color: #f8fafc;
-            color: #334155;
-            white-space: nowrap;
-        }
-
+        .section-banner { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); color: white; padding: 12px 16px; margin: 25px 0 15px 0; border-radius: 6px; font-size: 15px; font-weight: 700; }
+        .table-wrapper { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 25px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: center; }
+        th, td { border: 1px solid var(--border-color); padding: 10px 6px; }
+        th { background-color: #f8fafc; color: #334155; white-space: nowrap; }
         .header-blue { background-color: #e0f2fe; color: #0369a1; }
         .header-green { background-color: #dcfce7; color: #15803d; }
         .header-yellow { background-color: #fef9c3; color: #a16207; }
         .header-orange { background-color: #ffedd5; color: #c2410c; }
-
         .align-left { text-align: left; padding-left: 12px; }
         .text-bold { font-weight: 700; }
         .total-row { background-color: #f1f5f9; font-weight: 700; }
         .critical-text { color: #e11d48; font-weight: 700; }
-
-        #loadingOverlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: 600; color: var(--primary-color); }
     </style>
 </head>
 <body>
 
-<div id="loadingOverlay">Đang tải số liệu...</div>
+<div id="loadingOverlay">Đang tải số liệu thời gian thực từ Google Sheets...</div>
 
 <div class="dashboard-container">
     <div class="dashboard-header">
         <div>
-            <h1 class="main-title">Số Liệu Tổng Hợp Giao Ban</h1>
+            <h1 class="main-title">Dashboard Số Liệu Tổng Hợp Giao Ban</h1>
             <p id="currentSessionUser" class="user-status"></p>
         </div>
         <div class="control-panel">
@@ -217,7 +112,7 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZ3Ax7Cfo3n5PRaKnK6ZH9ynuHjJRjMRsHC4i4CI4djgA3OXLRIiZuhV1PVSUz4WEd/exec';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxi5gz51c3hBsihaYWR57KUefeyJYLY6DbVPXOSVXaVe_-QJ25yhg8c1FHsisr5pjow/exec';
     
     const TOKENS_MAPPING = {
         "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "NGOAI2026": "KHOA NGOẠI TỔNG HỢP",
@@ -242,8 +137,9 @@
             window.location.href = 'index.html';
             return;
         }
-        document.getElementById('currentSessionUser').innerText = "Tài khoản : " + TOKENS_MAPPING[storedToken];
+        document.getElementById('currentSessionUser').innerText = "Tài khoản giám sát: " + TOKENS_MAPPING[storedToken];
         
+        // Thiết lập mặc định hiển thị ngày hôm nay
         const currentDateStr = new Date().toISOString().split('T')[0];
         document.getElementById('filterDate').value = currentDateStr;
         
@@ -259,17 +155,18 @@
             const response = await fetch(APPS_SCRIPT_URL);
             const rawJsonData = await response.json();
             
+            // Lọc dữ liệu thô từ Google Sheets theo đúng Ngày được chọn trên Dashboard
             const filteredData = rawJsonData.filter(entry => {
                 if(!entry.ngay) return false;
-                return entry.ngay.split(' ')[0] === targetDate;
+                return entry.ngay === targetDate;
             });
 
             buildClinicalSection(filteredData);
-            buildParaclinicalSection(filteredData);
+            buildParaclinicalSection(rawJsonData, targetDate); // Truyền full để cộng dồn chéo từ khoa XN/CĐHA
         } catch (err) {
             console.error(err);
             alert("Lỗi tải cơ sở dữ liệu!");
-        } finally {
+        } finaly {
             loader.style.display = 'none';
         }
     }
@@ -278,7 +175,7 @@
         const tbody = document.querySelector('#clinicalTable tbody');
         tbody.innerHTML = '';
         let indexNum = 1;
-        let sumRow = { bc: 0, bm: 0, cd: 0, xv: 0, xv_xin: 0, bv: 0, tv: 0, cv: 0, cl: 0 };
+        let sumRow = { bc: 0, bm: 0, cd: 0, xv: 0, xin: 0, bv: 0, tv: 0, cv: 0, cl: 0 };
 
         Object.keys(KHOA_MAP_CONFIG).forEach(fullKhoaName => {
             const matchRecord = dayData.find(row => row.khoa === fullKhoaName) || {};
@@ -286,7 +183,7 @@
             const xv = Number(matchRecord.xuatVien || 0), xin = Number(matchRecord.xinVe || 0), bv = Number(matchRecord.boVe || 0);
             const tv = Number(matchRecord.tuVong || 0), cv = Number(matchRecord.chuyenVien || 0), cl = Number(matchRecord.conLai || 0);
 
-            sumRow.bc += bc; sumRow.bm += bm; sumRow.cd += cd; sumRow.xv += xv; sumRow.xv_xin += xin;
+            sumRow.bc += bc; sumRow.bm += bm; sumRow.cd += cd; sumRow.xv += xv; sumRow.xin += xin;
             sumRow.bv += bv; sumRow.tv += tv; sumRow.cv += cv; sumRow.cl += cl;
 
             tbody.innerHTML += `
@@ -304,54 +201,52 @@
             <tr class="total-row">
                 <td colspan="2">TỔNG CỘNG</td>
                 <td>${sumRow.bc}</td><td>${sumRow.bm}</td><td>${sumRow.cd}</td>
-                <td>${sumRow.xv}</td><td>${sumRow.xv_xin}</td><td>${sumRow.bv}</td>
+                <td>${sumRow.xv}</td><td>${sumRow.xin}</td><td>${sumRow.bv}</td>
                 <td class="critical-text">${sumRow.tv}</td><td>${sumRow.cv}</td><td>${sumRow.cl}</td>
             </tr>`;
     }
 
-    function buildParaclinicalSection(dayData) {
+    function buildParaclinicalSection(allData, targetDate) {
         const tbody = document.querySelector('#paraclinicalTable tbody');
         tbody.innerHTML = '';
 
+        // Đọc dữ liệu từ 2 khoa cận lâm sàng chuyên biệt trong ngày
+        const cdhaRecord = allData.find(r => r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.ngay === targetDate) || {};
+        const xnRecord = allData.find(r => r.khoa === "KHOA XÉT NGHIỆM" && r.ngay === targetDate) || {};
+
         const paraclinicalSchema = [
-            { id: 'procalcitonin', label: '1. PROCALCITONIN', sub: 'TỔNG', isDouble: false },
-            { id: 'bnp', label: '2. BNP', sub: 'TỔNG', isDouble: false },
-            { id: 'khiMauDongMach', label: '3. KHÍ MÁU ĐỘNG MẠCH', sub: 'TỔNG', isDouble: false },
-            { id: 'noiSoi', label: '4. SỐ LẦN NỘI SOI THỰC QUẢN - DẠ DÀY', sub: 'TỔNG', isDouble: false },
-            { id: 'xq', label: '5. SỐ LẦN CHỤP XQ', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'xqNgoaiTru', idNoi: 'xqNoiTru' },
-            { id: 'sieuAm', label: '6. SỐ LẦN SIÊU ÂM', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'sieuAmNgoaiTru', idNoi: 'sieuAmNoiTru' },
-            { id: 'xetNghiem', label: '7. SỐ LẦN XÉT NGHIỆM', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'xnNgoaiTru', idNoi: 'xnNoiTru' }
+            { id: 'procalcitonin', label: '1. PROCALCITONIN', sub: 'TỔNG', isDouble: false, source: xnRecord },
+            { id: 'bnp', label: '2. BNP', sub: 'TỔNG', isDouble: false, source: xnRecord },
+            { id: 'khiMauDongMach', label: '3. KHÍ MÁU ĐỘNG MẠCH', sub: 'TỔNG', isDouble: false, source: xnRecord },
+            { id: 'noiSoi', label: '4. SỐ LẦN NỘI SOI THỰC QUẢN - DẠ DÀY', sub: 'TỔNG', isDouble: false, source: xnRecord },
+            { id: 'xq', label: '5. SỐ LẦN CHỤP XQ', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'xqNgoaiTru', idNoi: 'xqNoiTru', source: cdhaRecord },
+            { id: 'sieuAm', label: '6. SỐ LẦN SIÊU ÂM', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'sieuAmNgoaiTru', idNoi: 'sieuAmNoiTru', source: cdhaRecord },
+            { id: 'xetNghiem', label: '7. SỐ LẦN XÉT NGHIỆM', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'xnNgoaiTru', idNoi: 'xnNoiTru', source: xnRecord }
         ];
 
         paraclinicalSchema.forEach(metric => {
             if (!metric.isDouble) {
+                // Đọc tổng số liệu báo cáo từ khoa chuyên môn
+                let totalSum = Number(metric.source[metric.id] || 0);
                 let cellHtml = `<td class="align-left text-bold">${metric.label}</td><td>${metric.sub}</td>`;
-                let totalSum = 0; let khoaDataCols = '';
+                let khoaDataCols = '';
 
-                Object.keys(KHOA_MAP_CONFIG).forEach(fullKhoaName => {
-                    const matchRecord = dayData.find(row => row.khoa === fullKhoaName) || {};
-                    const value = Number(matchRecord[metric.id] || 0);
-                    totalSum += value; khoaDataCols += `<td>${value || '-'}</td>`;
-                });
-                tbody.innerHTML += `<tr>${cellHtml}<td class="text-bold" style="background-color:#fffbeb;">${totalSum}</td>${khoDataCols}</tr>`;
+                // Các cột khoa khác mặc định hiển thị gạch ngang (vì chỉ có khoa chuyên môn nhập trường này)
+                Object.keys(KHOA_MAP_CONFIG).forEach(() => { khoaDataCols += `<td>-</td>`; });
+                tbody.innerHTML += `<tr>${cellHtml}<td class="text-bold" style="background-color:#fffbeb;">${totalSum || 0}</td>${khoaDataCols}</tr>`;
             } else {
+                // Xử lý các trường có cả luồng Ngoại trú và Nội trú
+                let sumNgoai = Number(metric.source[metric.idNgoai] || 0);
                 let rowNgoaiHtml = `<td rowspan="2" class="align-left text-bold">${metric.label}</td><td>NGOẠI TRÚ</td>`;
-                let sumNgoai = 0; let colsNgoaiHtml = '';
-                Object.keys(KHOA_MAP_CONFIG).forEach(fullKhoaName => {
-                    const matchRecord = dayData.find(row => row.khoa === fullKhoaName) || {};
-                    const value = Number(matchRecord[metric.idNgoai] || 0);
-                    sumNgoai += value; colsNgoaiHtml += `<td>${value || '-'}</td>`;
-                });
-                tbody.innerHTML += `<tr>${rowNgoaiHtml}<td class="text-bold" style="background-color:#fffbeb;">${sumNgoai}</td>${colsNgoaiHtml}</tr>`;
+                let colsNgoaiHtml = '';
+                Object.keys(KHOA_MAP_CONFIG).forEach(() => { colsNgoaiHtml += `<td>-</td>`; });
+                tbody.innerHTML += `<tr>${rowNgoaiHtml}<td class="text-bold" style="background-color:#fffbeb;">${sumNgoai || 0}</td>${colsNgoaiHtml}</tr>`;
 
+                let sumNoi = Number(metric.source[metric.idNoi] || 0);
                 let rowNoiHtml = `<td>NỘI TRÚ</td>`;
-                let sumNoi = 0; let colsNoiHtml = '';
-                Object.keys(KHOA_MAP_CONFIG).forEach(fullKhoaName => {
-                    const matchRecord = dayData.find(row => row.khoa === fullKhoaName) || {};
-                    const value = Number(matchRecord[metric.idNoi] || 0);
-                    sumNoi += value; colsNoiHtml += `<td>${value || '-'}</td>`;
-                });
-                tbody.innerHTML += `<tr>${rowNoiHtml}<td class="text-bold" style="background-color:#fffbeb;">${sumNoi}</td>${colsNoiHtml}</tr>`;
+                let colsNoiHtml = '';
+                Object.keys(KHOA_MAP_CONFIG).forEach(() => { colsNoiHtml += `<td>-</td>`; });
+                tbody.innerHTML += `<tr>${rowNoiHtml}<td class="text-bold" style="background-color:#fffbeb;">${sumNoi || 0}</td>${colsNoiHtml}</tr>`;
             }
         });
     }
