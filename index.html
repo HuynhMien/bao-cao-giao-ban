@@ -93,8 +93,7 @@
 </div>
 
 <script>
-    // 💡 HÃY THAY ĐƯỜNG DẪN WEB APP MỚI CỦA BẠN VÀO ĐÂY SAU KHI TRIỂN KHAI LẠI Ở BƯỚC TRÊN
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw4bJ1DnxWuj1JM-bAXG5QF4M9Q2RbjXJruwgKPwrF-1gx9T6suciUVSyDLYM-Gt19J/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwRglIQJcJ4v7CeYy_4CBShefsSU1oApWUf0AC2MDdNh8JH7_x97XDMIk1GVIfHcB_9/exec';
 
     const MAP_TOKENS = {
         "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "NGOAI2026": "KHOA NGOẠI TỔNG HỢP",
@@ -127,11 +126,12 @@
         form.style.display = 'block';
         document.getElementById('txtTenKhoa').innerText = MAP_TOKENS[token];
 
-        // Mở khóa toàn bộ và reset giá trị ô nhập về 0
         const inputs = form.querySelectorAll('input[type="number"]');
         inputs.forEach(i => { i.disabled = false; i.value = 0; });
+        
+        document.getElementById('grLamSang').style.display = 'block';
+        document.getElementById('grCanLamSang').style.display = 'block';
 
-        // Phân quyền hiển thị theo tính chất chuyên khoa giống hệt nghiệp vụ của bạn
         if (token === "CDHA2026") {
             document.getElementById('grLamSang').style.display = 'none';
             inputs.forEach(i => {
@@ -143,7 +143,7 @@
                 if(!['xnNgoaiTru', 'xnNoiTru', 'procalcitonin', 'bnp', 'khiMauDongMach'].includes(i.name)) i.disabled = true;
             });
         } else {
-            // Khối Lâm Sàng không được nhập các trường chuyên biệt Cận lâm sàng của 2 khoa trên
+            document.getElementById('grCanLamSang').style.display = 'none';
             inputs.forEach(i => {
                 if(!['benhCu', 'benhMoi', 'chuyenKhoa', 'xuatVien', 'xinVe', 'boVe', 'tuVong', 'chuyenVien'].includes(i.name)) i.disabled = true;
             });
@@ -158,7 +158,6 @@
         const encodedParams = new URLSearchParams();
         encodedParams.append('khoa', MAP_TOKENS[currentToken]);
 
-        // Quét tất cả các ô input (kể cả ô bị disabled) để gửi đầy đủ tham số về Sheet, tránh mất cột dữ liệu
         const inputs = document.getElementById('formReport').querySelectorAll('input[type="number"]');
         inputs.forEach(i => {
             encodedParams.append(i.name, i.value || 0);
@@ -167,19 +166,21 @@
         try {
             const res = await fetch(WEB_APP_URL, {
                 method: 'POST',
+                mode: 'cors',
+                redirect: 'follow', // Quan trọng: Cho phép chuyển hướng phản hồi từ Apps Script
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: encodedParams.toString()
             });
             const statusText = await res.text();
-            if(statusText.includes("SUCCESS")) {
+            if(statusText.trim() === "SUCCESS") {
                 alert('Dữ liệu giao ban đã được đồng bộ thành công vào Google Sheets!');
                 window.location.href = 'dashboard.html';
             } else {
-                alert('Máy chủ trả về phản hồi lỗi: ' + statusText);
+                alert('Máy chủ Apps Script phản hồi lỗi: ' + statusText);
             }
         } catch (error) {
             console.error(error);
-            alert('Lỗi kết nối mạng, không thể gửi dữ liệu!');
+            alert('Lỗi kết nối mạng! Hãy kiểm tra lại phân quyền "Anyone" của Web App trên Google Drive.');
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
