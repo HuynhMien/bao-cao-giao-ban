@@ -87,21 +87,28 @@
         </div>
 
         <div class="btn-box">
-            <button type="submit" class="btn btn-blue" style="font-size: 15px; padding: 12px 30px;">LƯU / CẬP NHẬT SỐ LIỆU GIAO BAN</button>
+            <button type="submit" class="btn btn-blue" style="font-size: 15px; padding: 12px 30px;">GỬI / CẬP NHẬT BÁO CÁO</button>
         </div>
     </form>
 </div>
 
 <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxjpIKetrgdcbAUtyLBFJNgUzjurATrcZQXDRaU7pbqpY_ZHPRvYvB7eK_8h7c2_E_2/exec';
+    // THAY ĐƯỜNG LINK WEB APP PHIÊN BẢN MỚI CỦA BẠN VÀO ĐÂY
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw4bJ1DnxWuj1JM-bAXG5QF4M9Q2RbjXJruwgKPwrF-1gx9T6suciUVSyDLYM-Gt19J/exec';
 
     const MAP_TOKENS = {
-        "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "NGOAI2026": "KHOA NGOẠI TỔNG HỢP",
-        "NHI2026": "KHOA NHI", "NOITIMMACH2026": "KHOA NỘI TIM MẠCH - LÃO HỌC",
-        "NOITONGHOP2026": "KHOA NỘI TỔNG HỢP", "GMHS2026": "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC",
-        "SAN2026": "KHOA PHỤ SẢN", "TRUYENNHIEM2026": "KHOA TRUYỀN NHIỄM",
-        "YHCT2026": "KHOA Y DƯỢC CỔ TRUYỀN", "LCK2026": "KHOA LIÊN CHUYÊN KHOA",
-        "KKB2026": "TỔNG LƯỢT KHÁM NGOẠI TRÚ", "CDHA2026": "KHOA CHẨN ĐOÁN HÌNH ẢNH",
+        "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
+        "NGOAI2026": "KHOA NGOẠI TỔNG HỢP",
+        "NHI2026": "KHOA NHI", 
+        "NOITIMMACH2026": "KHOA NỘI TIM MẠCH - LÃO HỌC",
+        "NOITONGHOP2026": "KHOA NỘI TỔNG HỢP", 
+        "GMHS2026": "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC",
+        "SAN2026": "KHOA PHỤ SẢN", 
+        "TRUYENNHIEM2026": "KHOA TRUYỀN NHIỄM",
+        "YHCT2026": "KHOA Y DƯỢC CỔ TRUYỀN", 
+        "LCK2026": "KHOA LIÊN CHUYÊN KHOA",
+        "KKB2026": "TỔNG LƯỢT KHÁM NGOẠI TRÚ", 
+        "CDHA2026": "KHOA CHẨN ĐOÁN HÌNH ẢNH",
         "XETNGHIEM2026": "KHOA XÉT NGHIỆM"
     };
 
@@ -116,7 +123,7 @@
             localStorage.setItem('hospital_token', tok);
             renderFormView(tok);
         } else {
-            alert('Mã bảo mật Token đơn vị không tồn tại trên hệ thống!');
+            alert('Mã bảo mật Token đơn vị không tồn tại!');
         }
     }
 
@@ -160,27 +167,27 @@
 
         const inputs = document.getElementById('formReport').querySelectorAll('input[type="number"]');
         inputs.forEach(i => {
-            encodedParams.append(i.name, i.value || 0);
+            if(!i.disabled) { encodedParams.append(i.name, i.value || 0); }
         });
 
         try {
             const res = await fetch(WEB_APP_URL, {
                 method: 'POST',
                 mode: 'cors',
-                redirect: 'follow', // Quan trọng: Cho phép chuyển hướng phản hồi từ Apps Script
+                redirect: 'follow',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: encodedParams.toString()
             });
             const statusText = await res.text();
             if(statusText.trim() === "SUCCESS") {
-                alert('Dữ liệu giao ban đã được đồng bộ thành công vào Google Sheets!');
+                alert('Dữ liệu giao ban đã được đồng bộ thành công!');
                 window.location.href = 'dashboard.html';
             } else {
-                alert('Máy chủ Apps Script phản hồi lỗi: ' + statusText);
+                alert('Lỗi phản hồi hệ thống: ' + statusText);
             }
         } catch (error) {
             console.error(error);
-            alert('Lỗi kết nối mạng! Hãy kiểm tra lại phân quyền "Anyone" của Web App trên Google Drive.');
+            alert('Lỗi đường truyền! Hãy kiểm tra lại cấu hình phiên bản Apps Script.');
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
