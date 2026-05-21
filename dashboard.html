@@ -23,7 +23,7 @@
         .bg-green { background-color: #dcfce7; }
         .bg-yellow { background-color: #fef9c3; font-weight: bold; }
         .bg-orange { background-color: #ffedd5; }
-        .left { text-align: left; padding-left: 10px; }
+        .left { text-align: left; padding-left: 10px; font-weight: bold; }
         .bold { font-weight: bold; }
         .total-line { background-color: #e2e8f0; font-weight: bold; }
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--primary); z-index: 9999; }
@@ -37,7 +37,7 @@
     <div class="header">
         <div>
             <h1>Dashboard Số Liệu Tổng Hợp Giao Ban Toàn Viện</h1>
-            <div id="userInfo" style="font-size: 13px; color:#64748b; margin-top:5px; font-weight: 600;"></div>
+            <div id="userInfo" style="font-size: 13px; color:#64748b; margin-top:5px; font-weight: 600;">-</div>
         </div>
         <div class="filter-box">
             <label>Chọn Ngày Xem Báo Cáo:</label>
@@ -90,34 +90,32 @@
 </div>
 
 <script>
+    // THAY ĐƯỜNG LINK WEB APP PHIÊN BẢN MỚI CỦA BẠN VÀO ĐÂY
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxjpIKetrgdcbAUtyLBFJNgUzjurATrcZQXDRaU7pbqpY_ZHPRvYvB7eK_8h7c2_E_2/exec';
 
-    const CLINICAL_KHOA_LIST = {
-        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC": "HSCC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC": "GMHS",
-        "KHOA NGOẠI TỔNG HỢP": "NGOẠI", "KHOA PHỤ SẢN": "SẢN", "KHOA NỘI TỔNG HỢP": "NỘI TH",
-        "KHOA NỘI TIM MẠCH - LÃO HỌC": "NỘI TMLH", "KHOA NHI": "NHI", "KHOA TRUYỀN NHIỄM": "NHIỄM",
-        "KHOA Y DƯỢC CỔ TRUYỀN": "YHCT", "KHOA LIÊN CHUYÊN KHOA": "LCK", "TỔNG LƯỢT KHÁM NGOẠI TRÚ": "KKB"
-    };
-
-    const MAP_TOKENS_INFO = {
-        "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "NGOAI2026": "KHOA NGOẠI TỔNG HỢP",
-        "NHI2026": "KHOA NHI", "NOITIMMACH2026": "KHOA NỘI TIM MẠCH - LÃO HỌC",
-        "NOITONGHOP2026": "KHOA NỘI TỔNG HỢP", "GMHS2026": "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC",
-        "SAN2026": "KHOA PHỤ SẢN", "TRUYENNHIEM2026": "KHOA TRUYỀN NHIỄM",
-        "YHCT2026": "KHOA Y DƯỢC CỔ TRUYỀN", "LCK2026": "KHOA LIÊN CHUYÊN KHOA",
-        "KKB2026": "TỔNG LƯỢT KHÁM NGOẠI TRÚ", "CDHA2026": "KHOA CHẨN ĐOÁN HÌNH ẢNH",
-        "XETNGHIEM2026": "KHOA XÉT NGHIỆM"
-    };
+    const CLINICAL_KHOA_LIST = [
+        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC",
+        "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC",
+        "KHOA NGOẠI TỔNG HỢP",
+        "KHOA PHỤ SẢN",
+        "KHOA NỘI TỔNG HỢP",
+        "KHOA NỘI TIM MẠCH - LÃO HỌC",
+        "KHOA NHI",
+        "KHOA TRUYỀN NHIỄM",
+        "KHOA Y DƯỢC CỔ TRUYỀN",
+        "KHOA LIÊN CHUYÊN KHOA",
+        "TỔNG LƯỢT KHÁM NGOẠI TRÚ"
+    ];
 
     window.onload = function() {
         const token = localStorage.getItem('hospital_token');
-        if (token && MAP_TOKENS_INFO[token]) {
-            document.getElementById('userInfo').innerText = "TÀI KHOẢN GIÁM SÁT: " + MAP_TOKENS_INFO[token];
-        } else {
-            document.getElementById('userInfo').innerText = "TÀI KHOẢN GIÁM SÁT: KHÁCH TRANG / ẨN DANH";
-        }
-
-        document.getElementById('selDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('userInfo').innerText = token ? "TÀI KHOẢN GIÁM SÁT: " + token : "TÀI KHOẢN: GIÁM SÁT TOÀN VIỆN";
+        
+        // Thiết lập ngày mặc định là hôm nay theo giờ VN
+        const tzoffset = (new Date()).getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
+        document.getElementById('selDate').value = localISOTime;
+        
         loadSheetsData();
     };
 
@@ -126,19 +124,17 @@
         const targetDate = document.getElementById('selDate').value;
 
         try {
-            const res = await fetch(WEB_APP_URL, { 
-                method: 'GET',
-                redirect: 'follow',
-                cache: 'no-store'
-            });
+            const res = await fetch(WEB_APP_URL, { method: 'GET', cache: 'no-store', redirect: 'follow' });
             const allRecords = await res.json();
-            const dayRecords = allRecords.filter(r => r.ngay === targetDate);
+            
+            // Lọc dữ liệu chính xác theo ngày dạng YYYY-MM-DD
+            const dayRecords = allRecords.filter(r => r.ngay && r.ngay.toString().substring(0, 10) === targetDate);
 
             renderClinicalTable(dayRecords);
             renderParaclinicalTable(allRecords, targetDate);
         } catch (error) {
             console.error(error);
-            alert('Không thể kết nối đến cơ sở dữ liệu Google Sheets! Kiểm tra lại phân quyền ứng dụng Web.');
+            alert('Lỗi kết nối cơ sở dữ liệu! Vui lòng làm mới trang.');
         } finally {
             document.getElementById('overlay').style.display = 'none';
         }
@@ -147,11 +143,12 @@
     function renderClinicalTable(dayData) {
         const tbody = document.querySelector('#tblLamSang tbody');
         tbody.innerHTML = '';
-        let stt = 1;
         let total = { bc:0, bm:0, cd:0, xv:0, xin:0, bv:0, tv:0, cv:0, cl:0 };
 
-        Object.keys(CLINICAL_KHOA_LIST).forEach(fullName => {
-            const r = dayData.find(item => item.khoa === fullName) || {};
+        CLINICAL_KHOA_LIST.forEach((fullName, idx) => {
+            // Đối chiếu an toàn không phân biệt chữ hoa/thường và khoảng trắng thừa
+            const r = dayData.find(item => item.khoa && item.khoa.toString().trim().toUpperCase() === fullName.toUpperCase()) || {};
+            
             const bc = Number(r.benhCu || 0), bm = Number(r.benhMoi || 0), cd = Number(r.chuyenKhoa || 0);
             const xv = Number(r.xuatVien || 0), xin = Number(r.xinVe || 0), bv = Number(r.boVe || 0);
             const tv = Number(r.tuVong || 0), cv = Number(r.chuyenVien || 0), cl = Number(r.conLai || 0);
@@ -161,12 +158,13 @@
 
             tbody.innerHTML += `
                 <tr>
-                    <td>${stt++}</td>
+                    <td>${idx + 1}</td>
                     <td class="left">${fullName}</td>
-                    <td>${bc || '-'}</td><td>${bm || '-'}</td><td>${cd || '-'}</td>
-                    <td>${xv || '-'}</td><td>${xin || '-'}</td><td>${bv || '-'}</td>
-                    <td class="${tv > 0 ? 'bold' : ''}" style="${tv > 0 ? 'color:red;' : ''}">${tv || '-'}</td><td>${cv || '-'}</td>
-                    <td class="bg-yellow">${cl || '0'}</td>
+                    <td>${r.khoa ? bc : '-'}</td><td>${r.khoa ? bm : '-'}</td><td>${r.khoa ? cd : '-'}</td>
+                    <td>${r.khoa ? xv : '-'}</td><td>${r.khoa ? xin : '-'}</td><td>${r.khoa ? bv : '-'}</td>
+                    <td style="color:${tv > 0 ? 'red' : 'inherit'}; font-weight:${tv > 0 ? 'bold' : 'normal'}">${r.khoa ? tv : '-'}</td>
+                    <td>${r.khoa ? cv : '-'}</td>
+                    <td class="bg-yellow">${r.khoa ? cl : 0}</td>
                 </tr>`;
         });
 
@@ -184,8 +182,8 @@
         const tbody = document.querySelector('#tblCanLamSang tbody');
         tbody.innerHTML = '';
 
-        const cdhaData = allData.find(r => r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.ngay === targetDate) || {};
-        const xnData = allData.find(r => r.khoa === "KHOA XÉT NGHIỆM" && r.ngay === targetDate) || {};
+        const cdhaData = allData.find(r => r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.ngay && r.ngay.toString().substring(0, 10) === targetDate) || {};
+        const xnData = allData.find(r => r.khoa === "KHOA XÉT NGHIỆM" && r.ngay && r.ngay.toString().substring(0, 10) === targetDate) || {};
 
         const schema = [
             { field: 'procalcitonin', text: '1. PROCALCITONIN', type: 'TỔNG', dual: false, ref: xnData },
@@ -207,18 +205,18 @@
 
             if (!item.dual) {
                 totalSum = Number(item.ref[item.field] || 0);
-                cells = `<td class="left bold">${item.text}</td><td>${item.type}</td><td class="bold bg-orange">${totalSum || 0}</td>`;
-                Object.keys(CLINICAL_KHOA_LIST).forEach(() => { cells += `<td>-</td>`; });
+                cells = `<td class="left">${item.text}</td><td>${item.type}</td><td class="bold bg-orange">${totalSum || 0}</td>`;
+                CLINICAL_KHOA_LIST.forEach(() => { cells += `<td>-</td>`; });
                 tbody.innerHTML += `<tr>${cells}</tr>`;
             } else {
                 totalSum = Number(item.ref[item.key] || 0);
                 let titleCell = "";
                 if (item.text !== lastText) {
-                    titleCell = `<td rowspan="2" class="left bold">${item.text}</td>`;
+                    titleCell = `<td rowspan="2" class="left">${item.text}</td>`;
                     lastText = item.text;
                 }
                 cells = `${titleCell}<td>${item.type}</td><td class="bold bg-orange">${totalSum || 0}</td>`;
-                Object.keys(CLINICAL_KHOA_LIST).forEach(() => { cells += `<td>-</td>`; });
+                CLINICAL_KHOA_LIST.forEach(() => { cells += `<td>-</td>`; });
                 tbody.innerHTML += `<tr>${cells}</tr>`;
             }
         });
