@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Tổng Hợp Giao Ban Bệnh Viện</title>
+    <title>Tổng Hợp Giao Ban Bệnh Viện</title>
     <style>
         :root {
             --primary-color: #1e3a8a;
@@ -146,12 +146,12 @@
 </head>
 <body>
 
-<div id="loadingOverlay">Đang tải số liệu thời gian thực từ Google Sheets...</div>
+<div id="loadingOverlay">Đang tải số liệu...</div>
 
 <div class="dashboard-container">
     <div class="dashboard-header">
         <div>
-            <h1 class="main-title">Dashboard Số Liệu Tổng Hợp Giao Ban</h1>
+            <h1 class="main-title">Số Liệu Tổng Hợp Giao Ban</h1>
             <p id="currentSessionUser" class="user-status"></p>
         </div>
         <div class="control-panel">
@@ -242,7 +242,7 @@
             window.location.href = 'formnhap.html';
             return;
         }
-        document.getElementById('currentSessionUser').innerText = "Tài khoản giám sát: " + TOKENS_MAPPING[storedToken];
+        document.getElementById('currentSessionUser').innerText = "Tài khoản : " + TOKENS_MAPPING[storedToken];
         
         const currentDateStr = new Date().toISOString().split('T')[0];
         document.getElementById('filterDate').value = currentDateStr;
