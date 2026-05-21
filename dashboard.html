@@ -159,7 +159,7 @@
                 <label>Xem Theo Ngày:</label>
                 <input type="date" id="filterDate" onchange="fetchDataFromSheets()">
             </div>
-            <a href="formnhap.html" class="btn btn-nav">⏎ QUAY LẠI TRANG NHẬP BÁO CÁO</a>
+            <a href="index.html" class="btn btn-nav">⏎ QUAY LẠI TRANG NHẬP BÁO CÁO</a>
             <button class="btn btn-logout" onclick="handleSecureLogout()">ĐĂNG XUẤT</button>
         </div>
     </div>
@@ -239,7 +239,7 @@
     window.onload = function() {
         const storedToken = localStorage.getItem('userToken');
         if (!storedToken || !TOKENS_MAPPING[storedToken]) {
-            window.location.href = 'formnhap.html';
+            window.location.href = 'index.html';
             return;
         }
         document.getElementById('currentSessionUser').innerText = "Tài khoản : " + TOKENS_MAPPING[storedToken];
@@ -358,7 +358,7 @@
 
     function handleSecureLogout() {
         localStorage.removeItem('userToken');
-        window.location.href = 'formnhap.html';
+        window.location.href = 'index.html';
     }
 </script>
 </body>
