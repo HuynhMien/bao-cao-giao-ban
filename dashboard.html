@@ -37,7 +37,7 @@
     <div class="header">
         <div>
             <h1>Dashboard Số Liệu Tổng Hợp Giao Ban Toàn Viện</h1>
-            <div id="userInfo" style="font-size: 13px; color:#64748b; margin-top:5px;"></div>
+            <div id="userInfo" style="font-size: 13px; color:#64748b; margin-top:5px; font-weight: 600;"></div>
         </div>
         <div class="filter-box">
             <label>Chọn Ngày Xem Báo Cáo:</label>
@@ -90,7 +90,6 @@
 </div>
 
 <script>
-    // 💡 ĐỒNG BỘ ĐƯỜNG DẪN WEB APP VỚI FILE TRÊN
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw4bJ1DnxWuj1JM-bAXG5QF4M9Q2RbjXJruwgKPwrF-1gx9T6suciUVSyDLYM-Gt19J/exec';
 
     const CLINICAL_KHOA_LIST = {
@@ -100,8 +99,24 @@
         "KHOA Y DƯỢC CỔ TRUYỀN": "YHCT", "KHOA LIÊN CHUYÊN KHOA": "LCK", "TỔNG LƯỢT KHÁM NGOẠI TRÚ": "KKB"
     };
 
+    const MAP_TOKENS_INFO = {
+        "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "NGOAI2026": "KHOA NGOẠI TỔNG HỢP",
+        "NHI2026": "KHOA NHI", "NOITIMMACH2026": "KHOA NỘI TIM MẠCH - LÃO HỌC",
+        "NOITONGHOP2026": "KHOA NỘI TỔNG HỢP", "GMHS2026": "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC",
+        "SAN2026": "KHOA PHỤ SẢN", "TRUYENNHIEM2026": "KHOA TRUYỀN NHIỄM",
+        "YHCT2026": "KHOA Y DƯỢC CỔ TRUYỀN", "LCK2026": "KHOA LIÊN CHUYÊN KHOA",
+        "KKB2026": "TỔNG LƯỢT KHÁM NGOẠI TRÚ", "CDHA2026": "KHOA CHẨN ĐOÁN HÌNH ẢNH",
+        "XETNGHIEM2026": "KHOA XÉT NGHIỆM"
+    };
+
     window.onload = function() {
-        // Thiết lập ngày mặc định là hôm nay
+        const token = localStorage.getItem('hospital_token');
+        if (token && MAP_TOKENS_INFO[token]) {
+            document.getElementById('userInfo').innerText = "TÀI KHOẢN GIÁM SÁT: " + MAP_TOKENS_INFO[token];
+        } else {
+            document.getElementById('userInfo').innerText = "TÀI KHOẢN GIÁM SÁT: KHÁCH TRANG / ẨN DANH";
+        }
+
         document.getElementById('selDate').value = new Date().toISOString().split('T')[0];
         loadSheetsData();
     };
@@ -111,17 +126,19 @@
         const targetDate = document.getElementById('selDate').value;
 
         try {
-            const res = await fetch(WEB_APP_URL);
+            const res = await fetch(WEB_APP_URL, { 
+                method: 'GET',
+                redirect: 'follow',
+                cache: 'no-store'
+            });
             const allRecords = await res.json();
-            
-            // Lọc dữ liệu theo ngày đã chọn trên bộ lọc
             const dayRecords = allRecords.filter(r => r.ngay === targetDate);
 
             renderClinicalTable(dayRecords);
             renderParaclinicalTable(allRecords, targetDate);
         } catch (error) {
             console.error(error);
-            alert('Không thể kết nối đến cơ sở dữ liệu Google Sheets!');
+            alert('Không thể kết nối đến cơ sở dữ liệu Google Sheets! Kiểm tra lại phân quyền ứng dụng Web.');
         } finally {
             document.getElementById('overlay').style.display = 'none';
         }
@@ -153,7 +170,6 @@
                 </tr>`;
         });
 
-        // Hàng tổng số liệu toàn viện
         tbody.innerHTML += `
             <tr class="total-line">
                 <td colspan="2">TỔNG CỘNG TOÀN VIỆN</td>
@@ -168,7 +184,6 @@
         const tbody = document.querySelector('#tblCanLamSang tbody');
         tbody.innerHTML = '';
 
-        // Trích xuất số liệu chuyên biệt từ 2 khoa cận lâm sàng đầu mối
         const cdhaData = allData.find(r => r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.ngay === targetDate) || {};
         const xnData = allData.find(r => r.khoa === "KHOA XÉT NGHIỆM" && r.ngay === targetDate) || {};
 
