@@ -1,27 +1,368 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đăng nhập Hệ thống Giao ban</title>
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Nhập Báo Cáo Giao Ban</title>
+    <style>
+        :root {
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+            --input-bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* KHU VỰC ĐĂNG NHẬP */
+        .login-card {
+            max-width: 450px;
+            margin: 100px auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .login-card h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-size: 22px;
+        }
+
+        .form-group-login {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-group-login label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group-login input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        /* KHU VỰC FORM NHẬP LIỆU */
+        .main-form {
+            display: none;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .user-info p { margin: 0; font-size: 13px; color: #64748b; font-weight: 500; }
+        .user-info h2 { margin: 5px 0 0 0; color: var(--primary); font-size: 24px; text-transform: uppercase; }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #334155;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            margin: 30px 0 15px 0;
+            text-transform: uppercase;
+        }
+
+        /* Grid hiển thị chuẩn 5 cột theo ảnh mẫu */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+        }
+
+        .grid-layout-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .input-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-box label {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 6px;
+            white-space: nowrap;
+        }
+
+        .input-box input {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            font-size: 15px;
+            font-weight: bold;
+            color: #1e293b;
+            outline: none;
+        }
+
+        .input-box input:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
+        }
+
+        .input-box input:disabled {
+            background-color: #e2e8f0;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        /* NÚT THAO TÁC */
+        .btn-group {
+            margin-top: 35px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-submit { background-color: #0284c7; color: white; }
+        .btn-submit:hover { background-color: var(--primary-hover); }
+        .btn-excel { background-color: #22c55e; color: white; }
+        .btn-logout { background-color: #ef4444; color: white; }
+        .btn-login { background-color: #0284c7; color: white; width: 100%; padding: 12px; }
+
+        #loading {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 18px;
+            z-index: 9999;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="login-container">
-    <div class="login-card">
-      <h1>HỆ THỐNG GIAO BAN</h1>
-      <p>Bệnh viện Đa khoa - Số liệu thời gian thực</p>
-      
-      <div class="form-group" style="text-align: left; margin-bottom: 20px;">
-        <label for="token">Mã xác thực của khoa</label>
-        <input type="password" id="token" placeholder="Nhập mã khoa được cấp..." autocomplete="off">
-      </div>
-      
-      <button class="btn-primary" style="width: 100%;" onclick="login()">ĐĂNG NHẬP</button>
-    </div>
-  </div>
+<div id="loading">Đang cập nhật số liệu lên Google Sheets...</div>
 
-  <script src="js/login.js"></script>
+<div class="container">
+
+    <div class="login-card" id="loginArea">
+        <h2>ĐĂNG NHẬP HỆ THỐNG GIAO BAN</h2>
+        <div class="form-group-login">
+            <label>Nhập mã bảo mật (Token) của khoa:</label>
+            <input type="password" id="inputToken" placeholder="Ví dụ: NGOAI2026, CDHA2026...">
+        </div>
+        <button class="btn btn-login" onclick="handleAuthLogin()">ĐĂNG NHẬP</button>
+    </div>
+
+    <form class="main-form" id="reportForm" onsubmit="submitFormReport(event)">
+        <div class="user-header">
+            <div class="user-info">
+                <p>TÀI KHOẢN ĐANG ĐĂNG NHẬP:</p>
+                <h2 id="lblTenKhoa">-</h2>
+            </div>
+            <div>
+                <a href="dashboard.html" class="btn btn-submit" style="background-color: #64748b; margin-right: 10px;">📊 XEM DASHBOARD</a>
+                <button type="button" class="btn btn-logout" onclick="handleLogout()">ĐĂNG XUẤT</button>
+            </div>
+        </div>
+
+        <div id="blockLamSang">
+            <div class="section-title">I. BÁO CÁO SỐ LIỆU LÂM SÀNG (BỆNH NHÂN)</div>
+            <div class="grid-layout">
+                <div class="input-box"><label>Bệnh cũ hôm trước</label><input type="number" name="benhCu" value="0" min="0"></div>
+                <div class="input-box"><label>Bệnh nhân mới vào</label><input type="number" name="benhMoi" value="0" min="0"></div>
+                <div class="input-box"><label>Khoa khác chuyển đến</label><input type="number" name="chuyenKhoa" value="0" min="0"></div>
+                <div class="input-box"><label>Xuất viện</label><input type="number" name="xuatVien" value="0" min="0"></div>
+                <div class="input-box"><label>Xin về</label><input type="number" name="xinVe" value="0" min="0"></div>
+            </div>
+            <div class="grid-layout-3">
+                <div class="input-box"><label>Bỏ viện</label><input type="number" name="boVe" value="0" min="0"></div>
+                <div class="input-box"><label>Tử vong</label><input type="number" name="tuVong" value="0" min="0"></div>
+                <div class="input-box"><label>Chuyển viện khác</label><input type="number" name="chuyenVien" value="0" min="0"></div>
+            </div>
+        </div>
+
+        <div id="blockCanLamSang">
+            <div class="section-title">II. THỐNG KÊ HOẠT ĐỘNG CẬN LÂM SÀNG</div>
+            <div class="grid-layout">
+                <div class="input-box"><label>PROCALCITONIN</label><input type="number" name="procalcitonin" value="0" min="0"></div>
+                <div class="input-box"><label>BNP</label><input type="number" name="bnp" value="0" min="0"></div>
+                <div class="input-box"><label>KHÍ MÁU ĐỘNG MẠCH</label><input type="number" name="khiMauDongMach" value="0" min="0"></div>
+                <div class="input-box"><label>NỘI SOI DẠ DÀY/TÁ TRÀNG</label><input type="number" name="noiSoi" value="0" min="0"></div>
+                <div class="input-box"><label>CHỤP XQ NGOẠI TRÚ</label><input type="number" name="xqNgoaiTru" value="0" min="0"></div>
+            </div>
+            <div class="grid-layout" style="margin-top: 20px;">
+                <div class="input-box"><label>CHỤP XQ NỘI TRÚ</label><input type="number" name="xqNoiTru" value="0" min="0"></div>
+                <div class="input-box"><label>SIÊU ÂM NGOẠI TRÚ</label><input type="number" name="sieuAmNgoaiTru" value="0" min="0"></div>
+                <div class="input-box"><label>SIÊU ÂM NỘI TRÚ</label><input type="number" name="sieuAmNoiTru" value="0" min="0"></div>
+                <div class="input-box"><label>XÉT NGHIỆM NGOẠI TRÚ</label><input type="number" name="xnNgoaiTru" value="0" min="0"></div>
+                <div class="input-box"><label>XÉT NGHIỆM NỘI TRÚ</label><input type="number" name="xnNoiTru" value="0" min="0"></div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-submit">GỬI / CẬP NHẬT BÁO CÁO</button>
+            <button type="button" class="btn btn-excel" onclick="alert('Đang tải file Excel tổng hợp...')">XUẤT TOÀN BỘ FILE EXCEL BỆNH VIỆN</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxi5gz51c3hBsihaYWR57KUefeyJYLY6DbVPXOSVXaVe_-QJ25yhg8c1FHsisr5pjow/exec';
+
+    const SECURITY_TOKENS = {
+        "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC",
+        "NGOAI2026": "KHOA NGOẠI TỔNG HỢP",
+        "NHI2026": "KHOA NHI",
+        "NOITIMMACH2026": "KHOA NỘI TIM MẠCH - LÃO HỌC",
+        "NOITONGHOP2026": "KHOA NỘI TỔNG HỢP",
+        "GMHS2026": "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC",
+        "SAN2026": "KHOA PHỤ SẢN",
+        "TRUYENNHIEM2026": "KHOA TRUYỀN NHIỄM",
+        "YHCT2026": "KHOA Y DƯỢC CỔ TRUYỀN",
+        "LCK2026": "KHOA LIÊN CHUYÊN KHOA",
+        "KKB2026": "TỔNG LƯỢT KHÁM NGOẠI TRÚ",
+        "CDHA2026": "KHOA CHẨN ĐOÁN HÌNH ẢNH",
+        "XETNGHIEM2026": "KHOA XÉT NGHIỆM"
+    };
+
+    window.onload = function() {
+        const cachedToken = localStorage.getItem('userToken');
+        if (cachedToken && SECURITY_TOKENS[cachedToken]) {
+            initReportInterface(cachedToken);
+        }
+    };
+
+    function handleAuthLogin() {
+        const enteredToken = document.getElementById('inputToken').value.trim().toUpperCase();
+        if (SECURITY_TOKENS[enteredToken]) {
+            localStorage.setItem('userToken', enteredToken);
+            initReportInterface(enteredToken);
+        } else {
+            alert('Mã bảo mật định danh (Token) không chính xác!');
+        }
+    }
+
+    function initReportInterface(token) {
+        const khoaName = SECURITY_TOKENS[token];
+        document.getElementById('loginArea').style.display = 'none';
+        const formView = document.getElementById('reportForm');
+        formView.style.display = 'block';
+        document.getElementById('lblTenKhoa').innerText = khoaName;
+
+        document.getElementById('blockLamSang').style.display = 'block';
+        document.getElementById('blockCanLamSang').style.display = 'block';
+        
+        const allInputs = formView.querySelectorAll('input[type="number"]');
+        allInputs.forEach(inp => { inp.disabled = false; inp.value = 0; });
+
+        // Nghiệp vụ phân quyền ô dữ liệu dựa trên Token khoa đăng nhập
+        if (token === "CDHA2026") {
+            document.getElementById('blockLamSang').style.display = 'none';
+            allInputs.forEach(inp => {
+                if (!['xqNgoaiTru', 'xqNoiTru', 'sieuAmNgoaiTru', 'sieuAmNoiTru'].includes(inp.name)) {
+                    inp.disabled = true;
+                }
+            });
+        } else if (token === "XETNGHIEM2026") {
+            document.getElementById('blockLamSang').style.display = 'none';
+            allInputs.forEach(inp => {
+                if (!['xnNgoaiTru', 'xnNoiTru', 'procalcitonin', 'bnp', 'khiMauDongMach'].includes(inp.name)) {
+                    inp.disabled = true;
+                }
+            });
+        } else {
+            allInputs.forEach(inp => {
+                if (!['benhCu', 'benhMoi', 'chuyenKhoa', 'xuatVien', 'xinVe', 'boVe', 'tuVong', 'chuyenVien'].includes(inp.name)) {
+                    inp.disabled = true;
+                }
+            });
+        }
+    }
+
+    async function submitFormReport(e) {
+        e.preventDefault();
+        document.getElementById('loading').style.display = 'flex';
+
+        const currentToken = localStorage.getItem('userToken');
+        const khoaHienTai = SECURITY_TOKENS[currentToken];
+        const formData = new FormData(document.getElementById('reportForm'));
+        
+        const params = new URLSearchParams();
+        params.append('action', 'POST_DATA');
+        params.append('khoa', khoaHienTai);
+
+        for (const [key, value] of formData.entries()) {
+            params.append(key, value);
+        }
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            });
+            alert('Cập nhật dữ liệu thành công!');
+            window.location.href = 'dashboard.html';
+        } catch (error) {
+            console.error(error);
+            alert('Lỗi khi đồng bộ lên hệ thống Sheet!');
+        } finally {
+            document.getElementById('loading').style.display = 'none';
+        }
+    }
+    function handleLogout() {
+        localStorage.removeItem('userToken');
+        document.getElementById('reportForm').style.display = 'none';
+        document.getElementById('loginArea').style.display = 'block';
+        document.getElementById('inputToken').value = '';
+    }
+</script>
 </body>
 </html>
