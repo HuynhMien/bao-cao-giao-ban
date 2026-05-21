@@ -3,107 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Tổng Hợp Giao Ban Bệnh Viện</title>
+    <title>Dashboard Số Liệu Tổng Hợp Giao Ban</title>
     <style>
-        :root {
-            --primary-color: #1e3a8a;
-            --secondary-color: #0284c7;
-            --bg-color: #f8fafc;
-            --text-color: #1e293b;
-            --border-color: #cbd5e1;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
-        .dashboard-container { max-width: 1600px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary-color); padding-bottom: 20px; margin-bottom: 25px; }
-        .main-title { margin: 0; font-size: 24px; color: var(--primary-color); text-transform: uppercase; font-weight: 700; }
-        .user-status { margin: 5px 0 0 0; font-size: 14px; color: #64748b; }
-        .control-panel { display: flex; gap: 15px; align-items: center; }
-        .date-picker-group { display: flex; align-items: center; gap: 8px; font-weight: 600; }
-        input[type="date"] { padding: 8px 12px; border: 2px solid var(--border-color); border-radius: 6px; }
-        .btn { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; text-decoration: none; font-size: 13px; }
-        .btn-nav { background-color: #10b981; color: white; }
-        .btn-logout { background-color: #ef4444; color: white; }
-        .section-banner { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); color: white; padding: 12px 16px; margin: 25px 0 15px 0; border-radius: 6px; font-size: 15px; font-weight: 700; }
-        .table-wrapper { overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 25px; }
+        :root { --primary: #1e3a8a; --secondary: #0284c7; --border: #cbd5e1; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 20px; }
+        .box { max-width: 1500px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 25px; }
+        .header h1 { margin: 0; font-size: 22px; color: var(--primary); text-transform: uppercase; }
+        .filter-box { display: flex; gap: 15px; align-items: center; font-weight: 600; }
+        input[type="date"] { padding: 6px 12px; border: 2px solid var(--border); border-radius: 6px; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px; cursor: pointer; }
+        .btn-green { background-color: #10b981; color: white; }
+        .banner { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: white; padding: 10px 15px; font-weight: bold; margin: 20px 0 12px 0; border-radius: 4px; font-size: 14px; text-transform: uppercase; }
+        .table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 25px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: center; }
-        th, td { border: 1px solid var(--border-color); padding: 10px 6px; }
-        th { background-color: #f8fafc; color: #334155; white-space: nowrap; }
-        .header-blue { background-color: #e0f2fe; color: #0369a1; }
-        .header-green { background-color: #dcfce7; color: #15803d; }
-        .header-yellow { background-color: #fef9c3; color: #a16207; }
-        .header-orange { background-color: #ffedd5; color: #c2410c; }
-        .align-left { text-align: left; padding-left: 12px; }
-        .text-bold { font-weight: 700; }
-        .total-row { background-color: #f1f5f9; font-weight: 700; }
-        .critical-text { color: #e11d48; font-weight: 700; }
-        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.85); z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: 600; color: var(--primary-color); }
+        th, td { border: 1px solid var(--border); padding: 8px 5px; }
+        th { background-color: #f1f5f9; color: #334155; }
+        .bg-blue { background-color: #e0f2fe; }
+        .bg-green { background-color: #dcfce7; }
+        .bg-yellow { background-color: #fef9c3; font-weight: bold; }
+        .bg-orange { background-color: #ffedd5; }
+        .left { text-align: left; padding-left: 10px; }
+        .bold { font-weight: bold; }
+        .total-line { background-color: #e2e8f0; font-weight: bold; }
+        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--primary); z-index: 9999; }
     </style>
 </head>
 <body>
 
-<div id="loadingOverlay">Đang tải số liệu thời gian thực từ Google Sheets...</div>
+<div id="overlay">Đang tải và tính toán số liệu thời gian thực từ Google Sheets...</div>
 
-<div class="dashboard-container">
-    <div class="dashboard-header">
+<div class="box">
+    <div class="header">
         <div>
-            <h1 class="main-title">Dashboard Số Liệu Tổng Hợp Giao Ban</h1>
-            <p id="currentSessionUser" class="user-status"></p>
+            <h1>Dashboard Số Liệu Tổng Hợp Giao Ban Toàn Viện</h1>
+            <div id="userInfo" style="font-size: 13px; color:#64748b; margin-top:5px;"></div>
         </div>
-        <div class="control-panel">
-            <div class="date-picker-group">
-                <label>Xem Theo Ngày:</label>
-                <input type="date" id="filterDate" onchange="fetchDataFromSheets()">
-            </div>
-            <a href="index.html" class="btn btn-nav">⏎ QUAY LẠI TRANG NHẬP BÁO CÁO</a>
-            <button class="btn btn-logout" onclick="handleSecureLogout()">ĐĂNG XUẤT</button>
+        <div class="filter-box">
+            <label>Chọn Ngày Xem Báo Cáo:</label>
+            <input type="date" id="selDate" onchange="loadSheetsData()">
+            <a href="index.html" class="btn btn-green">⏎ QUAY LẠI FORM NHẬP</a>
         </div>
     </div>
 
-    <div class="section-banner">I. BÁO CÁO SỐ LIỆU LÂM SÀNG (BỆNH NHÂN NỘI TRÚ)</div>
-    <div class="table-wrapper">
-        <table id="clinicalTable">
+    <div class="banner">I. Báo cáo số liệu lâm sàng (Bệnh nhân nội trú)</div>
+    <div class="table-container">
+        <table id="tblLamSang">
             <thead>
                 <tr>
                     <th rowspan="2">STT</th>
-                    <th rowspan="2" style="min-width: 250px;">TÊN KHOA</th>
-                    <th colspan="3" class="header-blue">ĐANG ĐIỀU TRỊ</th>
-                    <th colspan="5" class="header-green">KẾT THÚC ĐIỀU TRỊ</th>
-                    <th rowspan="2" class="header-yellow">BỆNH CÒN LẠI</th>
+                    <th rowspan="2" style="min-width: 240px;">TÊN KHOA</th>
+                    <th colspan="3" class="bg-blue">ĐANG ĐIỀU TRỊ</th>
+                    <th colspan="5" class="bg-green">KẾT THÚC ĐIỀU TRỊ</th>
+                    <th rowspan="2" class="bg-yellow">BỆNH CÒN LẠI</th>
                 </tr>
                 <tr>
-                    <th class="header-blue">BỆNH CŨ</th>
-                    <th class="header-blue">BỆNH MỚI</th>
-                    <th class="header-blue">CHUYỂN ĐẾN</th>
-                    <th class="header-green">XUẤT VIỆN</th>
-                    <th class="header-green">XIN VỀ</th>
-                    <th class="header-green">BỎ VIỆN</th>
-                    <th class="header-green">TỬ VONG</th>
-                    <th class="header-green">CHUYỂN VIỆN</th>
+                    <th class="bg-blue">BỆNH CŨ</th>
+                    <th class="bg-blue">BỆNH MỚI</th>
+                    <th class="bg-blue">CHUYỂN ĐẾN</th>
+                    <th class="bg-green">XUẤT VIỆN</th>
+                    <th class="bg-green">XIN VỀ</th>
+                    <th class="bg-green">BỎ VIỆN</th>
+                    <th class="bg-green">TỬ VONG</th>
+                    <th class="bg-green">CHUYỂN VIỆN</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
 
-    <div class="section-banner">II. THỐNG KÊ HOẠT ĐỘNG CẬN LÂM SÀNG</div>
-    <div class="table-wrapper">
-        <table id="paraclinicalTable">
+    <div class="banner">II. Thống kê hoạt động cận lâm sàng</div>
+    <div class="table-container">
+        <table id="tblCanLamSang">
             <thead>
                 <tr>
-                    <th style="min-width: 300px;">DANH MỤC BIỂU MẪU</th>
+                    <th style="min-width: 280px;">DANH MỤC BIỂU MẪU</th>
                     <th>PHÂN LOẠI</th>
-                    <th class="header-orange">TỔNG VIỆN</th>
-                    <th>HSCC</th>
-                    <th>GMHS</th>
-                    <th>NGOẠI</th>
-                    <th>SẢN</th>
-                    <th>NỘI TH</th>
-                    <th>NỘI TMLH</th>
-                    <th>NHI</th>
-                    <th>NHIỄM</th>
-                    <th>YHCT</th>
-                    <th>LCK</th>
-                    <th>KKB</th>
+                    <th class="bg-orange" style="min-width: 90px;">TỔNG VIỆN</th>
+                    <th>HSCC</th><th>GMHS</th><th>NGOẠI</th><th>SẢN</th><th>NỘI TH</th>
+                    <th>NỘI TMLH</th><th>NHI</th><th>NHIỄM</th><th>YHCT</th><th>LCK</th><th>KKB</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -112,19 +90,10 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxi5gz51c3hBsihaYWR57KUefeyJYLY6DbVPXOSVXaVe_-QJ25yhg8c1FHsisr5pjow/exec';
-    
-    const TOKENS_MAPPING = {
-        "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "NGOAI2026": "KHOA NGOẠI TỔNG HỢP",
-        "NHI2026": "KHOA NHI", "NOITIMMACH2026": "KHOA NỘI TIM MẠCH - LÃO HỌC",
-        "NOITONGHOP2026": "KHOA NỘI TỔNG HỢP", "GMHS2026": "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC",
-        "SAN2026": "KHOA PHỤ SẢN", "TRUYENNHIEM2026": "KHOA TRUYỀN NHIỄM",
-        "YHCT2026": "KHOA Y DƯỢC CỔ TRUYỀN", "LCK2026": "KHOA LIÊN CHUYÊN KHOA",
-        "KKB2026": "TỔNG LƯỢT KHÁM NGOẠI TRÚ", "CDHA2026": "KHOA CHẨN ĐOÁN HÌNH ẢNH",
-        "XETNGHIEM2026": "KHOA XÉT NGHIỆM"
-    };
+    // 💡 ĐỒNG BỘ ĐƯỜNG DẪN WEB APP VỚI FILE TRÊN
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw4bJ1DnxWuj1JM-bAXG5QF4M9Q2RbjXJruwgKPwrF-1gx9T6suciUVSyDLYM-Gt19J/exec';
 
-    const KHOA_MAP_CONFIG = {
+    const CLINICAL_KHOA_LIST = {
         "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC": "HSCC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC": "GMHS",
         "KHOA NGOẠI TỔNG HỢP": "NGOẠI", "KHOA PHỤ SẢN": "SẢN", "KHOA NỘI TỔNG HỢP": "NỘI TH",
         "KHOA NỘI TIM MẠCH - LÃO HỌC": "NỘI TMLH", "KHOA NHI": "NHI", "KHOA TRUYỀN NHIỄM": "NHIỄM",
@@ -132,128 +101,112 @@
     };
 
     window.onload = function() {
-        const storedToken = localStorage.getItem('userToken');
-        if (!storedToken || !TOKENS_MAPPING[storedToken]) {
-            window.location.href = 'index.html';
-            return;
-        }
-        document.getElementById('currentSessionUser').innerText = "Tài khoản giám sát: " + TOKENS_MAPPING[storedToken];
-        
-        // Thiết lập mặc định hiển thị ngày hôm nay
-        const currentDateStr = new Date().toISOString().split('T')[0];
-        document.getElementById('filterDate').value = currentDateStr;
-        
-        fetchDataFromSheets();
+        // Thiết lập ngày mặc định là hôm nay
+        document.getElementById('selDate').value = new Date().toISOString().split('T')[0];
+        loadSheetsData();
     };
 
-    async function fetchDataFromSheets() {
-        const loader = document.getElementById('loadingOverlay');
-        loader.style.display = 'flex';
-        const targetDate = document.getElementById('filterDate').value;
+    async function loadSheetsData() {
+        document.getElementById('overlay').style.display = 'flex';
+        const targetDate = document.getElementById('selDate').value;
 
         try {
-            const response = await fetch(APPS_SCRIPT_URL);
-            const rawJsonData = await response.json();
+            const res = await fetch(WEB_APP_URL);
+            const allRecords = await res.json();
             
-            // Lọc dữ liệu thô từ Google Sheets theo đúng Ngày được chọn trên Dashboard
-            const filteredData = rawJsonData.filter(entry => {
-                if(!entry.ngay) return false;
-                return entry.ngay === targetDate;
-            });
+            // Lọc dữ liệu theo ngày đã chọn trên bộ lọc
+            const dayRecords = allRecords.filter(r => r.ngay === targetDate);
 
-            buildClinicalSection(filteredData);
-            buildParaclinicalSection(rawJsonData, targetDate); // Truyền full để cộng dồn chéo từ khoa XN/CĐHA
-        } catch (err) {
-            console.error(err);
-            alert("Lỗi tải cơ sở dữ liệu!");
-        } finaly {
-            loader.style.display = 'none';
+            renderClinicalTable(dayRecords);
+            renderParaclinicalTable(allRecords, targetDate);
+        } catch (error) {
+            console.error(error);
+            alert('Không thể kết nối đến cơ sở dữ liệu Google Sheets!');
+        } finally {
+            document.getElementById('overlay').style.display = 'none';
         }
     }
 
-    function buildClinicalSection(dayData) {
-        const tbody = document.querySelector('#clinicalTable tbody');
+    function renderClinicalTable(dayData) {
+        const tbody = document.querySelector('#tblLamSang tbody');
         tbody.innerHTML = '';
-        let indexNum = 1;
-        let sumRow = { bc: 0, bm: 0, cd: 0, xv: 0, xin: 0, bv: 0, tv: 0, cv: 0, cl: 0 };
+        let stt = 1;
+        let total = { bc:0, bm:0, cd:0, xv:0, xin:0, bv:0, tv:0, cv:0, cl:0 };
 
-        Object.keys(KHOA_MAP_CONFIG).forEach(fullKhoaName => {
-            const matchRecord = dayData.find(row => row.khoa === fullKhoaName) || {};
-            const bc = Number(matchRecord.benhCu || 0), bm = Number(matchRecord.benhMoi || 0), cd = Number(matchRecord.chuyenKhoa || 0);
-            const xv = Number(matchRecord.xuatVien || 0), xin = Number(matchRecord.xinVe || 0), bv = Number(matchRecord.boVe || 0);
-            const tv = Number(matchRecord.tuVong || 0), cv = Number(matchRecord.chuyenVien || 0), cl = Number(matchRecord.conLai || 0);
+        Object.keys(CLINICAL_KHOA_LIST).forEach(fullName => {
+            const r = dayData.find(item => item.khoa === fullName) || {};
+            const bc = Number(r.benhCu || 0), bm = Number(r.benhMoi || 0), cd = Number(r.chuyenKhoa || 0);
+            const xv = Number(r.xuatVien || 0), xin = Number(r.xinVe || 0), bv = Number(r.boVe || 0);
+            const tv = Number(r.tuVong || 0), cv = Number(r.chuyenVien || 0), cl = Number(r.conLai || 0);
 
-            sumRow.bc += bc; sumRow.bm += bm; sumRow.cd += cd; sumRow.xv += xv; sumRow.xin += xin;
-            sumRow.bv += bv; sumRow.tv += tv; sumRow.cv += cv; sumRow.cl += cl;
+            total.bc += bc; total.bm += bm; total.cd += cd; total.xv += xv; 
+            total.xin += xin; total.bv += bv; total.tv += tv; total.cv += cv; total.cl += cl;
 
             tbody.innerHTML += `
                 <tr>
-                    <td>${indexNum++}</td>
-                    <td class="align-left">${fullKhoaName}</td>
+                    <td>${stt++}</td>
+                    <td class="left">${fullName}</td>
                     <td>${bc || '-'}</td><td>${bm || '-'}</td><td>${cd || '-'}</td>
                     <td>${xv || '-'}</td><td>${xin || '-'}</td><td>${bv || '-'}</td>
-                    <td class="${tv > 0 ? 'critical-text' : ''}">${tv || '-'}</td><td>${cv || '-'}</td>
-                    <td class="text-bold">${cl || '-'}</td>
+                    <td class="${tv > 0 ? 'bold' : ''}" style="${tv > 0 ? 'color:red;' : ''}">${tv || '-'}</td><td>${cv || '-'}</td>
+                    <td class="bg-yellow">${cl || '0'}</td>
                 </tr>`;
         });
 
+        // Hàng tổng số liệu toàn viện
         tbody.innerHTML += `
-            <tr class="total-row">
-                <td colspan="2">TỔNG CỘNG</td>
-                <td>${sumRow.bc}</td><td>${sumRow.bm}</td><td>${sumRow.cd}</td>
-                <td>${sumRow.xv}</td><td>${sumRow.xin}</td><td>${sumRow.bv}</td>
-                <td class="critical-text">${sumRow.tv}</td><td>${sumRow.cv}</td><td>${sumRow.cl}</td>
+            <tr class="total-line">
+                <td colspan="2">TỔNG CỘNG TOÀN VIỆN</td>
+                <td>${total.bc}</td><td>${total.bm}</td><td>${total.cd}</td>
+                <td>${total.xv}</td><td>${total.xin}</td><td>${total.bv}</td>
+                <td style="color:${total.tv > 0 ? 'red' : 'inherit'}">${total.tv}</td><td>${total.cv}</td>
+                <td style="background-color:#fef08a;">${total.cl}</td>
             </tr>`;
     }
 
-    function buildParaclinicalSection(allData, targetDate) {
-        const tbody = document.querySelector('#paraclinicalTable tbody');
+    function renderParaclinicalTable(allData, targetDate) {
+        const tbody = document.querySelector('#tblCanLamSang tbody');
         tbody.innerHTML = '';
 
-        // Đọc dữ liệu từ 2 khoa cận lâm sàng chuyên biệt trong ngày
-        const cdhaRecord = allData.find(r => r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.ngay === targetDate) || {};
-        const xnRecord = allData.find(r => r.khoa === "KHOA XÉT NGHIỆM" && r.ngay === targetDate) || {};
+        // Trích xuất số liệu chuyên biệt từ 2 khoa cận lâm sàng đầu mối
+        const cdhaData = allData.find(r => r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.ngay === targetDate) || {};
+        const xnData = allData.find(r => r.khoa === "KHOA XÉT NGHIỆM" && r.ngay === targetDate) || {};
 
-        const paraclinicalSchema = [
-            { id: 'procalcitonin', label: '1. PROCALCITONIN', sub: 'TỔNG', isDouble: false, source: xnRecord },
-            { id: 'bnp', label: '2. BNP', sub: 'TỔNG', isDouble: false, source: xnRecord },
-            { id: 'khiMauDongMach', label: '3. KHÍ MÁU ĐỘNG MẠCH', sub: 'TỔNG', isDouble: false, source: xnRecord },
-            { id: 'noiSoi', label: '4. SỐ LẦN NỘI SOI THỰC QUẢN - DẠ DÀY', sub: 'TỔNG', isDouble: false, source: xnRecord },
-            { id: 'xq', label: '5. SỐ LẦN CHỤP XQ', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'xqNgoaiTru', idNoi: 'xqNoiTru', source: cdhaRecord },
-            { id: 'sieuAm', label: '6. SỐ LẦN SIÊU ÂM', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'sieuAmNgoaiTru', idNoi: 'sieuAmNoiTru', source: cdhaRecord },
-            { id: 'xetNghiem', label: '7. SỐ LẦN XÉT NGHIỆM', sub: 'NGOẠI TRÚ', isDouble: true, idNgoai: 'xnNgoaiTru', idNoi: 'xnNoiTru', source: xnRecord }
+        const schema = [
+            { field: 'procalcitonin', text: '1. PROCALCITONIN', type: 'TỔNG', dual: false, ref: xnData },
+            { field: 'bnp', text: '2. BNP', type: 'TỔNG', dual: false, ref: xnData },
+            { field: 'khiMauDongMach', text: '3. KHÍ MÁU ĐỘNG MẠCH', type: 'TỔNG', dual: false, ref: xnData },
+            { field: 'noiSoi', text: '4. SỐ LẦN NỘI SOI THỰC QUẢN - DẠ DÀY', type: 'TỔNG', dual: false, ref: xnData },
+            { text: '5. SỐ LẦN CHỤP XQ', type: 'NGOẠI TRÚ', dual: true, key: 'xqNgoaiTru', ref: cdhaData },
+            { text: '5. SỐ LẦN CHỤP XQ', type: 'NỘI TRÚ', dual: true, key: 'xqNoiTru', ref: cdhaData },
+            { text: '6. SỐ LẦN SIÊU ÂM', type: 'NGOẠI TRÚ', dual: true, key: 'sieuAmNgoaiTru', ref: cdhaData },
+            { text: '6. SỐ LẦN SIÊU ÂM', type: 'NỘI TRÚ', dual: true, key: 'sieuAmNoiTru', ref: cdhaData },
+            { text: '7. SỐ LẦN XÉT NGHIỆM', type: 'NGOẠI TRÚ', dual: true, key: 'xnNgoaiTru', ref: xnData },
+            { text: '7. SỐ LẦN XÉT NGHIỆM', type: 'NỘI TRÚ', dual: true, key: 'xnNoiTru', ref: xnData }
         ];
 
-        paraclinicalSchema.forEach(metric => {
-            if (!metric.isDouble) {
-                // Đọc tổng số liệu báo cáo từ khoa chuyên môn
-                let totalSum = Number(metric.source[metric.id] || 0);
-                let cellHtml = `<td class="align-left text-bold">${metric.label}</td><td>${metric.sub}</td>`;
-                let khoaDataCols = '';
+        let lastText = "";
+        schema.forEach(item => {
+            let totalSum = 0;
+            let cells = "";
 
-                // Các cột khoa khác mặc định hiển thị gạch ngang (vì chỉ có khoa chuyên môn nhập trường này)
-                Object.keys(KHOA_MAP_CONFIG).forEach(() => { khoaDataCols += `<td>-</td>`; });
-                tbody.innerHTML += `<tr>${cellHtml}<td class="text-bold" style="background-color:#fffbeb;">${totalSum || 0}</td>${khoaDataCols}</tr>`;
+            if (!item.dual) {
+                totalSum = Number(item.ref[item.field] || 0);
+                cells = `<td class="left bold">${item.text}</td><td>${item.type}</td><td class="bold bg-orange">${totalSum || 0}</td>`;
+                Object.keys(CLINICAL_KHOA_LIST).forEach(() => { cells += `<td>-</td>`; });
+                tbody.innerHTML += `<tr>${cells}</tr>`;
             } else {
-                // Xử lý các trường có cả luồng Ngoại trú và Nội trú
-                let sumNgoai = Number(metric.source[metric.idNgoai] || 0);
-                let rowNgoaiHtml = `<td rowspan="2" class="align-left text-bold">${metric.label}</td><td>NGOẠI TRÚ</td>`;
-                let colsNgoaiHtml = '';
-                Object.keys(KHOA_MAP_CONFIG).forEach(() => { colsNgoaiHtml += `<td>-</td>`; });
-                tbody.innerHTML += `<tr>${rowNgoaiHtml}<td class="text-bold" style="background-color:#fffbeb;">${sumNgoai || 0}</td>${colsNgoaiHtml}</tr>`;
-
-                let sumNoi = Number(metric.source[metric.idNoi] || 0);
-                let rowNoiHtml = `<td>NỘI TRÚ</td>`;
-                let colsNoiHtml = '';
-                Object.keys(KHOA_MAP_CONFIG).forEach(() => { colsNoiHtml += `<td>-</td>`; });
-                tbody.innerHTML += `<tr>${rowNoiHtml}<td class="text-bold" style="background-color:#fffbeb;">${sumNoi || 0}</td>${colsNoiHtml}</tr>`;
+                totalSum = Number(item.ref[item.key] || 0);
+                let titleCell = "";
+                if (item.text !== lastText) {
+                    titleCell = `<td rowspan="2" class="left bold">${item.text}</td>`;
+                    lastText = item.text;
+                }
+                cells = `${titleCell}<td>${item.type}</td><td class="bold bg-orange">${totalSum || 0}</td>`;
+                Object.keys(CLINICAL_KHOA_LIST).forEach(() => { cells += `<td>-</td>`; });
+                tbody.innerHTML += `<tr>${cells}</tr>`;
             }
         });
-    }
-
-    function handleSecureLogout() {
-        localStorage.removeItem('userToken');
-        window.location.href = 'index.html';
     }
 </script>
 </body>
