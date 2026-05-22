@@ -17,13 +17,13 @@
         .banner { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: white; padding: 10px 15px; font-weight: bold; margin: 25px 0 12px 0; border-radius: 4px; font-size: 14px; text-transform: uppercase; }
         .table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 25px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: center; }
-        th, td { border: 1px solid var(--border); padding: 8px 4px; }
+        th, td { border: 1px solid var(--border); padding: 10px 5px; }
         th { background-color: #f1f5f9; color: #334155; }
         .bg-blue { background-color: #e0f2fe; }
         .bg-green { background-color: #dcfce7; }
         .bg-yellow { background-color: #fef9c3; font-weight: bold; }
-        .bg-orange { background-color: #ffedd5; font-weight: bold; }
-        .left { text-align: left; padding-left: 10px; font-weight: bold; }
+        .bg-orange { background-color: #ffedd5; font-weight: bold; font-size: 14px; }
+        .left { text-align: left; padding-left: 12px; font-weight: bold; }
         .total-line { background-color: #e2e8f0; font-weight: bold; }
         #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--primary); z-index: 9999; }
     </style>
@@ -35,13 +35,13 @@
 <div class="box">
     <div class="header">
         <div>
-            <h1>Dashboard Số Liệu Tổng Hợp Giao Ban Toàn Viện</h1>
+            <h1>Dashboard Số Liệu Tổng Hợp Giao Ban</h1>
             <div style="font-size: 13px; color:#64748b; margin-top:5px; font-weight: 600;">BỆNH VIỆN ĐA KHOA KHU VỰC HỒNG NGỰ</div>
         </div>
         <div class="filter-box">
             <label>Xem Ngày:</label>
             <input type="date" id="selDate" onchange="loadSheetsData()">
-            <a href="index.html" class="btn btn-green">⏎ QUAY LẠI CỬA SỔ NHẬP</a>
+            <a href="index.html" class="btn btn-green">⏎ QUAY LẠI TRANG NHẬP</a>
         </div>
     </div>
 
@@ -51,13 +51,13 @@
             <thead>
                 <tr>
                     <th rowspan="2">STT</th>
-                    <th rowspan="2" style="min-width: 250px;">TÊN KHOA</th>
+                    <th rowspan="2" style="min-width: 280px;">TÊN KHOA</th>
                     <th colspan="3" class="bg-blue">ĐANG ĐIỀU TRỊ</th>
                     <th colspan="5" class="bg-green">KẾT THÚC ĐIỀU TRỊ</th>
                     <th rowspan="2" class="bg-yellow">BỆNH CÒN LẠI</th>
                 </tr>
                 <tr>
-                    <th class="bg-blue">BỆNH CŨ</th>
+                    <th class="bg-blue">BỆNH CỦA</th>
                     <th class="bg-blue">BỆNH MỚI</th>
                     <th class="bg-blue">CHUYỂN ĐẾN</th>
                     <th class="bg-green">XUẤT VIỆN</th>
@@ -78,9 +78,9 @@
                 <tr>
                     <th style="min-width: 260px;">DANH MỤC BIỂU MẪU</th>
                     <th>PHÂN LOẠI</th>
-                    <th class="bg-orange" style="min-width: 100px;">TỔNG VIỆN</th>
-                    <th>HSCC</th><th>GMHS</th><th>NGOẠI</th><th>SẢN</th><th>NỘI TH</th>
-                    <th>NỘI TMLH</th><th>NHI</th><th>NHIỄM</th><th>YHCT</th><th>LCK</th><th>KKB</th>
+                    <th class="bg-orange" style="min-width: 110px;">TỔNG VIỆN</th>
+                    <th>CẤP CỨU</th><th>GMHS</th><th>NGOẠI TH</th><th>PHỤ SẢN</th><th>NỘI TH</th>
+                    <th>NỘI TMLH</th><th>NHI</th><th>TRUYỀN NHIỄM</th><th>YHCT</th><th>LCK</th><th>KHOA KB</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -89,12 +89,21 @@
 </div>
 
 <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx27JQ2e87Ll1pO-XWYsORG_PUwmcL4OsglrY2ZT6A4wfOvSHNsqGCjSHCBYCF_vvRq/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw4bJ1DnxWuj1JM-bAXG5QF4M9Q2RbjXJruwgKPwrF-1gx9T6suciUVSyDLYM-Gt19J/exec';
 
+    // Danh sách 11 khoa lâm sàng hiển thị khớp với thứ tự các cột cận lâm sàng
     const CLINICAL_KHOA_LIST = [
-        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", "KHOA NGOẠI TỔNG HỢP",
-        "KHOA PHỤ SẢN", "KHOA NỘI TỔNG HỢP", "KHOA NỘI TIM MẠCH - LÃO HỌC", "KHOA NHI",
-        "KHOA TRUYỀN NHIỄM", "KHOA Y DƯỢC CỔ TRUYỀN", "KHOA LIÊN CHUYÊN KHOA", "TỔNG LƯỢT KHÁM NGOẠI TRÚ"
+        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
+        "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", 
+        "KHOA NGOẠI TỔNG HỢP",
+        "KHOA PHỤ SẢN", 
+        "KHOA NỘI TỔNG HỢP", 
+        "KHOA NỘI TIM MẠCH - LÃO HỌC", 
+        "KHOA NHI",
+        "KHOA TRUYỀN NHIỄM", 
+        "KHOA Y DƯỢC CỔ TRUYỀN", 
+        "KHOA LIÊN CHUYÊN KHOA", 
+        "KHOA KHÁM BỆNH (TỔNG LƯỢT KHÁM NGOẠI TRÚ)"
     ];
 
     window.onload = function() {
@@ -118,7 +127,7 @@
             renderParaclinicalTable(dayCLS);
         } catch (error) {
             console.error(error);
-            alert('Lỗi truy vấn dữ liệu từ Google Sheets! Hãy kiểm tra lại phầm mềm.');
+            alert('Lỗi cấu trúc hoặc kết nối Apps Script thất bại!');
         } finally {
             document.getElementById('overlay').style.display = 'none';
         }
@@ -179,25 +188,24 @@
 
         let lastText = "";
         schema.forEach(item => {
-            let cells = "";
             let totalSum = 0;
             let subCells = "";
 
-            // Duyệt tính tổng các khoa lâm sàng chỉ định cận lâm sàng này
             CLINICAL_KHOA_LIST.forEach(khoa => {
-                let match = clsData.find(r => r.loai && r.loai.toString().trim().toUpperCase() === khoa.toUpperCase()) || {};
+                // Lọc ra các bản ghi của khoa lâm sàng này chỉ định trong ngày
+                let matches = clsData.filter(r => r.loai && r.loai.toString().trim().toUpperCase() === khoa.toUpperCase());
                 let val = 0;
-                if (!item.dual) {
-                    val = Number(match[item.field] || 0);
-                } else {
-                    val = Number(match[item.key] || 0);
-                }
+                
+                matches.forEach(m => {
+                    val += Number(item.dual ? (m[item.key] || 0) : (m[item.field] || 0));
+                });
+                
                 totalSum += val;
                 subCells += `<td>${val > 0 ? val : '-'}</td>`;
             });
 
             if (!item.dual) {
-                cells = `<td class="left">${item.text}</td><td>${item.type}</td><td class="bg-orange">${totalSum}</td>` + subCells;
+                let cells = `<td class="left">${item.text}</td><td>${item.type}</td><td class="bg-orange">${totalSum}</td>` + subCells;
                 tbody.innerHTML += `<tr>${cells}</tr>`;
             } else {
                 let titleCell = "";
@@ -205,7 +213,7 @@
                     titleCell = `<td rowspan="2" class="left">${item.text}</td>`;
                     lastText = item.text;
                 }
-                cells = `${titleCell}<td>${item.type}</td><td class="bg-orange">${totalSum}</td>` + subCells;
+                let cells = `${titleCell}<td>${item.type}</td><td class="bg-orange">${totalSum}</td>` + subCells;
                 tbody.innerHTML += `<tr>${cells}</tr>`;
             }
         });
