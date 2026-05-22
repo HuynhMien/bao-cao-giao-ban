@@ -89,10 +89,8 @@
 </div>
 
 <script>
-    // URL ứng dụng Web Apps Script kết nối đến Google Sheets dữ liệu của bạn
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyhprOyvs-aVfEb9NzJT0jXPfmx53aqbf0oB_61aQF-CMO-X-n0G81unG0TpiAroOSz/exec';
 
-    // Danh sách chuẩn hóa 11 đơn vị lâm sàng hiển thị đồng bộ trên Dashboard
     const CLINICAL_KHOA_LIST = [
         "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
         "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", 
@@ -108,19 +106,16 @@
     ];
 
     window.onload = function() {
-        // Thiết lập ngày mặc định ban đầu là ngày hôm nay theo múi giờ Việt Nam
         const tzoffset = (new Date()).getTimezoneOffset() * 60000;
         document.getElementById('selDate').value = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
         loadSheetsData();
     };
 
-    // Hàm định dạng đưa ngày về dạng chuỗi YYYY-MM-DD để so sánh không bị lệch giờ
     function formatDateString(dateInput) {
         if (!dateInput) return "";
         try {
             const d = new Date(dateInput);
             if (isNaN(d.getTime())) {
-                // Nếu là chuỗi text dạng "2026-05-22" thì lấy 10 ký tự đầu luôn
                 return dateInput.toString().substring(0, 10);
             }
             const year = d.getFullYear();
@@ -132,7 +127,6 @@
         }
     }
 
-    // Hàm chuyển đổi toàn bộ Key của Object thành chữ thường để tránh lỗi lệch hoa thường
     function lowercaseKeys(obj) {
         if (!obj || typeof obj !== 'object') return {};
         return Object.keys(obj).reduce((acc, key) => {
@@ -143,18 +137,16 @@
 
     async function loadSheetsData() {
         document.getElementById('overlay').style.display = 'flex';
-        const targetDateStr = document.getElementById('selDate').value; // Dạng "2026-05-22"
+        const targetDateStr = document.getElementById('selDate').value;
 
         try {
             const res = await fetch(WEB_APP_URL, { method: 'GET', cache: 'no-store', redirect: 'follow' });
             const rootData = await res.json();
             
-            // Lọc dữ liệu Lâm sàng bằng cách ép kiểu so sánh Ngày chuẩn
             const dayLamSang = (rootData.lamSang || []).filter(r => {
                 return r.ngay && formatDateString(r.ngay) === targetDateStr;
             }).map(item => lowercaseKeys(item));
 
-            // Lọc dữ liệu Cận lâm sàng bằng cách ép kiểu so sánh Ngày chuẩn
             const dayCLS = (rootData.canLamSang || []).filter(r => {
                 return r.ngay && formatDateString(r.ngay) === targetDateStr;
             }).map(item => lowercaseKeys(item));
@@ -163,7 +155,7 @@
             renderParaclinicalTable(dayCLS);
         } catch (error) {
             console.error(error);
-            alert('Lỗi kết nối API hoặc cấu trúc dữ liệu xuất bản từ Google Sheets chưa đúng!');
+            alert('Lỗi kết nối API Google Sheets!');
         } finally {
             document.getElementById('overlay').style.display = 'none';
         }
@@ -175,15 +167,17 @@
         let total = { bc:0, bm:0, cd:0, xv:0, xin:0, bv:0, tv:0, cv:0, cl:0 };
 
         CLINICAL_KHOA_LIST.forEach((fullName, idx) => {
-            // Tìm bản ghi khớp tên khoa (Không phân biệt hoa thường và khoảng trắng)
-            const r = dayData.find(item => item.khoa && item.khoa.toString().trim().toUpperCase() === fullName.toUpperCase()) || null;
+            // SỬA LỖI: Lọc toàn bộ các lần gửi trong ngày của Khoa này
+            const matches = dayData.filter(item => item.khoa && item.khoa.toString().trim().toUpperCase() === fullName.toUpperCase());
             
             let bc = 0, bm = 0, cd = 0, xv = 0, xin = 0, bv = 0, tv = 0, cv = 0, cl = 0;
             let hasData = false;
 
-            if (r) {
+            if (matches.length > 0) {
                 hasData = true;
-                // Đọc thuộc tính an toàn từ Object đã lowercase toàn bộ Key
+                // LẤY BẢN GHI CUỐI CÙNG (Dữ liệu mới nhất khoa cập nhật)
+                const r = matches[matches.length - 1]; 
+                
                 bc = Number(r.benhcu || 0);
                 bm = Number(r.benhmoi || 0);
                 cd = Number(r.chuyenkhoa || 0);
@@ -228,7 +222,6 @@
         const tbody = document.querySelector('#tblCanLamSang tbody');
         tbody.innerHTML = '';
 
-        // Định nghĩa Schema (Trường field đã được hạ thành chữ thường để so khớp an toàn tuyệt đối)
         const schema = [
             { field: 'procalcitonin', text: '1. PROCALCITONIN', type: 'TỔNG', dual: false },
             { field: 'bnp', text: '2. BNP', type: 'TỔNG', dual: false },
@@ -248,10 +241,11 @@
             let subCells = "";
 
             CLINICAL_KHOA_LIST.forEach(khoa => {
-                // Lọc ra các dòng chỉ định tương ứng với khoa lâm sàng hiện tại
+                // SỬA LỖI: Nhận diện chính xác tên khoa chỉ định tại trường 'loai'
                 let matches = clsData.filter(r => r.loai && r.loai.toString().trim().toUpperCase() === khoa.toUpperCase());
                 let val = 0;
                 
+                // CỘNG DỒN tất cả dữ liệu phát sinh trong ngày của khoa đó
                 matches.forEach(m => {
                     const lookupKey = item.dual ? item.key : item.field;
                     val += Number(m[lookupKey] || 0);
