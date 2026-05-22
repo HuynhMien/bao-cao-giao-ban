@@ -125,9 +125,13 @@
         "KHOA KHÁM BỆNH (TỔNG LƯỢT KHÁM NGOẠI TRÚ)"
     ];
 
-    window.onload = function() {
-        const savedToken = localStorage.getItem('hospital_token');
-        if (savedToken && MAP_TOKENS[savedToken]) { renderFormView(savedToken); }
+    // Gán URL Web App Apps Script của bạn vào đây (Lấy ở Bước 2 bên dưới)
+const WEB_APP_URL = "URL_WEB_APP_APPS_SCRIPT_CỦA_BẠN";
+
+window.onload = function() {
+    const savedToken = localStorage.getItem('hospital_token');
+    if (savedToken && MAP_TOKENS[savedToken]) { renderFormView(savedToken); }
+};
     };
 
     function loginSystem() {
