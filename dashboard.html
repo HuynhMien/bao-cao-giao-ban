@@ -11,7 +11,7 @@
         .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 25px; }
         .header h1 { margin: 0; font-size: 21px; color: var(--primary); text-transform: uppercase; }
         .filter-box { display: flex; gap: 15px; align-items: center; font-weight: 600; }
-        input[type="date"] { padding: 6px 12px; border: 2px solid var(--border); border-radius: 6px; }
+        input[type="date"] { padding: 6px 12px; border: 2px solid var(--border); border-radius: 6px; font-weight: bold; }
         .btn { padding: 8px 16px; border: none; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px; cursor: pointer; }
         .btn-green { background-color: #10b981; color: white; }
         .banner { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: white; padding: 10px 15px; font-weight: bold; margin: 25px 0 12px 0; border-radius: 4px; font-size: 14px; text-transform: uppercase; }
@@ -35,7 +35,7 @@
 <div class="box">
     <div class="header">
         <div>
-            <h1>Dashboard Số Liệu Tổng Hợp Giao Ban...........</h1>
+            <h1>Dashboard Số Liệu Tổng Hợp Giao Ban</h1>
             <div style="font-size: 13px; color:#64748b; margin-top:5px; font-weight: 600;">BỆNH VIỆN ĐA KHOA KHU VỰC HỒNG NGỰ</div>
         </div>
         <div class="filter-box">
@@ -89,10 +89,10 @@
 </div>
 
 <script>
-    // URL Web App từ Google Apps Script của bạn
+    // URL ứng dụng Web Apps Script kết nối đến Google Sheets dữ liệu của bạn
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyhprOyvs-aVfEb9NzJT0jXPfmx53aqbf0oB_61aQF-CMO-X-n0G81unG0TpiAroOSz/exec';
 
-    // Danh sách các khoa Lâm sàng hiển thị trên bảng
+    // Danh sách chuẩn hóa 11 đơn vị lâm sàng hiển thị đồng bộ trên Dashboard
     const CLINICAL_KHOA_LIST = [
         "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
         "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", 
@@ -108,28 +108,62 @@
     ];
 
     window.onload = function() {
+        // Thiết lập ngày mặc định ban đầu là ngày hôm nay theo múi giờ Việt Nam
         const tzoffset = (new Date()).getTimezoneOffset() * 60000;
         document.getElementById('selDate').value = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
         loadSheetsData();
     };
 
+    // Hàm định dạng đưa ngày về dạng chuỗi YYYY-MM-DD để so sánh không bị lệch giờ
+    function formatDateString(dateInput) {
+        if (!dateInput) return "";
+        try {
+            const d = new Date(dateInput);
+            if (isNaN(d.getTime())) {
+                // Nếu là chuỗi text dạng "2026-05-22" thì lấy 10 ký tự đầu luôn
+                return dateInput.toString().substring(0, 10);
+            }
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        } catch(e) {
+            return "";
+        }
+    }
+
+    // Hàm chuyển đổi toàn bộ Key của Object thành chữ thường để tránh lỗi lệch hoa thường
+    function lowercaseKeys(obj) {
+        if (!obj || typeof obj !== 'object') return {};
+        return Object.keys(obj).reduce((acc, key) => {
+            acc[key.toLowerCase().trim()] = obj[key];
+            return acc;
+        }, {});
+    }
+
     async function loadSheetsData() {
         document.getElementById('overlay').style.display = 'flex';
-        const targetDate = document.getElementById('selDate').value;
+        const targetDateStr = document.getElementById('selDate').value; // Dạng "2026-05-22"
 
         try {
             const res = await fetch(WEB_APP_URL, { method: 'GET', cache: 'no-store', redirect: 'follow' });
             const rootData = await res.json();
             
-            // Lọc chính xác bản ghi khớp với ngày được chọn trên giao diện
-            const dayLamSang = rootData.lamSang.filter(r => r.ngay && r.ngay.toString().substring(0, 10) === targetDate);
-            const dayCLS = rootData.canLamSang.filter(r => r.ngay && r.ngay.toString().substring(0, 10) === targetDate);
+            // Lọc dữ liệu Lâm sàng bằng cách ép kiểu so sánh Ngày chuẩn
+            const dayLamSang = (rootData.lamSang || []).filter(r => {
+                return r.ngay && formatDateString(r.ngay) === targetDateStr;
+            }).map(item => lowercaseKeys(item));
+
+            // Lọc dữ liệu Cận lâm sàng bằng cách ép kiểu so sánh Ngày chuẩn
+            const dayCLS = (rootData.canLamSang || []).filter(r => {
+                return r.ngay && formatDateString(r.ngay) === targetDateStr;
+            }).map(item => lowercaseKeys(item));
 
             renderClinicalTable(dayLamSang);
             renderParaclinicalTable(dayCLS);
         } catch (error) {
             console.error(error);
-            alert('Lỗi kết nối hoặc cấu trúc API Apps Script chưa chính xác!');
+            alert('Lỗi kết nối API hoặc cấu trúc dữ liệu xuất bản từ Google Sheets chưa đúng!');
         } finally {
             document.getElementById('overlay').style.display = 'none';
         }
@@ -141,7 +175,7 @@
         let total = { bc:0, bm:0, cd:0, xv:0, xin:0, bv:0, tv:0, cv:0, cl:0 };
 
         CLINICAL_KHOA_LIST.forEach((fullName, idx) => {
-            // Tìm kiếm không phân biệt chữ hoa, chữ thường và khoảng trắng thừa
+            // Tìm bản ghi khớp tên khoa (Không phân biệt hoa thường và khoảng trắng)
             const r = dayData.find(item => item.khoa && item.khoa.toString().trim().toUpperCase() === fullName.toUpperCase()) || null;
             
             let bc = 0, bm = 0, cd = 0, xv = 0, xin = 0, bv = 0, tv = 0, cv = 0, cl = 0;
@@ -149,16 +183,16 @@
 
             if (r) {
                 hasData = true;
-                // Chuẩn hóa lấy dữ liệu chuẩn từ thuộc tính JSON (chấp nhận cả hoa thường)
-                bc = Number(r.benhCu || r.benhcu || 0);
-                bm = Number(r.benhMoi || r.benhmoi || 0);
-                cd = Number(r.chuyenKhoa || r.chuyenkhoa || 0);
-                xv = Number(r.xuatVien || r.xuatvien || 0);
-                xin = Number(r.xinVe || r.xinve || 0);
-                bv = Number(r.boVe || r.bove || 0);
-                tv = Number(r.tuVong || r.tuvong || 0);
-                cv = Number(r.chuyenVien || r.chuyenvien || 0);
-                cl = Number(r.conLai || r.conlai || 0);
+                // Đọc thuộc tính an toàn từ Object đã lowercase toàn bộ Key
+                bc = Number(r.benhcu || 0);
+                bm = Number(r.benhmoi || 0);
+                cd = Number(r.chuyenkhoa || 0);
+                xv = Number(r.xuatvien || 0);
+                xin = Number(r.xinve || 0);
+                bv = Number(r.bove || 0);
+                tv = Number(r.tuvong || 0);
+                cv = Number(r.chuyenvien || 0);
+                cl = Number(r.conlai || 0);
 
                 total.bc += bc; total.bm += bm; total.cd += cd; total.xv += xv; 
                 total.xin += xin; total.bv += bv; total.tv += tv; total.cv += cv; total.cl += cl;
@@ -194,18 +228,18 @@
         const tbody = document.querySelector('#tblCanLamSang tbody');
         tbody.innerHTML = '';
 
-        // Khai báo chính xác key trường dữ liệu trùng khớp cấu trúc trả về của Apps Script
+        // Định nghĩa Schema (Trường field đã được hạ thành chữ thường để so khớp an toàn tuyệt đối)
         const schema = [
             { field: 'procalcitonin', text: '1. PROCALCITONIN', type: 'TỔNG', dual: false },
             { field: 'bnp', text: '2. BNP', type: 'TỔNG', dual: false },
-            { field: 'khiMauDongMach', text: '3. KHÍ MÁU ĐỘNG MẠCH', type: 'TỔNG', dual: false },
-            { field: 'noiSoi', text: '4. SỐ LẦN NỘI SOI THỰC QUẢN - DẠ DÀY', type: 'TỔNG', dual: false },
-            { text: '5. SỐ LẦN CHỤP XQ', type: 'NGOẠI TRÚ', dual: true, key: 'xqNgoaiTru' },
-            { text: '5. SỐ LẦN CHỤP XQ', type: 'NỘI TRÚ', dual: true, key: 'xqNoiTru' },
-            { text: '6. SỐ LẦN SIÊU ÂM', type: 'NGOẠI TRÚ', dual: true, key: 'sieuAmNgoaiTru' },
-            { text: '6. SỐ LẦN SIÊU ÂM', type: 'NỘI TRÚ', dual: true, key: 'sieuAmNoiTru' },
-            { text: '7. SỐ LẦN XÉT NGHIỆM', type: 'NGOẠI TRÚ', dual: true, key: 'xnNgoaiTru' },
-            { text: '7. SỐ LẦN XÉT NGHIỆM', type: 'NỘI TRÚ', dual: true, key: 'xnNoiTru' }
+            { field: 'khimaudongmach', text: '3. KHÍ MÁU ĐỘNG MẠCH', type: 'TỔNG', dual: false },
+            { field: 'noisoi', text: '4. SỐ LẦN NỘI SOI THỰC QUẢN - DẠ DÀY', type: 'TỔNG', dual: false },
+            { text: '5. SỐ LẦN CHỤP XQ', type: 'NGOẠI TRÚ', dual: true, key: 'xqngoaitru' },
+            { text: '5. SỐ LẦN CHỤP XQ', type: 'NỘI TRÚ', dual: true, key: 'xqnoitru' },
+            { text: '6. SỐ LẦN SIÊU ÂM', type: 'NGOẠI TRÚ', dual: true, key: 'sieuanngoaitru' },
+            { text: '6. SỐ LẦN SIÊU ÂM', type: 'NỘI TRÚ', dual: true, key: 'sieuaunoitru' },
+            { text: '7. SỐ LẦN XÉT NGHIỆM', type: 'NGOẠI TRÚ', dual: true, key: 'xnngoaitru' },
+            { text: '7. SỐ LẦN XÉT NGHIỆM', type: 'NỘI TRÚ', dual: true, key: 'xnnoitru' }
         ];
 
         let lastText = "";
@@ -214,19 +248,13 @@
             let subCells = "";
 
             CLINICAL_KHOA_LIST.forEach(khoa => {
-                // Lọc dữ liệu CLS chỉ định bởi Khoa lâm sàng đích
+                // Lọc ra các dòng chỉ định tương ứng với khoa lâm sàng hiện tại
                 let matches = clsData.filter(r => r.loai && r.loai.toString().trim().toUpperCase() === khoa.toUpperCase());
                 let val = 0;
                 
                 matches.forEach(m => {
-                    // Chấp nhận xử lý cả hai trường hợp thuộc tính viết thường hoàn toàn hoặc viết hoa dạng CamelCase
-                    if (item.dual) {
-                        const lowKey = item.key.toLowerCase();
-                        val += Number(m[item.key] || m[lowKey] || 0);
-                    } else {
-                        const lowField = item.field.toLowerCase();
-                        val += Number(m[item.field] || m[lowField] || 0);
-                    }
+                    const lookupKey = item.dual ? item.key : item.field;
+                    val += Number(m[lookupKey] || 0);
                 });
                 
                 totalSum += val;
