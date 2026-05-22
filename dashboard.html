@@ -89,9 +89,10 @@
 </div>
 
 <script>
+    // URL Web App từ Google Apps Script của bạn
     const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyhprOyvs-aVfEb9NzJT0jXPfmx53aqbf0oB_61aQF-CMO-X-n0G81unG0TpiAroOSz/exec';
 
-    // Danh sách 11 khoa lâm sàng hiển thị khớp với thứ tự các cột cận lâm sàng
+    // Danh sách các khoa Lâm sàng hiển thị trên bảng
     const CLINICAL_KHOA_LIST = [
         "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
         "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", 
@@ -120,6 +121,7 @@
             const res = await fetch(WEB_APP_URL, { method: 'GET', cache: 'no-store', redirect: 'follow' });
             const rootData = await res.json();
             
+            // Lọc chính xác bản ghi khớp với ngày được chọn trên giao diện
             const dayLamSang = rootData.lamSang.filter(r => r.ngay && r.ngay.toString().substring(0, 10) === targetDate);
             const dayCLS = rootData.canLamSang.filter(r => r.ngay && r.ngay.toString().substring(0, 10) === targetDate);
 
@@ -127,7 +129,7 @@
             renderParaclinicalTable(dayCLS);
         } catch (error) {
             console.error(error);
-            alert('Lỗi cấu trúc hoặc kết nối Apps Script thất bại!');
+            alert('Lỗi kết nối hoặc cấu trúc API Apps Script chưa chính xác!');
         } finally {
             document.getElementById('overlay').style.display = 'none';
         }
@@ -139,23 +141,42 @@
         let total = { bc:0, bm:0, cd:0, xv:0, xin:0, bv:0, tv:0, cv:0, cl:0 };
 
         CLINICAL_KHOA_LIST.forEach((fullName, idx) => {
-            const r = dayData.find(item => item.khoa && item.khoa.toString().trim().toUpperCase() === fullName.toUpperCase()) || {};
-            const bc = Number(r.benhCu || 0), bm = Number(r.benhMoi || 0), cd = Number(r.chuyenKhoa || 0);
-            const xv = Number(r.xuatVien || 0), xin = Number(r.xinVe || 0), bv = Number(r.boVe || 0);
-            const tv = Number(r.tuVong || 0), cv = Number(r.chuyenVien || 0), cl = Number(r.conLai || 0);
+            // Tìm kiếm không phân biệt chữ hoa, chữ thường và khoảng trắng thừa
+            const r = dayData.find(item => item.khoa && item.khoa.toString().trim().toUpperCase() === fullName.toUpperCase()) || null;
+            
+            let bc = 0, bm = 0, cd = 0, xv = 0, xin = 0, bv = 0, tv = 0, cv = 0, cl = 0;
+            let hasData = false;
 
-            total.bc += bc; total.bm += bm; total.cd += cd; total.xv += xv; 
-            total.xin += xin; total.bv += bv; total.tv += tv; total.cv += cv; total.cl += cl;
+            if (r) {
+                hasData = true;
+                // Chuẩn hóa lấy dữ liệu chuẩn từ thuộc tính JSON (chấp nhận cả hoa thường)
+                bc = Number(r.benhCu || r.benhcu || 0);
+                bm = Number(r.benhMoi || r.benhmoi || 0);
+                cd = Number(r.chuyenKhoa || r.chuyenkhoa || 0);
+                xv = Number(r.xuatVien || r.xuatvien || 0);
+                xin = Number(r.xinVe || r.xinve || 0);
+                bv = Number(r.boVe || r.bove || 0);
+                tv = Number(r.tuVong || r.tuvong || 0);
+                cv = Number(r.chuyenVien || r.chuyenvien || 0);
+                cl = Number(r.conLai || r.conlai || 0);
+
+                total.bc += bc; total.bm += bm; total.cd += cd; total.xv += xv; 
+                total.xin += xin; total.bv += bv; total.tv += tv; total.cv += cv; total.cl += cl;
+            }
 
             tbody.innerHTML += `
                 <tr>
                     <td>${idx + 1}</td>
                     <td class="left">${fullName}</td>
-                    <td>${r.khoa ? bc : '-'}</td><td>${r.khoa ? bm : '-'}</td><td>${r.khoa ? cd : '-'}</td>
-                    <td>${r.khoa ? xv : '-'}</td><td>${r.khoa ? xin : '-'}</td><td>${r.khoa ? bv : '-'}</td>
-                    <td style="color:${tv > 0 ? 'red' : 'inherit'}; font-weight:${tv > 0 ? 'bold' : 'normal'}">${r.khoa ? tv : '-'}</td>
-                    <td>${r.khoa ? cv : '-'}</td>
-                    <td class="bg-yellow">${r.khoa ? cl : 0}</td>
+                    <td>${hasData ? bc : '-'}</td>
+                    <td>${hasData ? bm : '-'}</td>
+                    <td>${hasData ? cd : '-'}</td>
+                    <td>${hasData ? xv : '-'}</td>
+                    <td>${hasData ? xin : '-'}</td>
+                    <td>${hasData ? bv : '-'}</td>
+                    <td style="color:${tv > 0 ? 'red' : 'inherit'}; font-weight:${tv > 0 ? 'bold' : 'normal'}">${hasData ? tv : '-'}</td>
+                    <td>${hasData ? cv : '-'}</td>
+                    <td class="bg-yellow">${hasData ? cl : 0}</td>
                 </tr>`;
         });
 
@@ -173,6 +194,7 @@
         const tbody = document.querySelector('#tblCanLamSang tbody');
         tbody.innerHTML = '';
 
+        // Khai báo chính xác key trường dữ liệu trùng khớp cấu trúc trả về của Apps Script
         const schema = [
             { field: 'procalcitonin', text: '1. PROCALCITONIN', type: 'TỔNG', dual: false },
             { field: 'bnp', text: '2. BNP', type: 'TỔNG', dual: false },
@@ -192,12 +214,19 @@
             let subCells = "";
 
             CLINICAL_KHOA_LIST.forEach(khoa => {
-                // Lọc ra các bản ghi của khoa lâm sàng này chỉ định trong ngày
+                // Lọc dữ liệu CLS chỉ định bởi Khoa lâm sàng đích
                 let matches = clsData.filter(r => r.loai && r.loai.toString().trim().toUpperCase() === khoa.toUpperCase());
                 let val = 0;
                 
                 matches.forEach(m => {
-                    val += Number(item.dual ? (m[item.key] || 0) : (m[item.field] || 0));
+                    // Chấp nhận xử lý cả hai trường hợp thuộc tính viết thường hoàn toàn hoặc viết hoa dạng CamelCase
+                    if (item.dual) {
+                        const lowKey = item.key.toLowerCase();
+                        val += Number(m[item.key] || m[lowKey] || 0);
+                    } else {
+                        const lowField = item.field.toLowerCase();
+                        val += Number(m[item.field] || m[lowField] || 0);
+                    }
                 });
                 
                 totalSum += val;
