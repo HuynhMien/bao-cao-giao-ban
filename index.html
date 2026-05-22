@@ -3,43 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Nhập Báo Cáo Giao Ban</title>
+    <title>Hệ Thống Nhập Báo Cáo Giao Ban - Bệnh Viện Hồng Ngự</title>
     <style>
-        :root { --primary: #0284c7; --bg: #f1f5f9; --card-bg: #ffffff; --text: #1e293b; --border: #e2e8f0; }
+        :root { --primary: #0284c7; --bg: #f1f5f9; --card-bg: #ffffff; --text: #1e293b; --border: #cbd5e1; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 1100px; margin: 0 auto; }
+        .container { max-width: 1300px; margin: 0 auto; }
         .login-card { max-width: 450px; margin: 80px auto; background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); text-align: center; }
         .login-card h2 { color: var(--primary); margin-bottom: 20px; font-size: 20px; }
         .form-group { text-align: left; margin-bottom: 15px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; }
         .main-form { display: none; background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .header-area { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 15px; margin-bottom: 25px; }
+        .header-area { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 25px; }
         .header-title h2 { margin: 0; color: var(--primary); font-size: 22px; text-transform: uppercase; }
-        .section-title { font-size: 14px; font-weight: bold; color: #334155; border-left: 4px solid var(--primary); padding-left: 10px; margin: 25px 0 15px 0; text-transform: uppercase; }
+        .section-title { font-size: 15px; font-weight: bold; color: #334155; border-left: 4px solid var(--primary); padding-left: 10px; margin: 25px 0 15px 0; text-transform: uppercase; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
         .input-item { display: flex; flex-direction: column; }
         .input-item label { font-size: 12px; color: #64748b; margin-bottom: 5px; font-weight: 500; }
-        .input-item input { padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; font-weight: bold; background-color: #f8fafc; }
-        .input-item input:focus { border-color: var(--primary); background-color: #fff; outline: none; }
-        .btn-box { margin-top: 30px; display: flex; gap: 10px; }
-        .btn { padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+        .input-item input { padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; font-weight: bold; background-color: #f8fafc; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th, td { border: 1px solid var(--border); padding: 6px; text-align: center; }
+        th { background-color: #f1f5f9; }
+        .td-left { text-align: left; font-weight: bold; background-color: #f8fafc; }
+        .table-input { width: 80px; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: bold; text-align: center; }
+        .btn-box { margin-top: 30px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
         .btn-blue { background-color: #0284c7; color: white; }
         .btn-gray { background-color: #64748b; color: white; }
         .btn-red { background-color: #ef4444; color: white; }
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); display: none; justify-content: center; align-items: center; font-weight: bold; color: var(--primary); font-size: 16px; z-index: 9999; }
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; justify-content: center; align-items: center; font-weight: bold; color: var(--primary); font-size: 16px; z-index: 9999; }
     </style>
 </head>
 <body>
 
-<div id="loading">Đang truyền tải dữ liệu đồng bộ lên Google Sheets...</div>
+<div id="loading">Đang thực hiện truyền tải dữ liệu đồng bộ lên Google Sheets...</div>
 
 <div class="container">
     <div class="login-card" id="loginBlock">
         <h2>HỆ THỐNG GIAO BAN BỆNH VIỆN</h2>
         <div class="form-group">
-            <label>Nhập Token xác thực của khoa:</label>
-            <input type="password" id="txtToken" placeholder="Mã bảo mật khoa...">
+            <label>Nhập Token xác thực khoa phòng:</label>
+            <input type="password" id="txtToken" placeholder="Mã bảo mật...">
         </div>
         <button class="btn btn-blue" style="width:100%" onclick="loginSystem()">ĐĂNG NHẬP</button>
     </div>
@@ -51,13 +55,13 @@
                 <h2 id="txtTenKhoa">-</h2>
             </div>
             <div>
-                <a href="dashboard.html" class="btn btn-gray" style="margin-right: 8px;">📊 TRANG XEM DASHBOARD</a>
+                <a href="dashboard.html" class="btn btn-gray" style="margin-right: 8px;">📊 TRANG DASHBOARD TỔNG HỢP</a>
                 <button type="button" class="btn btn-red" onclick="logoutSystem()">ĐĂNG XUẤT</button>
             </div>
         </div>
 
-        <div id="grLamSang">
-            <div class="section-title">I. Số liệu lâm sàng (Bệnh nhân điều trị nội trú)</div>
+        <div id="grLamSang" style="display:none;">
+            <div class="section-title">Số liệu lâm sàng bệnh nhân nội trú</div>
             <div class="form-grid">
                 <div class="input-item"><label>Bệnh cũ hôm trước</label><input type="number" name="benhCu" value="0" min="0"></div>
                 <div class="input-item"><label>Bệnh nhân mới vào</label><input type="number" name="benhMoi" value="0" min="0"></div>
@@ -70,31 +74,27 @@
             </div>
         </div>
 
-        <div id="grCanLamSang">
-            <div class="section-title">II. Thống kê hoạt động cận lâm sàng</div>
-            <div class="form-grid">
-                <div class="input-item"><label>PROCALCITONIN</label><input type="number" name="procalcitonin" value="0" min="0"></div>
-                <div class="input-item"><label>BNP</label><input type="number" name="bnp" value="0" min="0"></div>
-                <div class="input-item"><label>KHÍ MÁU ĐỘNG MẠCH</label><input type="number" name="khiMauDongMach" value="0" min="0"></div>
-                <div class="input-item"><label>NỘI SOI DẠ DÀY/TÁ TRÀNG</label><input type="number" name="noiSoi" value="0" min="0"></div>
-                <div class="input-item"><label>CHỤP XQ NGOẠI TRÚ</label><input type="number" name="xqNgoaiTru" value="0" min="0"></div>
-                <div class="input-item"><label>CHỤP XQ NỘI TRÚ</label><input type="number" name="xqNoiTru" value="0" min="0"></div>
-                <div class="input-item"><label>SIÊU ÂM NGOẠI TRÚ</label><input type="number" name="sieuAmNgoaiTru" value="0" min="0"></div>
-                <div class="input-item"><label>SIÊU ÂM NỘI TRÚ</label><input type="number" name="sieuAmNoiTru" value="0" min="0"></div>
-                <div class="input-item"><label>XÉT NGHIỆM NGOẠI TRÚ</label><input type="number" name="xnNgoaiTru" value="0" min="0"></div>
-                <div class="input-item"><label>XÉT NGHIỆM NỘI TRÚ</label><input type="number" name="xnNoiTru" value="0" min="0"></div>
+        <div id="grCanLamSang" style="display:none;">
+            <div class="section-title" id="clsTitle">Bảng nhập chi tiết hoạt động cận lâm sàng cho các khoa</div>
+            <div style="overflow-x: auto;">
+                <table id="tblInputCLS">
+                    <thead>
+                        <tr id="thrCLS">
+                            </tr>
+                    </thead>
+                    <tbody id="tbyInputCLS"></tbody>
+                </table>
             </div>
         </div>
 
         <div class="btn-box">
-            <button type="submit" class="btn btn-blue" style="font-size: 15px; padding: 12px 30px;">GỬI / CẬP NHẬT BÁO CÁO</button>
+            <button type="submit" class="btn btn-blue" style="font-size: 15px; padding: 12px 40px;">GỬI / CẬP NHẬT BÁO CÁO MỚI NHẤT</button>
         </div>
     </form>
 </div>
 
 <script>
-    // THAY ĐƯỜNG LINK WEB APP PHIÊN BẢN MỚI CỦA BẠN VÀO ĐÂY
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxjpIKetrgdcbAUtyLBFJNgUzjurATrcZQXDRaU7pbqpY_ZHPRvYvB7eK_8h7c2_E_2/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw4bJ1DnxWuj1JM-bAXG5QF4M9Q2RbjXJruwgKPwrF-1gx9T6suciUVSyDLYM-Gt19J/exec';
 
     const MAP_TOKENS = {
         "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
@@ -109,8 +109,15 @@
         "LCK2026": "KHOA LIÊN CHUYÊN KHOA",
         "KKB2026": "TỔNG LƯỢT KHÁM NGOẠI TRÚ", 
         "CDHA2026": "KHOA CHẨN ĐOÁN HÌNH ẢNH",
-        "XETNGHIEM2026": "KHOA XÉT NGHIỆM"
+        "XETNGHIEM2026": "KHOA XXét NGHIỆM"
     };
+
+    // Danh sách các khoa lâm sàng cần được chỉ định số liệu cận lâm sàng
+    const CLINICAL_KHOAS = [
+        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", "KHOA NGOẠI TỔNG HỢP",
+        "KHOA PHỤ SẢN", "KHOA NỘI TỔNG HỢP", "KHOA NỘI TIM MẠCH - LÃO HỌC", "KHOA NHI",
+        "KHOA TRUYỀN NHIỄM", "KHOA Y DƯỢC CỔ TRUYỀN", "KHOA LIÊN CHUYÊN KHOA", "TỔNG LƯỢT KHÁM NGOẠI TRÚ"
+    ];
 
     window.onload = function() {
         const savedToken = localStorage.getItem('hospital_token');
@@ -123,52 +130,72 @@
             localStorage.setItem('hospital_token', tok);
             renderFormView(tok);
         } else {
-            alert('Mã bảo mật Token đơn vị không tồn tại!');
+            alert('Mã bảo mật Token không hợp lệ!');
         }
     }
 
     function renderFormView(token) {
         document.getElementById('loginBlock').style.display = 'none';
-        const form = document.getElementById('formReport');
-        form.style.display = 'block';
+        document.getElementById('formReport').style.display = 'block';
         document.getElementById('txtTenKhoa').innerText = MAP_TOKENS[token];
 
-        const inputs = form.querySelectorAll('input[type="number"]');
-        inputs.forEach(i => { i.disabled = false; i.value = 0; });
-        
-        document.getElementById('grLamSang').style.display = 'block';
-        document.getElementById('grCanLamSang').style.display = 'block';
+        document.getElementById('grLamSang').style.display = 'none';
+        document.getElementById('grCanLamSang').style.display = 'none';
 
         if (token === "CDHA2026") {
-            document.getElementById('grLamSang').style.display = 'none';
-            inputs.forEach(i => {
-                if(!['xqNgoaiTru', 'xqNoiTru', 'sieuAmNgoaiTru', 'sieuAmNoiTru'].includes(i.name)) i.disabled = true;
-            });
+            document.getElementById('grCanLamSang').style.display = 'block';
+            buildParaclinicalTable(["xqNgoaiTru", "xqNoiTru", "sieuAmNgoaiTru", "sieuAmNoiTru"], ["XQ Ngoại Trú", "XQ Nội Trú", "Siêu Âm Ngoại Trú", "Siêu Âm Nội Trú"]);
         } else if (token === "XETNGHIEM2026") {
-            document.getElementById('grLamSang').style.display = 'none';
-            inputs.forEach(i => {
-                if(!['xnNgoaiTru', 'xnNoiTru', 'procalcitonin', 'bnp', 'khiMauDongMach'].includes(i.name)) i.disabled = true;
-            });
+            document.getElementById('grCanLamSang').style.display = 'block';
+            buildParaclinicalTable(["procalcitonin", "bnp", "khiMauDongMach", "noiSoi", "xnNgoaiTru", "xnNoiTru"], ["Procalcitonin", "BNP", "Khí Máu ĐM", "Nội Soi", "Xét Nghiệm NTru", "Xét Nghiệm NTrú"]);
         } else {
-            document.getElementById('grCanLamSang').style.display = 'none';
-            inputs.forEach(i => {
-                if(!['benhCu', 'benhMoi', 'chuyenKhoa', 'xuatVien', 'xinVe', 'boVe', 'tuVong', 'chuyenVien'].includes(i.name)) i.disabled = true;
-            });
+            document.getElementById('grLamSang').style.display = 'block';
         }
+    }
+
+    function buildParaclinicalTable(fields, labels) {
+        const thr = document.getElementById('thrCLS');
+        const tby = document.getElementById('tbyInputCLS');
+        
+        let headerHtml = `<th>STT</th><th style="text-align:left; width:250px;">Khoa Lâm Sàng Chỉ Định</th>`;
+        labels.forEach(l => { headerHtml += `<th>${l}</th>`; });
+        thr.innerHTML = headerHtml;
+
+        let bodyHtml = "";
+        CLINICAL_KHOAS.forEach((khoa, index) => {
+            let rowInputs = "";
+            fields.forEach(f => {
+                rowInputs += `<td><input type="number" class="table-input cls-val" data-khoa="${khoa}" data-field="${f}" value="0" min="0"></td>`;
+            });
+            bodyHtml += `<tr><td>${index+1}</td><td class="td-left">${khoa}</td>${rowInputs}</tr>`;
+        });
+        tby.innerHTML = bodyHtml;
     }
 
     async function sendReportData(e) {
         e.preventDefault();
         document.getElementById('loading').style.display = 'flex';
-
         const currentToken = localStorage.getItem('hospital_token');
+        
         const encodedParams = new URLSearchParams();
         encodedParams.append('khoa', MAP_TOKENS[currentToken]);
 
-        const inputs = document.getElementById('formReport').querySelectorAll('input[type="number"]');
-        inputs.forEach(i => {
-            if(!i.disabled) { encodedParams.append(i.name, i.value || 0); }
-        });
+        if (currentToken === "CDHA2026" || currentToken === "XETNGHIEM2026") {
+            // Đóng gói danh sách mảng sang cấu trúc mảng đối tượng JSON để gửi lên Apps Script
+            let dataPayload = [];
+            CLINICAL_KHOAS.forEach(khoa => {
+                let obj = { loai: khoa };
+                let inputs = document.querySelectorAll(`input[data-khoa="${khoa}"]`);
+                inputs.forEach(i => {
+                    obj[i.getAttribute('data-field')] = Number(i.value || 0);
+                });
+                dataPayload.push(obj);
+            });
+            encodedParams.append('payloadData', JSON.stringify(dataPayload));
+        } else {
+            const inputs = document.getElementById('grLamSang').querySelectorAll('input[type="number"]');
+            inputs.forEach(i => { encodedParams.append(i.name, i.value || 0); });
+        }
 
         try {
             const res = await fetch(WEB_APP_URL, {
@@ -180,14 +207,14 @@
             });
             const statusText = await res.text();
             if(statusText.trim() === "SUCCESS") {
-                alert('Dữ liệu giao ban đã được đồng bộ thành công!');
+                alert('Dữ liệu giao ban toàn viện đã được đồng bộ và cập nhật thành công!');
                 window.location.href = 'dashboard.html';
             } else {
-                alert('Lỗi phản hồi hệ thống: ' + statusText);
+                alert('Hệ thống từ chối phản hồi: ' + statusText);
             }
         } catch (error) {
             console.error(error);
-            alert('Lỗi đường truyền! Hãy kiểm tra lại cấu hình phiên bản Apps Script.');
+            alert('Lỗi đường truyền! Vui lòng lưu lại bản triển khai mới nhất trên Apps Script.');
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
