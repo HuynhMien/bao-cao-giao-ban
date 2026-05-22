@@ -22,10 +22,10 @@
         .input-item label { font-size: 12px; color: #64748b; margin-bottom: 5px; font-weight: 500; }
         .input-item input { padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; font-weight: bold; background-color: #f8fafc; text-align: center; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th, td { border: 1px solid var(--border); padding: 6px; text-align: center; }
+        th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
         th { background-color: #f1f5f9; }
         .td-left { text-align: left; font-weight: bold; background-color: #f8fafc; }
-        .table-input { width: 80px; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: bold; text-align: center; }
+        .table-input { width: 100px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: bold; text-align: center; }
         .btn-box { margin-top: 30px; }
         .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
         .btn-blue { background-color: #0284c7; color: white; }
@@ -75,12 +75,11 @@
         </div>
 
         <div id="grCanLamSang" style="display:none;">
-            <div class="section-title" id="clsTitle">Bảng nhập chi tiết hoạt động cận lâm sàng cho các khoa</div>
+            <div class="section-title">Bảng nhập chi tiết hoạt động cận lâm sàng cho các khoa phòng</div>
             <div style="overflow-x: auto;">
                 <table id="tblInputCLS">
                     <thead>
-                        <tr id="thrCLS">
-                            </tr>
+                        <tr id="thrCLS"></tr>
                     </thead>
                     <tbody id="tbyInputCLS"></tbody>
                 </table>
@@ -94,8 +93,7 @@
 </div>
 
 <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx27JQ2e87Ll1pO-XWYsORG_PUwmcL4OsglrY2ZT6A4wfOvSHNsqGCjSHCBYCF_vvRq/exec';
-
+    // Đồng bộ chính xác TÊN KHOA trên hệ thống
     const MAP_TOKENS = {
         "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
         "NGOAI2026": "KHOA NGOẠI TỔNG HỢP",
@@ -107,16 +105,24 @@
         "TRUYENNHIEM2026": "KHOA TRUYỀN NHIỄM",
         "YHCT2026": "KHOA Y DƯỢC CỔ TRUYỀN", 
         "LCK2026": "KHOA LIÊN CHUYÊN KHOA",
-        "KKB2026": "TỔNG LƯỢT KHÁM NGOẠI TRÚ", 
+        "KKB2026": "KHOA KHÁM BỆNH (TỔNG LƯỢT KHÁM NGOẠI TRÚ)", 
         "CDHA2026": "KHOA CHẨN ĐOÁN HÌNH ẢNH",
-        "XETNGHIEM2026": "KHOA XXét NGHIỆM"
+        "XETNGHIEM2026": "KHOA XÉT NGHIỆM"
     };
 
-    // Danh sách các khoa lâm sàng cần được chỉ định số liệu cận lâm sàng
+    // Danh sách các khoa lâm sàng để chỉ định chỉ tiêu cận lâm sàng
     const CLINICAL_KHOAS = [
-        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", "KHOA NGOẠI TỔNG HỢP",
-        "KHOA PHỤ SẢN", "KHOA NỘI TỔNG HỢP", "KHOA NỘI TIM MẠCH - LÃO HỌC", "KHOA NHI",
-        "KHOA TRUYỀN NHIỄM", "KHOA Y DƯỢC CỔ TRUYỀN", "KHOA LIÊN CHUYÊN KHOA", "TỔNG LƯỢT KHÁM NGOẠI TRÚ"
+        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
+        "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", 
+        "KHOA NGOẠI TỔNG HỢP",
+        "KHOA PHỤ SẢN", 
+        "KHOA NỘI TỔNG HỢP", 
+        "KHOA NỘI TIM MẠCH - LÃO HỌC", 
+        "KHOA NHI",
+        "KHOA TRUYỀN NHIỄM", 
+        "KHOA Y DƯỢC CỔ TRUYỀN", 
+        "KHOA LIÊN CHUYÊN KHOA", 
+        "KHOA KHÁM BỆNH (TỔNG LƯỢT KHÁM NGOẠI TRÚ)"
     ];
 
     window.onload = function() {
@@ -130,7 +136,7 @@
             localStorage.setItem('hospital_token', tok);
             renderFormView(tok);
         } else {
-            alert('Mã bảo mật Token không hợp lệ!');
+            alert('Mã bảo mật đơn vị không chính xác!');
         }
     }
 
@@ -144,10 +150,18 @@
 
         if (token === "CDHA2026") {
             document.getElementById('grCanLamSang').style.display = 'block';
-            buildParaclinicalTable(["xqNgoaiTru", "xqNoiTru", "sieuAmNgoaiTru", "sieuAmNoiTru"], ["XQ Ngoại Trú", "XQ Nội Trú", "Siêu Âm Ngoại Trú", "Siêu Âm Nội Trú"]);
+            // Khoa CĐHA chịu trách nhiệm nhập: Nội soi, XQ Ngoại/Nội, Siêu âm Ngoại/Nội
+            buildParaclinicalTable(
+                ["noiSoi", "xqNgoaiTru", "xqNoiTru", "sieuAmNgoaiTru", "sieuAmNoiTru"], 
+                ["Nội Soi", "XQ Ngoại Trú", "XQ Nội Trú", "Siêu Âm Ngoại Trú", "Siêu Âm Nội Trú"]
+            );
         } else if (token === "XETNGHIEM2026") {
             document.getElementById('grCanLamSang').style.display = 'block';
-            buildParaclinicalTable(["procalcitonin", "bnp", "khiMauDongMach", "noiSoi", "xnNgoaiTru", "xnNoiTru"], ["Procalcitonin", "BNP", "Khí Máu ĐM", "Nội Soi", "Xét Nghiệm NTru", "Xét Nghiệm NTrú"]);
+            // Khoa Xét nghiệm nhập: Procalcitonin, BNP, Khí máu động mạch, Xét nghiệm Ngoại/Nội
+            buildParaclinicalTable(
+                ["procalcitonin", "bnp", "khiMauDongMach", "xnNgoaiTru", "xnNoiTru"], 
+                ["Procalcitonin", "BNP", "Khí Máu ĐM", "Xét Nghiệm Ngoại", "Xét Nghiệm Nội Trú"]
+            );
         } else {
             document.getElementById('grLamSang').style.display = 'block';
         }
@@ -157,7 +171,7 @@
         const thr = document.getElementById('thrCLS');
         const tby = document.getElementById('tbyInputCLS');
         
-        let headerHtml = `<th>STT</th><th style="text-align:left; width:250px;">Khoa Lâm Sàng Chỉ Định</th>`;
+        let headerHtml = `<th>STT</th><th style="text-align:left; min-width:280px;">Khoa Lâm Sàng Chỉ Định</th>`;
         labels.forEach(l => { headerHtml += `<th>${l}</th>`; });
         thr.innerHTML = headerHtml;
 
@@ -165,7 +179,7 @@
         CLINICAL_KHOAS.forEach((khoa, index) => {
             let rowInputs = "";
             fields.forEach(f => {
-                rowInputs += `<td><input type="number" class="table-input cls-val" data-khoa="${khoa}" data-field="${f}" value="0" min="0"></td>`;
+                rowInputs += `<td><input type="number" class="table-input" data-khoa="${khoa}" data-field="${f}" value="0" min="0"></td>`;
             });
             bodyHtml += `<tr><td>${index+1}</td><td class="td-left">${khoa}</td>${rowInputs}</tr>`;
         });
@@ -181,7 +195,6 @@
         encodedParams.append('khoa', MAP_TOKENS[currentToken]);
 
         if (currentToken === "CDHA2026" || currentToken === "XETNGHIEM2026") {
-            // Đóng gói danh sách mảng sang cấu trúc mảng đối tượng JSON để gửi lên Apps Script
             let dataPayload = [];
             CLINICAL_KHOAS.forEach(khoa => {
                 let obj = { loai: khoa };
@@ -207,14 +220,14 @@
             });
             const statusText = await res.text();
             if(statusText.trim() === "SUCCESS") {
-                alert('Dữ liệu giao ban toàn viện đã được đồng bộ và cập nhật thành công!');
+                alert('Đã đồng bộ thành công số liệu giao ban lên hệ thống!');
                 window.location.href = 'dashboard.html';
             } else {
-                alert('Hệ thống từ chối phản hồi: ' + statusText);
+                alert('Gặp lỗi phản hồi hệ thống: ' + statusText);
             }
         } catch (error) {
             console.error(error);
-            alert('Lỗi đường truyền! Vui lòng lưu lại bản triển khai mới nhất trên Apps Script.');
+            alert('Lỗi kết nối! Xin vui lòng kiểm tra lại URL Web App Apps Script.');
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
