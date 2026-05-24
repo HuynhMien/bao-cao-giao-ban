@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Nhập Báo Cáo Giao Ban - Bệnh Viện ĐK KV Hồng Ngự</title>
+    <title>Nhập Báo Cáo Giao Ban - BV ĐK KV Hồng Ngự</title>
     <style>
         :root { --primary: #0284c7; --bg: #f1f5f9; --card-bg: #ffffff; --text: #1e293b; --border: #cbd5e1; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         .container { max-width: 1350px; margin: 0 auto; }
         .login-card { max-width: 450px; margin: 80px auto; background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); text-align: center; }
-        .login-card h2 { color: var(--primary); margin-bottom: 20px; font-size: 19px; text-transform: uppercase; letter-spacing: 0.5px; }
         .form-group { text-align: left; margin-bottom: 15px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
         .form-group input { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; }
@@ -24,34 +23,32 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { border: 1px solid var(--border); padding: 10px; text-align: center; }
         th { background-color: #f1f5f9; color: #334155; font-weight: bold; }
-        .td-left { text-align: left; font-weight: bold; background-color: #f8fafc; color: #1e293b; }
         .table-input { width: 90px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: bold; text-align: center; }
-        .btn-box { margin-top: 30px; }
         .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
         .btn-blue { background-color: #0284c7; color: white; }
         .btn-gray { background-color: #64748b; color: white; }
         .btn-red { background-color: #ef4444; color: white; }
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); display: none; justify-content: center; align-items: center; font-weight: bold; color: var(--primary); font-size: 16px; z-index: 9999; }
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; justify-content: center; align-items: center; font-weight: bold; color: var(--primary); z-index: 9999; }
     </style>
 </head>
 <body>
 
-<div id="loading">🚀 HỆ THỐNG ĐANG TIẾN HÀNH CHUẨN HÓA ĐỊNH DẠNG VÀ ĐỒNG BỘ SỐ LIỆU LÊN GOOGLE SHEETS...</div>
+<div id="loading">🚀 ĐANG TIẾN HÀNH XỬ LÝ DỮ LIỆU VÀ ĐỒNG BỘ LÊN GOOGLE SHEETS...</div>
 
 <div class="container">
     <div class="login-card" id="loginBlock">
-        <h2 style="margin-top:0; color:#0284c7;">BỆNH VIỆN ĐA KHOA KHU VỰC HỒNG NGỰ</h2>
+        <h2 style="color:#0284c7;">BỆNH VIỆN ĐA KHOA KHU VỰC HỒNG NGỰ</h2>
         <div class="form-group">
-            <label>Nhập Token xác thực quyền truy cập Khoa phòng:</label>
-            <input type="password" id="txtToken" placeholder="Mã xác thực không kèm năm...">
+            <label>Nhập Token xác thực Khoa phòng:</label>
+            <input type="password" id="txtToken" placeholder="Mã khoa phòng...">
         </div>
-        <button class="btn btn-blue" style="width:100%; font-size:14px; padding:12px;" onclick="loginSystem()">ĐĂNG NHẬP HỆ THỐNG</button>
+        <button class="btn btn-blue" style="width:100%;" onclick="loginSystem()">ĐĂNG NHẬP</button>
     </div>
 
     <form class="main-form" id="formReport" onsubmit="sendReportData(event)">
         <div class="header-area">
             <div class="header-title">
-                <small style="color: #64748b; font-weight: 600; text-transform: uppercase;">Đơn vị thực hiện báo cáo:</small>
+                <small style="color: #64748b; font-weight:600;">ĐƠN VỊ BÁO CÁO:</small>
                 <h2 id="txtTenKhoa">-</h2>
             </div>
             <div>
@@ -74,8 +71,18 @@
             </div>
         </div>
 
+        <div id="grKhamBenh" style="display:none;">
+            <div class="section-title">Số liệu hoạt động ngoại trú</div>
+            <div class="form-grid" style="grid-template-columns: 300px;">
+                <div class="input-item">
+                    <label style="font-weight: bold; color: #0284c7;">TỔNG LƯỢT KHÁM NGOẠI TRÚ</label>
+                    <input type="number" name="luotKhamNgoaiTru" value="0" min="0" style="padding:15px; font-size:18px; border:2px solid #0284c7;">
+                </div>
+            </div>
+        </div>
+
         <div id="grCanLamSang" style="display:none;">
-            <div class="section-title">Bảng ghi nhận chỉ số cận lâm sàng chi tiết theo từng đơn vị chỉ định</div>
+            <div class="section-title">Bảng chỉ số cận lâm sàng chi tiết theo từng đơn vị chỉ định</div>
             <div style="overflow-x: auto;">
                 <table id="tblInputCLS">
                     <thead><tr id="thrCLS"></tr></thead>
@@ -84,17 +91,15 @@
             </div>
         </div>
 
-        <div class="btn-box">
-            <button type="submit" class="btn btn-blue" style="font-size: 15px; padding: 14px 45px;">GỬI / CẬP NHẬT BÁO CÁO MỚI NHẤT</button>
+        <div class="btn-box" style="margin-top:30px;">
+            <button type="submit" class="btn btn-blue" style="font-size:15px; padding:14px 45px;">GỬI CẬP NHẬT BÁO CÁO GIAO BAN</button>
         </div>
     </form>
 </div>
 
 <script>
-    // URL Web App sau khi bạn Deploy lại bản dựng mới
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxSMsudKFyRg2qeBdjRcC7zyIY464d4aja7-iAomFfq0_APoSjRzzh1AU7r4NOT3SDV/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxoXV3chGmAqItZDCBWYlIuYZrO_Ech521KwzuPqpPM2GjtsjJ4Jdanfg_tFopapjIu/exec';
 
-    // Mảng Token đã bỏ năm 2026
     const MAP_TOKENS = {
         "CAPCUU": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "NGOAI": "KHOA NGOẠI TỔNG HỢP", "NHI": "KHOA NHI", 
         "NOITIMMACH": "KHOA NỘI TIM MẠCH - LÃO HỌC", "NOITONGHOP": "KHOA NỘI TỔNG HỢP", "GMHS": "KHOA PHẪT THUẬT GÂY MÊ HỒI SỨC",
@@ -119,30 +124,26 @@
         if (MAP_TOKENS[tok]) {
             localStorage.setItem('hospital_token', tok);
             renderFormView(tok);
-        } else {
-            alert('Mã xác thực Token không chính xác!');
-        }
+        } else { alert('Sai mã Token xác thực!'); }
     }
 
     function renderFormView(token) {
         document.getElementById('loginBlock').style.display = 'none';
         document.getElementById('formReport').style.display = 'block';
         document.getElementById('txtTenKhoa').innerText = MAP_TOKENS[token];
+        
         document.getElementById('grLamSang').style.display = 'none';
+        document.getElementById('grKhamBenh').style.display = 'none';
         document.getElementById('grCanLamSang').style.display = 'none';
 
-        if (token === "CDHA") {
+        if (token === "KKB") {
+            document.getElementById('grKhamBenh').style.display = 'block';
+        } else if (token === "CDHA") {
             document.getElementById('grCanLamSang').style.display = 'block';
-            buildParaclinicalTable(
-                ["noiSoi", "xqNgoaiTru", "xqNoiTru", "sieuAmNgoaiTru", "sieuAmNoiTru"], 
-                ["Nội Soi Thực Quản - Dạ Dày", "Số Lần Chụp XQ Ngoại Trú", "Số Lần Chụp XQ Nội Trú", "Số Lần Siêu Âm Ngoại Trú", "Số Lần Siêu Âm Nội Trú"]
-            );
+            buildParaclinicalTable(["noiSoi", "xqNgoaiTru", "xqNoiTru", "sieuAmNgoaiTru", "sieuAmNoiTru"], ["Nội Soi", "XQ Ngoại", "XQ Nội", "Siêu Âm Ngoại", "Siêu Âm Nội"]);
         } else if (token === "XETNGHIEM") {
             document.getElementById('grCanLamSang').style.display = 'block';
-            buildParaclinicalTable(
-                ["procalcitonin", "bnp", "khiMauDongMach", "xnNgoaiTru", "xnNoiTru"], 
-                ["1. Procalcitonin", "2. BNP", "3. Khí Máu Động Mạch", "7. Số Lần Xét Nghiệm Ngoại Trú", "7. Số Lần Xét Nghiệm Nội Trú"]
-            );
+            buildParaclinicalTable(["procalcitonin", "bnp", "khiMauDongMach", "xnNgoaiTru", "xnNoiTru"], ["Procalcitonin", "BNP", "Khí Máu ĐM", "XN Ngoại", "XN Nội"]);
         } else {
             document.getElementById('grLamSang').style.display = 'block';
         }
@@ -151,7 +152,7 @@
     function buildParaclinicalTable(fields, labels) {
         const thr = document.getElementById('thrCLS');
         const tby = document.getElementById('tbyInputCLS');
-        let headerHtml = `<th>STT</th><th style="text-align:left; min-width:320px;">Khoa Lâm Sàng Chỉ Định Dữ Liệu</th>`;
+        let headerHtml = `<th>STT</th><th style="text-align:left; min-width:300px;">Khoa Lâm Sàng Chỉ Định</th>`;
         labels.forEach(l => { headerHtml += `<th>${l}</th>`; });
         thr.innerHTML = headerHtml;
 
@@ -159,7 +160,7 @@
         CLINICAL_KHOAS.forEach((khoa, index) => {
             let rowInputs = "";
             fields.forEach(f => { rowInputs += `<td><input type="number" class="table-input" data-khoa="${khoa}" data-field="${f}" value="0" min="0"></td>`; });
-            bodyHtml += `<tr><td>${index+1}</td><td class="td-left">${khoa}</td>${rowInputs}</tr>`;
+            bodyHtml += `<tr><td>${index+1}</td><td style="text-align:left; font-weight:600;">${khoa}</td>${rowInputs}</tr>`;
         });
         tby.innerHTML = bodyHtml;
     }
@@ -168,7 +169,6 @@
         e.preventDefault();
         document.getElementById('loading').style.display = 'flex';
         const currentToken = localStorage.getItem('hospital_token');
-        
         const encodedParams = new URLSearchParams();
         encodedParams.append('khoa', MAP_TOKENS[currentToken]);
 
@@ -176,46 +176,36 @@
             let dataPayload = [];
             CLINICAL_KHOAS.forEach(khoa => {
                 let obj = { loai: khoa };
-                let inputs = document.querySelectorAll(`input[data-khoa="${khoa}"]`);
-                inputs.forEach(i => { 
-                    var fName = i.getAttribute('data-field');
-                    obj[fName] = Number(i.value || 0); 
+                document.querySelectorAll(`input[data-khoa="${khoa}"]`).forEach(i => { 
+                    obj[i.getAttribute('data-field')] = Number(i.value || 0); 
                 });
                 dataPayload.push(obj);
             });
             encodedParams.append('payloadData', JSON.stringify(dataPayload));
+        } else if (currentToken === "KKB") {
+            encodedParams.append('luotKhamNgoaiTru', document.querySelector('input[name="luotKhamNgoaiTru"]').value || 0);
         } else {
-            const inputs = document.getElementById('grLamSang').querySelectorAll('input[type="number"]');
-            inputs.forEach(i => { encodedParams.append(i.name, i.value || 0); });
+            document.getElementById('grLamSang').querySelectorAll('input[type="number"]').forEach(i => { 
+                encodedParams.append(i.name, i.value || 0); 
+            });
         }
 
         try {
             const res = await fetch(WEB_APP_URL, {
                 method: 'POST',
                 mode: 'cors',
-                redirect: 'follow',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: encodedParams.toString()
             });
-            const statusText = await res.text();
-            if(statusText.trim() === "SUCCESS") {
-                alert('Đồng bộ số liệu thành công! Đã cập nhật tăng tiến số lần báo cáo.');
+            if((await res.text()).trim() === "SUCCESS") {
+                alert('Gửi báo cáo thành công!');
                 window.location.href = 'dashboard.html';
-            } else {
-                alert('Lỗi hệ thống: ' + statusText);
-            }
-        } catch (error) {
-            console.error(error);
-            alert('Lỗi kết nối đường truyền đến Web App.');
-        } finally {
-            document.getElementById('loading').style.display = 'none';
-        }
+            } else { alert('Lỗi đồng bộ dữ liệu.'); }
+        } catch (error) { alert('Lỗi kết nối mạng.'); }
+        finally { document.getElementById('loading').style.display = 'none'; }
     }
 
-    function logoutSystem() {
-        localStorage.removeItem('hospital_token');
-        location.reload();
-    }
+    function logoutSystem() { localStorage.removeItem('hospital_token'); location.reload(); }
 </script>
 </body>
 </html>
