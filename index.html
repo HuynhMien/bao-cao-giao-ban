@@ -17,7 +17,7 @@
         .header-title h2 { margin: 0; color: var(--primary); font-size: 22px; text-transform: uppercase; }
         .section-title { font-size: 15px; font-weight: bold; color: #334155; border-left: 4px solid var(--primary); padding-left: 10px; margin: 25px 0 15px 0; text-transform: uppercase; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        .input-item { display: flex; flex-direction: column; }
+        .input-item { display: flex; flex-direction: column; margin-bottom: 15px; }
         .input-item label { font-size: 12px; color: #64748b; margin-bottom: 5px; font-weight: 500; }
         .input-item input { padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; font-weight: bold; background-color: #f8fafc; text-align: center; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
@@ -39,7 +39,7 @@
     <div class="login-card" id="loginBlock">
         <h2 style="color:#0284c7;">BỆNH VIỆN ĐA KHOA KHU VỰC HỒNG NGỰ</h2>
         <div class="form-group">
-            <label>Nhập Token xác thực Khoa phòng:</label>
+            <label>Nhập Token phòng ban:</label>
             <input type="password" id="txtToken" placeholder="Mã khoa phòng...">
         </div>
         <button class="btn btn-blue" style="width:100%;" onclick="loginSystem()">ĐĂNG NHẬP</button>
@@ -52,7 +52,7 @@
                 <h2 id="txtTenKhoa">-</h2>
             </div>
             <div>
-                <a href="dashboard.html" class="btn btn-gray" style="margin-right: 8px;">📊 TRANG DASHBOARD TỔNG HỢP</a>
+                <a href="dashboard.html" class="btn btn-gray" style="margin-right: 8px;">📊 DASHBOARD TỔNG HỢP</a>
                 <button type="button" class="btn btn-red" onclick="logoutSystem()">ĐĂNG XUẤT</button>
             </div>
         </div>
@@ -64,7 +64,9 @@
                 <div class="input-item"><label>Bệnh mới vào</label><input type="number" name="benhMoi" value="0" min="0"></div>
                 <div class="input-item"><label>Khoa khác chuyển đến</label><input type="number" name="chuyenKhoa" value="0" min="0"></div>
                 <div class="input-item"><label>Xuất viện</label><input type="number" name="xuatVien" value="0" min="0"></div>
-                <div class="input-item"><label>Xin về</label><input type="number" name="xinVe" value="0" min="0"></div>
+                <div class="input-item"><label>Xin về (Bệnh ổn)</label><input type="number" name="xinVeBenhOn" value="0" min="0"></div>
+                <div class="input-item"><label>Xin về (Bệnh nặng)</label><input type="number" name="xinVeBenhNang" value="0" min="0"></div>
+                <div class="input-item"><label>Chuyển đi các khoa</label><input type="number" name="chuyenDiCacKhoa" value="0" min="0"></div>
                 <div class="input-item"><label>Bỏ viện</label><input type="number" name="boVe" value="0" min="0"></div>
                 <div class="input-item"><label>Tử vong</label><input type="number" name="tuVong" value="0" min="0"></div>
                 <div class="input-item"><label>Chuyển viện khác</label><input type="number" name="chuyenVien" value="0" min="0"></div>
@@ -82,13 +84,28 @@
         </div>
 
         <div id="grCanLamSang" style="display:none;">
-            <div class="section-title">Bảng chỉ số cận lâm sàng chi tiết theo từng đơn vị chỉ định</div>
-            <div style="overflow-x: auto;">
-                <table id="tblInputCLS">
-                    <thead><tr id="thrCLS"></tr></thead>
-                    <tbody id="tbyInputCLS"></tbody>
-                </table>
+            <div id="wrapperBangCLS" style="display:none;">
+                <div class="section-title">Bảng chỉ số xét nghiệm chi tiết theo đơn vị chỉ định</div>
+                <div style="overflow-x: auto;">
+                    <table id="tblInputCLS">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th style="text-align:left; min-width:280px;">Khoa Lâm Sàng Chỉ Định</th>
+                                <th>Procalcitonin</th>
+                                <th>BNP</th>
+                                <th>Khí Máu ĐM</th>
+                                <th>XN Ngoại Trú</th>
+                                <th>XN Nội Trú</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbyInputCLS"></tbody>
+                    </table>
+                </div>
             </div>
+
+            <div class="section-title" id="titleKhoiTong">Số liệu báo cáo tổng toàn viện</div>
+            <div class="form-grid" id="containerKhoiTong"></div>
         </div>
 
         <div class="btn-box" style="margin-top:30px;">
@@ -98,7 +115,7 @@
 </div>
 
 <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxoXV3chGmAqItZDCBWYlIuYZrO_Ech521KwzuPqpPM2GjtsjJ4Jdanfg_tFopapjIu/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxFhs9ZLvxVd1BmZk5XDg1xgEVkPtjvrgi5zc7r3DHwQa85ILF2HXfwiZYPY0gnK8Au/exec';
 
     const MAP_TOKENS = {
         "CAPCUU": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "NGOAI": "KHOA NGOẠI TỔNG HỢP", "NHI": "KHOA NHI", 
@@ -135,34 +152,53 @@
         document.getElementById('grLamSang').style.display = 'none';
         document.getElementById('grKhamBenh').style.display = 'none';
         document.getElementById('grCanLamSang').style.display = 'none';
+        document.getElementById('wrapperBangCLS').style.display = 'none';
 
         if (token === "KKB") {
             document.getElementById('grKhamBenh').style.display = 'block';
-        } else if (token === "CDHA") {
-            document.getElementById('grCanLamSang').style.display = 'block';
-            buildParaclinicalTable(["noiSoi", "xqNgoaiTru", "xqNoiTru", "sieuAmNgoaiTru", "sieuAmNoiTru"], ["Nội Soi", "XQ Ngoại", "XQ Nội", "Siêu Âm Ngoại", "Siêu Âm Nội"]);
         } else if (token === "XETNGHIEM") {
             document.getElementById('grCanLamSang').style.display = 'block';
-            buildParaclinicalTable(["procalcitonin", "bnp", "khiMauDongMach", "xnNgoaiTru", "xnNoiTru"], ["Procalcitonin", "BNP", "Khí Máu ĐM", "XN Ngoại", "XN Nội"]);
+            document.getElementById('wrapperBangCLS').style.display = 'block';
+            
+            // Xây dựng bảng nhập theo khoa lâm sàng cho Xét nghiệm
+            const tby = document.getElementById('tbyInputCLS');
+            const fieldsXN = ["procalcitonin", "bnp", "khiMauDongMach", "xnNgoaiTru", "xnNoiTru"];
+            let bodyHtml = "";
+            CLINICAL_KHOAS.forEach((khoa, index) => {
+                let rowInputs = "";
+                fieldsXN.forEach(f => { rowInputs += `<td><input type="number" class="table-input" data-khoa="${khoa}" data-field="${f}" value="0" min="0"></td>`; });
+                bodyHtml += `<tr><td>${index+1}</td><td style="text-align:left; font-weight:600;">${khoa}</td>${rowInputs}</tr>`;
+            });
+            tby.innerHTML = bodyHtml;
+
+            // Xây dựng thêm ô nhập Tổng nhóm máu ở dưới
+            document.getElementById('titleKhoiTong').innerText = "Thống kê Tổng số lượng các nhóm máu (Toàn viện)";
+            buildTotalFields(
+                ["nhomMauO", "nhomMauA", "nhomMauB", "nhomMauAB"],
+                ["TỔNG NHÓM MÁU O", "TỔNG NHÓM MÁU A", "TỔNG NHÓM MÁU B", "TỔNG NHÓM MÁU AB"]
+            );
+        } else if (token === "CDHA") {
+            document.getElementById('grCanLamSang').style.display = 'block';
+            document.getElementById('titleKhoiTong').innerText = "Số lượt tổng hoạt động Chẩn Đoán Hình Ảnh toàn viện";
+            buildTotalFields(
+                ["noiSoi", "xqNgoaiTru", "xqNoiTru", "sieuAmNgoaiTru", "sieuAmNoiTru"], 
+                ["TỔNG LƯỢT NỘI SOI", "TỔNG LƯỢT XQ NGOẠI", "TỔNG LƯỢT XQ NỘI", "TỔNG LƯỢT SIÊU ÂM NGOẠI", "TỔNG LƯỢT SIÊU ÂM NỘI"]
+            );
         } else {
             document.getElementById('grLamSang').style.display = 'block';
         }
     }
 
-    function buildParaclinicalTable(fields, labels) {
-        const thr = document.getElementById('thrCLS');
-        const tby = document.getElementById('tbyInputCLS');
-        let headerHtml = `<th>STT</th><th style="text-align:left; min-width:300px;">Khoa Lâm Sàng Chỉ Định</th>`;
-        labels.forEach(l => { headerHtml += `<th>${l}</th>`; });
-        thr.innerHTML = headerHtml;
-
-        let bodyHtml = "";
-        CLINICAL_KHOAS.forEach((khoa, index) => {
-            let rowInputs = "";
-            fields.forEach(f => { rowInputs += `<td><input type="number" class="table-input" data-khoa="${khoa}" data-field="${f}" value="0" min="0"></td>`; });
-            bodyHtml += `<tr><td>${index+1}</td><td style="text-align:left; font-weight:600;">${khoa}</td>${rowInputs}</tr>`;
+    function buildTotalFields(fields, labels) {
+        const container = document.getElementById('containerKhoiTong');
+        let html = "";
+        fields.forEach((f, idx) => {
+            html += `<div class="input-item">
+                <label style="font-weight:bold; color:#0284c7;">${labels[idx]}</label>
+                <input type="number" name="${f}" class="total-field" value="0" min="0" style="padding:12px; font-size:16px;">
+            </div>`;
         });
-        tby.innerHTML = bodyHtml;
+        container.innerHTML = html;
     }
 
     async function sendReportData(e) {
@@ -172,8 +208,9 @@
         const encodedParams = new URLSearchParams();
         encodedParams.append('khoa', MAP_TOKENS[currentToken]);
 
-        if (currentToken === "CDHA" || currentToken === "XETNGHIEM") {
+        if (currentToken === "XETNGHIEM") {
             let dataPayload = [];
+            // 1. Gom dữ liệu chẻ nhỏ theo từng khoa lâm sàng
             CLINICAL_KHOAS.forEach(khoa => {
                 let obj = { loai: khoa };
                 document.querySelectorAll(`input[data-khoa="${khoa}"]`).forEach(i => { 
@@ -181,6 +218,19 @@
                 });
                 dataPayload.push(obj);
             });
+            // 2. Gom dữ liệu lượt tổng nhóm máu lưu vào dòng đặc biệt "TỔNG TOÀN VIỆN"
+            let objTong = { loai: "TỔNG TOÀN VIỆN" };
+            document.querySelectorAll('.total-field').forEach(i => { objTong[i.name] = Number(i.value || 0); });
+            dataPayload.push(objTong);
+            
+            encodedParams.append('payloadData', JSON.stringify(dataPayload));
+        } else if (currentToken === "CDHA") {
+            // Gom toàn bộ chỉ số tổng của CDHA lưu vào dòng "TỔNG TOÀN VIỆN"
+            let dataPayload = [];
+            let objTong = { loai: "TỔNG TOÀN VIỆN" };
+            document.querySelectorAll('.total-field').forEach(i => { objTong[i.name] = Number(i.value || 0); });
+            dataPayload.push(objTong);
+            
             encodedParams.append('payloadData', JSON.stringify(dataPayload));
         } else if (currentToken === "KKB") {
             encodedParams.append('luotKhamNgoaiTru', document.querySelector('input[name="luotKhamNgoaiTru"]').value || 0);
