@@ -167,17 +167,15 @@
 </div>
 
 <script>
-    // URL Web App Apps Script đồng bộ với Dashboard của bạn
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzO-ojuDKiC4-5K7oiQb6wUSTMCnKMZSs4kX9lNzpB7EFoknPPHDL-wFiq6yTy4Ljiy/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx-EFPIemJu0Ryxw0kEkjenW4MWihGig9W8VHj7LK-H0Reb3nnCOeuJ2XtAhR8cfORG/exec';
 
-    // Đồng bộ chuẩn hóa chuỗi TÊN KHOA trên toàn hệ thống 100%
     const MAP_TOKENS = {
         "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
         "NGOAI2026": "KHOA NGOẠI TỔNG HỢP",
         "NHI2026": "KHOA NHI", 
         "NOITIMMACH2026": "KHOA NỘI TIM MẠCH - LÃO HỌC",
         "NOITONGHOP2026": "KHOA NỘI TỔNG HỢP", 
-        "GMHS2026": "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC",
+        "GMHS2026": "KHOA PHẪT THUẬT GÂY MÊ HỒI SỨC",
         "SAN2026": "KHOA PHỤ SẢN", 
         "TRUYENNHIEM2026": "KHOA TRUYỀN NHIỄM",
         "YHCT2026": "KHOA Y DƯỢC CỔ TRUYỀN", 
@@ -187,7 +185,6 @@
         "XETNGHIEM2026": "KHOA XÉT NGHIỆM"
     };
 
-    // Danh sách các khoa lâm sàng nhận phân bổ chỉ tiêu cận lâm sàng chỉ định
     const CLINICAL_KHOAS = [
         "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
         "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", 
@@ -227,14 +224,12 @@
 
         if (token === "CDHA2026") {
             document.getElementById('grCanLamSang').style.display = 'block';
-            // Khoa CĐHA chịu trách nhiệm nhập chỉ tiêu: Nội soi và XQuang/Siêu âm
             buildParaclinicalTable(
                 ["noiSoi", "xqNgoaiTru", "xqNoiTru", "sieuAmNgoaiTru", "sieuAmNoiTru"], 
                 ["Nội Soi", "XQ Ngoại Trú", "XQ Nội Trú", "Siêu Âm Ngoại Trú", "Siêu Âm Nội Trú"]
             );
         } else if (token === "XETNGHIEM2026") {
             document.getElementById('grCanLamSang').style.display = 'block';
-            // Khoa Xét nghiệm nhập: Procalcitonin, BNP, Khí máu động mạch, Các xét nghiệm quy đổi
             buildParaclinicalTable(
                 ["procalcitonin", "bnp", "khiMauDongMach", "xnNgoaiTru", "xnNoiTru"], 
                 ["Procalcitonin", "BNP", "Khí Máu ĐM", "Xét Nghiệm Ngoại", "Xét Nghiệm Nội Trú"]
@@ -300,11 +295,11 @@
                 alert('Đã đồng bộ thành công số liệu giao ban lên hệ thống!');
                 window.location.href = 'dashboard.html';
             } else {
-                alert('Gặp lỗi từ Apps Script: ' + statusText);
+                alert('Gặp lỗi hệ thống: ' + statusText);
             }
         } catch (error) {
             console.error(error);
-            alert('Lỗi kết nối! Xin vui lòng kiểm tra lại URL Web App hoặc phân quyền Deploy (Anyone).');
+            alert('Lỗi kết nối! Xin vui lòng kiểm tra lại URL Web App hoặc phân quyền Deploy.');
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
