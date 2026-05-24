@@ -3,69 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Báo Cáo Giao Ban Tổng Hợp - Bệnh Viện Hồng Ngự</title>
+    <title>Dashboard Tổng Hợp Giao Ban - BV Hồng Ngự</title>
     <style>
         :root { --primary: #0284c7; --bg: #f8fafc; --text: #0f172a; --border: #cbd5e1; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .dashboard-container { max-width: 1400px; margin: 0 auto; }
+        .dashboard-container { max-width: 1450px; margin: 0 auto; }
         .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .top-bar h1 { margin: 0; font-size: 20px; color: var(--primary); text-transform: uppercase; }
-        .filter-box { display: flex; align-items: center; gap: 10px; font-weight: 600; }
-        .filter-box input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; font-weight: bold; }
+        .top-bar h1 { margin: 0; font-size: 19px; color: var(--primary); text-transform: uppercase; }
+        .filter-box { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .filter-box input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-weight: bold; }
         .table-section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 25px; overflow-x: auto; }
-        .section-h2 { font-size: 20px; text-transform: uppercase; margin-top: 0; margin-bottom: 15px; color: #334155; border-left: 4px solid var(--primary); padding-left: 10px; }
-        table { width: 100%; border-collapse: collapse; font-size: 18px; text-align: center; }
-        th, td { border: 1px solid var(--border); padding: 10px; }
+        .section-h2 { font-size: 14px; text-transform: uppercase; margin-top: 0; margin-bottom: 15px; color: #334155; border-left: 4px solid var(--primary); padding-left: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: center; }
+        th, td { border: 1px solid var(--border); padding: 9px; }
         th { background: #f1f5f9; color: #334155; font-weight: bold; }
         .text-left { text-align: left; font-weight: 600; background: #f8fafc; }
         .sum-row { background: #f0fdf4; font-weight: bold; color: #166534; }
-        .badge { background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
-        .btn-nav { display: inline-flex; padding: 8px 16px; background-color: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px; }
+        .badge { background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 10px; font-size: 11px; }
+        .btn-nav { padding: 8px 16px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="dashboard-container">
     <div class="top-bar">
-        <h1>HỆ THỐNG GIAO BAN ĐIỆN TỬ BỆNH VIỆN</h1>
+        <h1>📊 DASHBOARD SỐ LIỆU TỔNG HỢP GIAO BAN - BỆNH VIỆN ĐK KV HỒNG NGỰ</h1>
         <div class="filter-box">
-            <span>CHỌN NGÀY XEM:</span>
+            <span>NGÀY XEM:</span>
             <input type="date" id="targetDatePicker" onchange="loadDashboardCoreData()">
-            <a href="index.html" class="btn-nav">✍️ TRANG NHẬP BÁO CÁO</a>
+            <a href="index.html" class="btn-nav">✍️ NHẬP BÁO CÁO</a>
         </div>
     </div>
 
     <div class="table-section">
-        <div class="section-h2">Tình hình người bệnh điều trị nội trú các khoa lâm sàng</div>
+        <div class="section-h2">I. Tình hình người bệnh điều trị nội trú & ngoại trú các khoa lâm sàng</div>
         <table>
             <thead>
                 <tr>
                     <th rowspan="2">STT</th>
-                    <th rowspan="2" style="min-width: 260px;">Tên Đơn Vị Khoa Phòng</th>
-                    <th rowspan="2">Bệnh Cũ</th>
-                    <th rowspan="2">Nhập Viện</th>
-                    <th rowspan="2">Khoa Đến</th>
-                    <th colspan="5">Số Lượng Người Bệnh Ra Viện Trong Ngày</th>
+                    <th rowspan="2" style="min-width: 250px;">Tên Đơn Vị Khoa Phòng</th>
+                    <th rowspan="2" style="background:#e0f2fe; color:#0369a1;">Tổng Lượt Khám Ngoại Trú</th>
+                    <th colspan="3">Đang Điều Trị Nội Trú</th>
+                    <th colspan="5">Kết Thúc Điều Trị Trong Ngày</th>
                     <th rowspan="2">Còn Lại</th>
-                    <th rowspan="2">Lượt gửi</th>
+                    <th rowspan="2">Cập nhật</th>
                 </tr>
                 <tr>
+                    <th>Bệnh Cũ</th><th>Bệnh Mới</th><th>Chuyển Đến</th>
                     <th>Ra Viện</th><th>Xin Về</th><th>Bỏ Viện</th><th>Tử Vong</th><th>Chuyển Viện</th>
                 </tr>
             </thead>
             <tbody id="bodyLamSang">
-                <tr><td colspan="12">Đang tải dữ liệu kết nối từ hệ thống Google Sheets...</td></tr>
+                <tr><td colspan="13">Đang đồng bộ dữ liệu trực tuyến...</td></tr>
             </tbody>
         </table>
     </div>
 
     <div class="table-section">
-        <div class="section-h2">Số liệu hoạt động cận lâm sàng toàn viện</div>
+        <div class="section-h2">II. Số liệu hoạt động cận lâm sàng toàn viện</div>
         <table>
             <thead>
                 <tr>
                     <th rowspan="2">STT</th>
-                    <th rowspan="2" style="min-width: 260px;">Khoa Lâm Sàng Chỉ Định</th>
+                    <th rowspan="2" style="min-width: 250px;">Khoa Lâm Sàng Chỉ Định</th>
                     <th colspan="5">Khoa Xét Nghiệm</th>
                     <th colspan="5">Khoa Chẩn Đoán Hình Ảnh</th>
                 </tr>
@@ -75,14 +75,14 @@
                 </tr>
             </thead>
             <tbody id="bodyCanLamSang">
-                <tr><td colspan="12">Đang xử lý kết xuất số liệu...</td></tr>
+                <tr><td colspan="12">Đang kết xuất sơ đồ...</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxSMsudKFyRg2qeBdjRcC7zyIY464d4aja7-iAomFfq0_APoSjRzzh1AU7r4NOT3SDV/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxoXV3chGmAqItZDCBWYlIuYZrO_Ech521KwzuPqpPM2GjtsjJ4Jdanfg_tFopapjIu/exec';
 
     const CLINICAL_KHOAS = [
         "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", "KHOA NGOẠI TỔNG HỢP", "KHOA PHỤ SẢN", 
@@ -91,8 +91,6 @@
     ];
 
     let cacheRawData = null;
-
-    // Thiết lập ngày mặc định ban đầu là ngày hôm nay
     document.getElementById('targetDatePicker').valueAsDate = new Date();
 
     async function loadDashboardCoreData() {
@@ -103,74 +101,75 @@
             }
             renderDashboardTables(cacheRawData);
         } catch (error) {
-            console.error(error);
-            document.getElementById('bodyLamSang').innerHTML = `<tr><td colspan="12" style="color:red; font-weight:bold;">Lỗi kết nối API cơ sở dữ liệu!</td></tr>`;
+            document.getElementById('bodyLamSang').innerHTML = `<tr><td colspan="13" style="color:red; font-weight:bold;">Lỗi kết nối cơ sở dữ liệu!</td></tr>`;
         }
     }
 
-    // Hàm chuyển đổi định dạng date html (yyyy-MM-dd) sang dạng chuỗi lưu trên sheet (dd-MM-yyyy)
     function convertDateToDMY(dateString) {
         if(!dateString) return "";
         const parts = dateString.split('-');
-        if(parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
-        return dateString;
+        return parts.length === 3 ? `${parts[2]}-${parts[1]}-${parts[0]}` : dateString;
     }
 
     function renderDashboardTables(data) {
-        const selectedDateHTML = document.getElementById('targetDatePicker').value;
-        const searchDate = convertDateToDMY(selectedDateHTML); // Chuyển về dạng "dd-MM-yyyy"
+        const searchDate = convertDateToDMY(document.getElementById('targetDatePicker').value);
 
-        // 1. DỰNG BẢNG LÂM SÀNG
+        // RENDER MẢNG LÂM SÀNG
         const tbodyLS = document.getElementById('bodyLamSang');
         let htmlLS = "";
-        let sums = { bc:0, bm:0, ck:0, xv:0, xv_xv:0, xv_bv:0, xv_tv:0, xv_cv:0, cl:0 };
+        let sums = { nt:0, bc:0, bm:0, ck:0, xv:0, xv_xv:0, bv:0, tv:0, cv:0, cl:0 };
 
         CLINICAL_KHOAS.forEach((khoa, index) => {
-            // Lọc ra tất cả các lượt gửi trong ngày của khoa này
             let matches = data.lamSang.filter(r => r.ngay === searchDate && r.khoa.toUpperCase() === khoa.toUpperCase());
-            let activeRecord = { benhCu:0, benhMoi:0, chuyenKhoa:0, xuatVien:0, xinVe:0, boVe:0, tuVong:0, chuyenVien:0, conLai:0, lanGui:"-" };
+            let act = { luotKhamNgoaiTru:0, benhCu:0, benhMoi:0, chuyenKhoa:0, xuatVien:0, xinVe:0, boVe:0, tuVong:0, chuyenVien:0, conLai:0, lanGui:"-" };
             
             if (matches.length > 0) {
-                // Lấy bản ghi có số lần gửi (lanGui) lớn nhất (mới nhất)
                 matches.sort((a, b) => Number(b.lanGui || 0) - Number(a.lanGui || 0));
-                activeRecord = matches[0];
+                act = matches[0];
             }
 
-            sums.bc += Number(activeRecord.benhCu || 0); sums.bm += Number(activeRecord.benhMoi || 0); sums.ck += Number(activeRecord.chuyenKhoa || 0);
-            sums.xv += Number(activeRecord.xuatVien || 0); sums.xv_xv += Number(activeRecord.xinVe || 0); sums.xv_bv += Number(activeRecord.boVe || 0);
-            sums.xv_tv += Number(activeRecord.tuVong || 0); sums.xv_cv += Number(activeRecord.chuyenVien || 0); sums.cl += Number(activeRecord.conLai || 0);
+            sums.nt += Number(act.luotKhamNgoaiTru || 0); sums.bc += Number(act.benhCu || 0); sums.bm += Number(act.benhMoi || 0); sums.ck += Number(act.chuyenKhoa || 0);
+            sums.xv += Number(act.xuatVien || 0); sums.xv_xv += Number(act.xinVe || 0); sums.bv += Number(act.boVe || 0);
+            sums.tv += Number(act.tuVong || 0); sums.cv += Number(act.chuyenVien || 0); sums.cl += Number(act.conLai || 0);
+
+            let isKKB = khoa.includes("KHÁM BỆNH");
 
             htmlLS += `<tr>
                 <td>${index + 1}</td>
                 <td class="text-left">${khoa}</td>
-                <td>${activeRecord.benhCu || 0}</td><td>${activeRecord.benhMoi || 0}</td><td>${activeRecord.chuyenKhoa || 0}</td>
-                <td>${activeRecord.xuatVien || 0}</td><td>${activeRecord.xinVe || 0}</td><td>${activeRecord.boVe || 0}</td>
-                <td>${activeRecord.tuVong || 0}</td><td>${activeRecord.chuyenVien || 0}</td>
-                <td style="font-weight:bold; color:#0284c7;">${activeRecord.conLai || 0}</td>
-                <td><span class="badge">Lần ${activeRecord.lanGui || 0}</span></td>
+                <td style="font-weight:bold; color:#0369a1; background:#f0f9ff;">${act.luotKhamNgoaiTru || 0}</td>
+                <td>${isKKB ? '-' : (act.benhCu || 0)}</td>
+                <td>${isKKB ? '-' : (act.benhMoi || 0)}</td>
+                <td>${isKKB ? '-' : (act.chuyenKhoa || 0)}</td>
+                <td>${isKKB ? '-' : (act.xuatVien || 0)}</td>
+                <td>${isKKB ? '-' : (act.xinVe || 0)}</td>
+                <td>${isKKB ? '-' : (act.boVe || 0)}</td>
+                <td>${isKKB ? '-' : (act.tuVong || 0)}</td>
+                <td>${isKKB ? '-' : (act.chuyenVien || 0)}</td>
+                <td style="font-weight:bold; color:#0284c7;">${isKKB ? '-' : (act.conLai || 0)}</td>
+                <td><span class="badge">Lần ${act.lanGui || 0}</span></td>
             </tr>`;
         });
 
         htmlLS += `<tr class="sum-row">
             <td colspan="2">TỔNG TOÀN VIỆN</td>
+            <td style="background:#dbeafe;">${sums.nt}</td>
             <td>${sums.bc}</td><td>${sums.bm}</td><td>${sums.ck}</td>
-            <td>${sums.xv}</td><td>${sums.xv_xv}</td><td>${sums.xv_bv}</td><td>${sums.xv_tv}</td><td>${sums.xv_cv}</td>
+            <td>${sums.xv}</td><td>${sums.xv_xv}</td><td>${sums.bv}</td><td>${sums.tv}</td><td>${sums.cv}</td>
             <td>${sums.cl}</td><td>-</td>
         </tr>`;
         tbodyLS.innerHTML = htmlLS;
 
-        // 2. DỰNG BẢNG CẬN LÂM SÀNG
+        // RENDER MẢNG CẬN LÂM SÀNG
         const tbodyCLS = document.getElementById('bodyCanLamSang');
         let htmlCLS = "";
         let totalCLS = { pro:0, bnp:0, khi:0, xnNg:0, xnNo:0, ns:0, xqNg:0, xqNo:0, saNg:0, saNo:0 };
 
         CLINICAL_KHOAS.forEach((khoa, index) => {
-            // Lấy dòng cận lâm sàng mới nhất trong ngày của Khoa Xét Nghiệm chỉ định cho khoa này
             let matchesXN = data.canLamSang.filter(r => r.ngay === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === khoa);
             matchesXN.sort((a,b) => Number(b.lanGui||0) - Number(a.lanGui||0));
             let rXN = matchesXN[0] || {};
 
-            // Lấy dòng cận lâm sàng mới nhất trong ngày của Khoa CDHA chỉ định cho khoa này
             let matchesCDHA = data.canLamSang.filter(r => r.ngay === searchDate && r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.loai === khoa);
             matchesCDHA.sort((a,b) => Number(b.lanGui||0) - Number(a.lanGui||0));
             let rCDHA = matchesCDHA[0] || {};
@@ -189,14 +188,13 @@
         });
 
         htmlCLS += `<tr class="sum-row">
-            <td colspan="2">TỔNG CẬN LÂM SÀNG</td>
+            <td colspan="2">TỔNG CẬN LÂM SÀNG TRONG NGÀY</td>
             <td>${totalCLS.pro}</td><td>${totalCLS.bnp}</td><td>${totalCLS.khi}</td><td>${totalCLS.xnNg}</td><td>${totalCLS.xnNo}</td>
             <td>${totalCLS.ns}</td><td>${totalCLS.xqNg}</td><td>${totalCLS.xqNo}</td><td>${totalCLS.saNg}</td><td>${totalCLS.saNo}</td>
         </tr>`;
         tbodyCLS.innerHTML = htmlCLS;
     }
 
-    // Tự động kích hoạt tải dữ liệu ngay khi vừa load xong trang Dashboard
     loadDashboardCoreData();
 </script>
 </body>
