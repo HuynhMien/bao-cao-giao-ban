@@ -3,278 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Số Liệu Tổng Hợp Giao Ban Toàn Viện</title>
+    <title>Dashboard Báo Cáo Giao Ban Tổng Hợp - Bệnh Viện Hồng Ngự</title>
     <style>
-        :root { --primary: #1e3a8a; --secondary: #0284c7; --border: #cbd5e1; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 20px; }
-        .box { max-width: 1550px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 25px; }
-        .header h1 { margin: 0; font-size: 21px; color: var(--primary); text-transform: uppercase; }
-        .filter-box { display: flex; gap: 15px; align-items: center; font-weight: 600; }
-        input[type="date"] { padding: 6px 12px; border: 2px solid var(--border); border-radius: 6px; font-weight: bold; }
-        .btn { padding: 8px 16px; border: none; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px; cursor: pointer; }
-        .btn-green { background-color: #10b981; color: white; }
-        .banner { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: white; padding: 10px 15px; font-weight: bold; margin: 25px 0 12px 0; border-radius: 4px; font-size: 14px; text-transform: uppercase; }
-        .table-container { overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 25px; }
+        :root { --primary: #0284c7; --bg: #f8fafc; --text: #0f172a; --border: #cbd5e1; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .dashboard-container { max-width: 1400px; margin: 0 auto; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .top-bar h1 { margin: 0; font-size: 20px; color: var(--primary); text-transform: uppercase; }
+        .filter-box { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+        .filter-box input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; font-weight: bold; }
+        .table-section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 25px; overflow-x: auto; }
+        .section-h2 { font-size: 15px; text-transform: uppercase; margin-top: 0; margin-bottom: 15px; color: #334155; border-left: 4px solid var(--primary); padding-left: 10px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: center; }
-        th, td { border: 1px solid var(--border); padding: 10px 5px; }
-        th { background-color: #f1f5f9; color: #334155; }
-        .bg-blue { background-color: #e0f2fe; }
-        .bg-green { background-color: #dcfce7; }
-        .bg-yellow { background-color: #fef9c3; font-weight: bold; }
-        .bg-orange { background-color: #ffedd5; font-weight: bold; font-size: 14px; }
-        .left { text-align: left; padding-left: 12px; font-weight: bold; }
-        .total-line { background-color: #e2e8f0; font-weight: bold; }
-        #overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: flex; justify-content: center; align-items: center; font-weight: bold; color: var(--primary); z-index: 9999; }
+        th, td { border: 1px solid var(--border); padding: 10px; }
+        th { background: #f1f5f9; color: #334155; font-weight: bold; }
+        .text-left { text-align: left; font-weight: 600; background: #f8fafc; }
+        .sum-row { background: #f0fdf4; font-weight: bold; color: #166534; }
+        .badge { background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+        .btn-nav { display: inline-flex; padding: 8px 16px; background-color: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px; }
     </style>
 </head>
 <body>
 
-<div id="overlay">Đang tải và đồng bộ tính toán số liệu thời gian thực từ hệ thống...</div>
-
-<div class="box">
-    <div class="header">
-        <div>
-            <h1>Dashboard Số Liệu Tổng Hợp Giao Ban</h1>
-            <div style="font-size: 13px; color:#64748b; margin-top:5px; font-weight: 600;">BỆNH VIỆN ĐA KHOA KHU VỰC HỒNG NGỰ</div>
-        </div>
+<div class="dashboard-container">
+    <div class="top-bar">
+        <h1>HỆ THỐNG GIAO BAN ĐIỆN TỬ BỆNH VIỆN</h1>
         <div class="filter-box">
-            <label>Xem Ngày:</label>
-            <input type="date" id="selDate" onchange="loadSheetsData()">
-            <a href="index.html" class="btn btn-green">⏎ QUAY LẠI TRANG NHẬP</a>
+            <span>CHỌN NGÀY XEM:</span>
+            <input type="date" id="targetDatePicker" onchange="loadDashboardCoreData()">
+            <a href="index.html" class="btn-nav">✍️ TRANG NHẬP BÁO CÁO</a>
         </div>
     </div>
 
-    <div class="banner">I. Báo cáo số liệu lâm sàng (Bệnh nhân điều trị nội trú)</div>
-    <div class="table-container">
-        <table id="tblLamSang">
+    <div class="table-section">
+        <div class="section-h2">Tình hình người bệnh điều trị nội trú các khoa lâm sàng</div>
+        <table>
             <thead>
                 <tr>
                     <th rowspan="2">STT</th>
-                    <th rowspan="2" style="min-width: 280px;">TÊN KHOA</th>
-                    <th colspan="3" class="bg-blue">ĐANG ĐIỀU TRỊ</th>
-                    <th colspan="5" class="bg-green">KẾT THÚC ĐIỀU TRỊ</th>
-                    <th rowspan="2" class="bg-yellow">BỆNH CÒN LẠI</th>
-                    <th rowspan="2" style="background:#f8fafc; color:#64748b;">LẦN CẬP NHẬT</th>
+                    <th rowspan="2" style="min-width: 260px;">Tên Đơn Vị Khoa Phòng</th>
+                    <th rowspan="2">Bệnh Cũ</th>
+                    <th rowspan="2">Nhập Viện</th>
+                    <th rowspan="2">Khoa Đến</th>
+                    <th colspan="5">Số Lượng Người Bệnh Ra Viện Trong Ngày</th>
+                    <th rowspan="2">Còn Lại</th>
+                    <th rowspan="2">Lượt gửi</th>
                 </tr>
                 <tr>
-                    <th class="bg-blue">BỆNH CỦA</th>
-                    <th class="bg-blue">BỆNH MỚI</th>
-                    <th class="bg-blue">CHUYỂN ĐẾN</th>
-                    <th class="bg-green">XUẤT VIỆN</th>
-                    <th class="bg-green">XIN VỀ</th>
-                    <th class="bg-green">BỎ VIỆN</th>
-                    <th class="bg-green">TỬ VONG</th>
-                    <th class="bg-green">CHUYỂN VIỆN</th>
+                    <th>Ra Viện</th><th>Xin Về</th><th>Bỏ Viện</th><th>Tử Vong</th><th>Chuyển Viện</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody id="bodyLamSang">
+                <tr><td colspan="12">Đang tải dữ liệu kết nối từ hệ thống Google Sheets...</td></tr>
+            </tbody>
         </table>
     </div>
 
-    <div class="banner">II. Thống kê chi tiết hoạt động cận lâm sàng</div>
-    <div class="table-container">
-        <table id="tblCanLamSang">
+    <div class="table-section">
+        <div class="section-h2">Số liệu hoạt động cận lâm sàng toàn viện</div>
+        <table>
             <thead>
                 <tr>
-                    <th style="min-width: 260px;">DANH MỤC BIỂU MẪU</th>
-                    <th>PHÂN LOẠI</th>
-                    <th class="bg-orange" style="min-width: 110px;">TỔNG VIỆN</th>
-                    <th>CẤP CỨU</th><th>GMHS</th><th>NGOẠI TH</th><th>PHỤ SẢN</th><th>NỘI TH</th>
-                    <th>NỘI TMLH</th><th>NHI</th><th>TRUYỀN NHIỄM</th><th>YHCT</th><th>LCK</th><th>KHOA KB</th>
+                    <th rowspan="2">STT</th>
+                    <th rowspan="2" style="min-width: 260px;">Khoa Lâm Sàng Chỉ Định</th>
+                    <th colspan="5">Khoa Xét Nghiệm</th>
+                    <th colspan="5">Khoa Chẩn Đoán Hình Ảnh</th>
+                </tr>
+                <tr>
+                    <th>Procalcitonin</th><th>BNP</th><th>Khí Máu ĐM</th><th>XN Ngoại</th><th>XN Nội</th>
+                    <th>Nội Soi</th><th>XQ Ngoại</th><th>XQ Nội</th><th>Siêu Âm Ngoại</th><th>Siêu Âm Nội</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody id="bodyCanLamSang">
+                <tr><td colspan="12">Đang xử lý kết xuất số liệu...</td></tr>
+            </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzO-ojuDKiC4-5K7oiQb6wUSTMCnKMZSs4kX9lNzpB7EFoknPPHDL-wFiq6yTy4Ljiy/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxSMsudKFyRg2qeBdjRcC7zyIY464d4aja7-iAomFfq0_APoSjRzzh1AU7r4NOT3SDV/exec';
 
-    const CLINICAL_KHOA_LIST = [
-        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
-        "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", 
-        "KHOA NGOẠI TỔNG HỢP",
-        "KHOA PHỤ SẢN", 
-        "KHOA NỘI TỔNG HỢP", 
-        "KHOA NỘI TIM MẠCH - LÃO HỌC", 
-        "KHOA NHI",
-        "KHOA TRUYỀN NHIỄM", 
-        "KHOA Y DƯỢC CỔ TRUYỀN", 
-        "KHOA LIÊN CHUYÊN KHOA", 
-        "KHOA KHÁM BỆNH (TỔNG LƯỢT KHÁM NGOẠI TRÚ)"
+    const CLINICAL_KHOAS = [
+        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", "KHOA NGOẠI TỔNG HỢP", "KHOA PHỤ SẢN", 
+        "KHOA NỘI TỔNG HỢP", "KHOA NỘI TIM MẠCH - LÃO HỌC", "KHOA NHI", "KHOA TRUYỀN NHIỄM", "KHOA Y DƯỢC CỔ TRUYỀN", 
+        "KHOA LIÊN CHUYÊN KHOA", "KHOA KHÁM BỆNH (TỔNG LƯỢT KHÁM NGOẠI TRÚ)"
     ];
 
-    window.onload = function() {
-        const tzoffset = (new Date()).getTimezoneOffset() * 60000;
-        document.getElementById('selDate').value = (new Date(Date.now() - tzoffset)).toISOString().split('T')[0];
-        loadSheetsData();
-    };
+    let cacheRawData = null;
 
-    function formatDateString(dateInput) {
-        if (!dateInput) return "";
+    // Thiết lập ngày mặc định ban đầu là ngày hôm nay
+    document.getElementById('targetDatePicker').valueAsDate = new Date();
+
+    async function loadDashboardCoreData() {
         try {
-            const d = new Date(dateInput);
-            if (isNaN(d.getTime())) {
-                return dateInput.toString().substring(0, 10).trim();
+            if (!cacheRawData) {
+                const response = await fetch(API_URL);
+                cacheRawData = await response.json();
             }
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        } catch(e) {
-            return dateInput.toString().substring(0, 10).trim();
-        }
-    }
-
-    function lowercaseKeys(obj) {
-        if (!obj || typeof obj !== 'object') return {};
-        return Object.keys(obj).reduce((acc, key) => {
-            acc[key.toLowerCase().trim()] = obj[key];
-            return acc;
-        }, {});
-    }
-
-    async function loadSheetsData() {
-        document.getElementById('overlay').style.display = 'flex';
-        const targetDateStr = document.getElementById('selDate').value;
-
-        try {
-            const res = await fetch(WEB_APP_URL, { method: 'GET', cache: 'no-store', redirect: 'follow' });
-            const rootData = await res.json();
-            
-            const dayLamSang = (rootData.lamSang || []).filter(r => {
-                return r.ngay && formatDateString(r.ngay) === targetDateStr;
-            }).map(item => lowercaseKeys(item));
-
-            const dayCLS = (rootData.canLamSang || []).filter(r => {
-                return r.ngay && formatDateString(r.ngay) === targetDateStr;
-            }).map(item => lowercaseKeys(item));
-
-            renderClinicalTable(dayLamSang);
-            renderParaclinicalTable(dayCLS);
+            renderDashboardTables(cacheRawData);
         } catch (error) {
             console.error(error);
-            alert('Lỗi kết nối API Google Sheets!');
-        } finally {
-            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('bodyLamSang').innerHTML = `<tr><td colspan="12" style="color:red; font-weight:bold;">Lỗi kết nối API cơ sở dữ liệu!</td></tr>`;
         }
     }
 
-    function renderClinicalTable(dayData) {
-        const tbody = document.querySelector('#tblLamSang tbody');
-        tbody.innerHTML = '';
-        let total = { bc:0, bm:0, cd:0, xv:0, xin:0, bv:0, tv:0, cv:0, cl:0 };
+    // Hàm chuyển đổi định dạng date html (yyyy-MM-dd) sang dạng chuỗi lưu trên sheet (dd-MM-yyyy)
+    function convertDateToDMY(dateString) {
+        if(!dateString) return "";
+        const parts = dateString.split('-');
+        if(parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        return dateString;
+    }
 
-        CLINICAL_KHOA_LIST.forEach((fullName, idx) => {
-            // Sắp xếp theo số lần gửi (langui) từ cao xuống thấp để lấy bản ghi mới nhất
-            const matches = dayData
-                .filter(item => item.khoa && item.khoa.toString().trim().toUpperCase() === fullName.toUpperCase())
-                .sort((a, b) => Number(b.langui || 0) - Number(a.langui || 0));
+    function renderDashboardTables(data) {
+        const selectedDateHTML = document.getElementById('targetDatePicker').value;
+        const searchDate = convertDateToDMY(selectedDateHTML); // Chuyển về dạng "dd-MM-yyyy"
+
+        // 1. DỰNG BẢNG LÂM SÀNG
+        const tbodyLS = document.getElementById('bodyLamSang');
+        let htmlLS = "";
+        let sums = { bc:0, bm:0, ck:0, xv:0, xv_xv:0, xv_bv:0, xv_tv:0, xv_cv:0, cl:0 };
+
+        CLINICAL_KHOAS.forEach((khoa, index) => {
+            // Lọc ra tất cả các lượt gửi trong ngày của khoa này
+            let matches = data.lamSang.filter(r => r.ngay === searchDate && r.khoa.toUpperCase() === khoa.toUpperCase());
+            let activeRecord = { benhCu:0, benhMoi:0, chuyenKhoa:0, xuatVien:0, xinVe:0, boVe:0, tuVong:0, chuyenVien:0, conLai:0, lanGui:"-" };
             
-            let bc = 0, bm = 0, cd = 0, xv = 0, xin = 0, bv = 0, tv = 0, cv = 0, cl = 0, lg = 0;
-            let hasData = false;
-
             if (matches.length > 0) {
-                hasData = true;
-                const r = matches[0]; // Bản ghi có `langui` lớn nhất nằm ở đầu tiên
-                
-                bc = Number(r.benhcu || 0);
-                bm = Number(r.benhmoi || 0);
-                cd = Number(r.chuyenkhoa || 0);
-                xv = Number(r.xuatvien || 0);
-                xin = Number(r.xinve || 0);
-                bv = Number(r.bove || 0);
-                tv = Number(r.tuvong || 0);
-                cv = Number(r.chuyenvien || 0);
-                cl = Number(r.conlai || 0);
-                lg = Number(r.langui || 1);
-
-                total.bc += bc; total.bm += bm; total.cd += cd; total.xv += xv; 
-                total.xin += xin; total.bv += bv; total.tv += tv; total.cv += cv; total.cl += cl;
+                // Lấy bản ghi có số lần gửi (lanGui) lớn nhất (mới nhất)
+                matches.sort((a, b) => Number(b.lanGui || 0) - Number(a.lanGui || 0));
+                activeRecord = matches[0];
             }
 
-            tbody.innerHTML += `
-                <tr>
-                    <td>${idx + 1}</td>
-                    <td class="left">${fullName}</td>
-                    <td>${hasData ? bc : '-'}</td>
-                    <td>${hasData ? bm : '-'}</td>
-                    <td>${hasData ? cd : '-'}</td>
-                    <td>${hasData ? xv : '-'}</td>
-                    <td>${hasData ? xin : '-'}</td>
-                    <td>${hasData ? bv : '-'}</td>
-                    <td style="color:${tv > 0 ? 'red' : 'inherit'}; font-weight:${tv > 0 ? 'bold' : 'normal'}">${hasData ? tv : '-'}</td>
-                    <td>${hasData ? cv : '-'}</td>
-                    <td class="bg-yellow">${hasData ? cl : 0}</td>
-                    <td style="color:#64748b; font-weight:bold;">${hasData ? 'Lần ' + lg : '-'}</td>
-                </tr>`;
-        });
+            sums.bc += Number(activeRecord.benhCu || 0); sums.bm += Number(activeRecord.benhMoi || 0); sums.ck += Number(activeRecord.chuyenKhoa || 0);
+            sums.xv += Number(activeRecord.xuatVien || 0); sums.xv_xv += Number(activeRecord.xinVe || 0); sums.xv_bv += Number(activeRecord.boVe || 0);
+            sums.xv_tv += Number(activeRecord.tuVong || 0); sums.xv_cv += Number(activeRecord.chuyenVien || 0); sums.cl += Number(activeRecord.conLai || 0);
 
-        tbody.innerHTML += `
-            <tr class="total-line">
-                <td colspan="2">TỔNG CỘNG TOÀN VIỆN</td>
-                <td>${total.bc}</td><td>${total.bm}</td><td>${total.cd}</td>
-                <td>${total.xv}</td><td>${total.xin}</td><td>${total.bv}</td>
-                <td style="color:${total.tv > 0 ? 'red' : 'inherit'}">${total.tv}</td><td>${total.cv}</td>
-                <td style="background-color:#fef08a;">${total.cl}</td>
-                <td>-</td>
+            htmlLS += `<tr>
+                <td>${index + 1}</td>
+                <td class="text-left">${khoa}</td>
+                <td>${activeRecord.benhCu || 0}</td><td>${activeRecord.benhMoi || 0}</td><td>${activeRecord.chuyenKhoa || 0}</td>
+                <td>${activeRecord.xuatVien || 0}</td><td>${activeRecord.xinVe || 0}</td><td>${activeRecord.boVe || 0}</td>
+                <td>${activeRecord.tuVong || 0}</td><td>${activeRecord.chuyenVien || 0}</td>
+                <td style="font-weight:bold; color:#0284c7;">${activeRecord.conLai || 0}</td>
+                <td><span class="badge">Lần ${activeRecord.lanGui || 0}</span></td>
             </tr>`;
-    }
-
-    function renderParaclinicalTable(clsData) {
-        const tbody = document.querySelector('#tblCanLamSang tbody');
-        tbody.innerHTML = '';
-
-        const schema = [
-            { field: 'procalcitonin', text: '1. PROCALCITONIN', type: 'TỔNG', dual: false },
-            { field: 'bnp', text: '2. BNP', type: 'TỔNG', dual: false },
-            { field: 'khimaudongmach', text: '3. KHÍ MÁU ĐỘNG MẠCH', type: 'TỔNG', dual: false },
-            { field: 'noisoi', text: '4. SỐ LẦN NỘI SOI THỰC QUẢN - DẠ DÀY', type: 'TỔNG', dual: false },
-            { text: '5. SỐ LẦN CHỤP XQ', type: 'NGOẠI TRÚ', dual: true, key: 'xqngoaitru' },
-            { text: '5. SỐ LẦN CHỤP XQ', type: 'NỘI TRÚ', dual: true, key: 'xqnoitru' },
-            { text: '6. SỐ LẦN SIÊU ÂM', type: 'NGOẠI TRÚ', dual: true, key: 'sieuanngoaitru' },
-            { text: '6. SỐ LẦN SIÊU ÂM', type: 'NỘI TRÚ', dual: true, key: 'sieuaunoitru' },
-            { text: '7. SỐ LẦN XÉT NGHIỆM', type: 'NGOẠI TRÚ', dual: true, key: 'xnngoaitru' },
-            { text: '7. SỐ LẦN XÉT NGHIỆM', type: 'NỘI TRÚ', dual: true, key: 'xnnoitru' }
-        ];
-
-        let lastText = "";
-        schema.forEach(item => {
-            let totalSum = 0;
-            let subCells = "";
-
-            CLINICAL_KHOA_LIST.forEach(khoa => {
-                // Lọc dữ liệu theo khoa lâm sàng, đồng thời sắp xếp langui giảm dần để ưu tiên lấy lần gửi mới nhất
-                let matches = clsData
-                    .filter(r => r.loai && r.loai.toString().trim().toUpperCase() === khoa.toUpperCase())
-                    .sort((a, b) => Number(b.langui || 0) - Number(a.langui || 0));
-                
-                let val = 0;
-                if (matches.length > 0) {
-                    const lookupKey = item.dual ? item.key : item.field;
-                    val = Number(matches[0][lookupKey] || 0); // Chỉ ăn số liệu của bản ghi có langui lớn nhất
-                }
-                
-                totalSum += val;
-                subCells += `<td>${val > 0 ? val : '-'}</td>`;
-            });
-
-            if (!item.dual) {
-                let cells = `<td class="left">${item.text}</td><td>${item.type}</td><td class="bg-orange">${totalSum}</td>` + subCells;
-                tbody.innerHTML += `<tr>${cells}</tr>`;
-            } else {
-                let titleCell = "";
-                if (item.text !== lastText) {
-                    titleCell = `<td rowspan="2" class="left">${item.text}</td>`;
-                    lastText = item.text;
-                }
-                let cells = `${titleCell}<td>${item.type}</td><td class="bg-orange">${totalSum}</td>` + subCells;
-                tbody.innerHTML += `<tr>${cells}</tr>`;
-            }
         });
+
+        htmlLS += `<tr class="sum-row">
+            <td colspan="2">TỔNG TOÀN VIỆN</td>
+            <td>${sums.bc}</td><td>${sums.bm}</td><td>${sums.ck}</td>
+            <td>${sums.xv}</td><td>${sums.xv_xv}</td><td>${sums.xv_bv}</td><td>${sums.xv_tv}</td><td>${sums.xv_cv}</td>
+            <td>${sums.cl}</td><td>-</td>
+        </tr>`;
+        tbodyLS.innerHTML = htmlLS;
+
+        // 2. DỰNG BẢNG CẬN LÂM SÀNG
+        const tbodyCLS = document.getElementById('bodyCanLamSang');
+        let htmlCLS = "";
+        let totalCLS = { pro:0, bnp:0, khi:0, xnNg:0, xnNo:0, ns:0, xqNg:0, xqNo:0, saNg:0, saNo:0 };
+
+        CLINICAL_KHOAS.forEach((khoa, index) => {
+            // Lấy dòng cận lâm sàng mới nhất trong ngày của Khoa Xét Nghiệm chỉ định cho khoa này
+            let matchesXN = data.canLamSang.filter(r => r.ngay === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === khoa);
+            matchesXN.sort((a,b) => Number(b.lanGui||0) - Number(a.lanGui||0));
+            let rXN = matchesXN[0] || {};
+
+            // Lấy dòng cận lâm sàng mới nhất trong ngày của Khoa CDHA chỉ định cho khoa này
+            let matchesCDHA = data.canLamSang.filter(r => r.ngay === searchDate && r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.loai === khoa);
+            matchesCDHA.sort((a,b) => Number(b.lanGui||0) - Number(a.lanGui||0));
+            let rCDHA = matchesCDHA[0] || {};
+
+            totalCLS.pro += Number(rXN.procalcitonin || 0); totalCLS.bnp += Number(rXN.bnp || 0); totalCLS.khi += Number(rXN.khiMauDongMach || 0);
+            totalCLS.xnNg += Number(rXN.xnNgoaiTru || 0); totalCLS.xnNo += Number(rXN.xnNoiTru || 0);
+            totalCLS.ns += Number(rCDHA.noiSoi || 0); totalCLS.xqNg += Number(rCDHA.xqNgoaiTru || 0); totalCLS.xqNo += Number(rCDHA.xqNoiTru || 0);
+            totalCLS.saNg += Number(rCDHA.sieuAmNgoaiTru || 0); totalCLS.saNo += Number(rCDHA.sieuAmNoiTru || 0);
+
+            htmlCLS += `<tr>
+                <td>${index + 1}</td>
+                <td class="text-left">${khoa}</td>
+                <td>${rXN.procalcitonin || 0}</td><td>${rXN.bnp || 0}</td><td>${rXN.khiMauDongMach || 0}</td><td>${rXN.xnNgoaiTru || 0}</td><td>${rXN.xnNoiTru || 0}</td>
+                <td>${rCDHA.noiSoi || 0}</td><td>${rCDHA.xqNgoaiTru || 0}</td><td>${rCDHA.xqNoiTru || 0}</td><td>${rCDHA.sieuAmNgoaiTru || 0}</td><td>${rCDHA.sieuAmNoiTru || 0}</td>
+            </tr>`;
+        });
+
+        htmlCLS += `<tr class="sum-row">
+            <td colspan="2">TỔNG CẬN LÂM SÀNG</td>
+            <td>${totalCLS.pro}</td><td>${totalCLS.bnp}</td><td>${totalCLS.khi}</td><td>${totalCLS.xnNg}</td><td>${totalCLS.xnNo}</td>
+            <td>${totalCLS.ns}</td><td>${totalCLS.xqNg}</td><td>${totalCLS.xqNo}</td><td>${totalCLS.saNg}</td><td>${totalCLS.saNo}</td>
+        </tr>`;
+        tbodyCLS.innerHTML = htmlCLS;
     }
+
+    // Tự động kích hoạt tải dữ liệu ngay khi vừa load xong trang Dashboard
+    loadDashboardCoreData();
 </script>
 </body>
 </html>
