@@ -27,7 +27,7 @@
 
 <div class="dashboard-container">
     <div class="top-bar">
-        <h1>📊 DASHBOARD BÁO CÁO GIAO BAN - BỆNH VIỆN ĐK KV HỒNG NGỰ</h1>
+        <h1>📊 DASHBOARD BÁO CÁO GIAO BAN - BỆNH VIỆN ĐKKV HỒNG NGỰ</h1>
         <div class="filter-box">
             <span>NGÀY XEM:</span>
             <input type="date" id="targetDatePicker" onchange="loadDashboardCoreData()">
@@ -46,7 +46,6 @@
                     <th colspan="3">Đang Điều Trị Nội Trú</th>
                     <th colspan="7">Kết Thúc Điều Trị / Ra Viện Trong Ngày</th>
                     <th rowspan="2" style="background:#fef08a; color:#854d0e;">Còn Lại</th>
-                    <th rowspan="2">Cập nhật</th>
                 </tr>
                 <tr>
                     <th>Bệnh Cũ</th><th>Bệnh Mới</th><th>Chuyển Đến</th>
@@ -54,7 +53,7 @@
                 </tr>
             </thead>
             <tbody id="bodyLamSang">
-                <tr><td colspan="15">Đang đồng bộ dữ liệu trực tuyến...</td></tr>
+                <tr><td colspan="14">Đang đồng bộ dữ liệu trực tuyến...</td></tr>
             </tbody>
         </table>
     </div>
@@ -103,7 +102,7 @@
             }
             renderDashboardTables(cacheRawData);
         } catch (error) {
-            document.getElementById('bodyLamSang').innerHTML = `<tr><td colspan="15" style="color:red; font-weight:bold;">Lỗi kết nối cơ sở dữ liệu!</td></tr>`;
+            document.getElementById('bodyLamSang').innerHTML = `<tr><td colspan="14" style="color:red; font-weight:bold;">Lỗi kết nối cơ sở dữ liệu!</td></tr>`;
         }
     }
 
@@ -130,16 +129,26 @@
                 act = matches[0];
             }
 
-            sums.nt += Number(act.luotKhamNgoaiTru || 0); sums.bc += Number(act.benhCu || 0); sums.bm += Number(act.benhMoi || 0); sums.ck += Number(act.chuyenKhoa || 0);
-            sums.xv += Number(act.xuatVien || 0); sums.v_on += Number(act.xinVeBenhOn || 0); sums.v_nang += Number(act.xinVeBenhNang || 0); sums.c_khoa += Number(act.chuyenDiCacKhoa || 0);
-            sums.bv += Number(act.boVe || 0); sums.tv += Number(act.tuVong || 0); sums.cv += Number(act.chuyenVien || 0); sums.cl += Number(act.conLai || 0);
-
             let isKKB = khoa.includes("KHÁM BỆNH");
+
+            // Cộng dồn hàng tổng toàn viện (Nếu là khoa khám bệnh thì không cộng nội trú)
+            sums.nt += Number(act.luotKhamNgoaiTru || 0);
+            sums.bc += isKKB ? 0 : Number(act.benhCu || 0);
+            sums.bm += isKKB ? 0 : Number(act.benhMoi || 0);
+            sums.ck += isKKB ? 0 : Number(act.chuyenKhoa || 0);
+            sums.xv += isKKB ? 0 : Number(act.xuatVien || 0);
+            sums.v_on += isKKB ? 0 : Number(act.xinVeBenhOn || 0);
+            sums.v_nang += isKKB ? 0 : Number(act.xinVeBenhNang || 0);
+            sums.c_khoa += isKKB ? 0 : Number(act.chuyenDiCacKhoa || 0);
+            sums.bv += isKKB ? 0 : Number(act.boVe || 0);
+            sums.tv += isKKB ? 0 : Number(act.tuVong || 0);
+            sums.cv += isKKB ? 0 : Number(act.chuyenVien || 0);
+            sums.cl += isKKB ? 0 : Number(act.conLai || 0);
 
             htmlLS += `<tr>
                 <td>${index + 1}</td>
                 <td class="text-left">${khoa}</td>
-                <td style="font-weight:bold; color:#0369a1; background:#f0f9ff;">${act.luotKhamNgoaiTru || 0}</td>
+                <td style="font-weight:bold; color:#0369a1; background:#f0f9ff;">${isKKB ? (act.luotKhamNgoaiTru || 0) : '-'}</td>
                 <td>${isKKB ? '-' : (act.benhCu || 0)}</td>
                 <td>${isKKB ? '-' : (act.benhMoi || 0)}</td>
                 <td>${isKKB ? '-' : (act.chuyenKhoa || 0)}</td>
@@ -151,7 +160,6 @@
                 <td>${isKKB ? '-' : (act.tuVong || 0)}</td>
                 <td>${isKKB ? '-' : (act.chuyenVien || 0)}</td>
                 <td style="font-weight:bold; color:#854d0e; background:#fef9c3;">${isKKB ? '-' : (act.conLai || 0)}</td>
-                <td><span class="badge">Lần ${act.lanGui || 0}</span></td>
             </tr>`;
         });
 
@@ -160,7 +168,7 @@
             <td style="background:#dbeafe;">${sums.nt}</td>
             <td>${sums.bc}</td><td>${sums.bm}</td><td>${sums.ck}</td>
             <td>${sums.xv}</td><td>${sums.v_on}</td><td>${sums.v_nang}</td><td>${sums.c_khoa}</td><td>${sums.bv}</td><td>${sums.tv}</td><td>${sums.cv}</td>
-            <td style="background:#fef08a;">${sums.cl}</td><td>-</td>
+            <td style="background:#fef08a;">${sums.cl}</td>
         </tr>`;
         tbodyLS.innerHTML = htmlLS;
 
@@ -169,7 +177,6 @@
         let htmlCLS = "";
         let totalCLS = { pro:0, bnp:0, khi:0, xnNg:0, xnNo:0 };
 
-        // Lấy dòng Tổng Toàn Viện của XN và CDHA
         let rowTongXN = data.canLamSang.filter(r => r.ngay === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
         let rowTongCDHA = data.canLamSang.filter(r => r.ngay === searchDate && r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
 
@@ -192,7 +199,6 @@
             </tr>`;
         });
 
-        // Hàng Tổng hiển thị tổng các chỉ số xét nghiệm cùng với số lượt tổng cấu hình riêng
         htmlCLS += `<tr class="sum-row">
             <td colspan="2">TỔNG CẬN LÂM SÀNG TOÀN VIỆN</td>
             <td>${totalCLS.pro}</td><td>${totalCLS.bnp}</td><td>${totalCLS.khi}</td><td>${totalCLS.xnNg}</td><td>${totalCLS.xnNo}</td>
