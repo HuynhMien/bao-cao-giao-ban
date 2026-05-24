@@ -3,259 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nhập Báo Cáo Giao Ban - BV ĐK KV Hồng Ngự</title>
+    <title>Nhập Báo Cáo Giao Ban Hằng Ngày</title>
     <style>
-        :root { --primary: #0284c7; --bg: #f1f5f9; --card-bg: #ffffff; --text: #1e293b; --border: #cbd5e1; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 1350px; margin: 0 auto; }
-        .login-card { max-width: 450px; margin: 80px auto; background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); text-align: center; }
-        .form-group { text-align: left; margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
-        .form-group input { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; }
-        .main-form { display: none; background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .header-area { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 25px; }
-        .header-title h2 { margin: 0; color: var(--primary); font-size: 22px; text-transform: uppercase; }
-        .section-title { font-size: 15px; font-weight: bold; color: #334155; border-left: 4px solid var(--primary); padding-left: 10px; margin: 25px 0 15px 0; text-transform: uppercase; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        .input-item { display: flex; flex-direction: column; margin-bottom: 15px; }
-        .input-item label { font-size: 12px; color: #64748b; margin-bottom: 5px; font-weight: 500; }
-        .input-item input { padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; font-weight: bold; background-color: #f8fafc; text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th, td { border: 1px solid var(--border); padding: 10px; text-align: center; }
-        th { background-color: #f1f5f9; color: #334155; font-weight: bold; }
-        .table-input { width: 90px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: bold; text-align: center; }
-        .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
-        .btn-blue { background-color: #0284c7; color: white; }
-        .btn-gray { background-color: #64748b; color: white; }
-        .btn-red { background-color: #ef4444; color: white; }
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; justify-content: center; align-items: center; font-weight: bold; color: var(--primary); z-index: 9999; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f1f5f9; padding: 20px; color: #334155; }
+        .form-container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #0284c7; margin-bottom: 25px; text-transform: uppercase; }
+        .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
+        label { font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        select, input { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .section-title { background: #e2e8f0; padding: 8px 12px; font-weight: bold; margin-top: 20px; border-radius: 4px; color: #1e293b; }
+        button { background: #0284c7; color: white; border: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 20px; width: 100%; transition: background 0.2s; }
+        button:hover { background: #0369a1; }
+        .btn-view { display: block; text-align: center; margin-top: 15px; color: #0284c7; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="loading">🚀 ĐANG TIẾN HÀNH XỬ LÝ DỮ LIỆU VÀ ĐỒNG BỘ LÊN GOOGLE SHEETS...</div>
-
-<div class="container">
-    <div class="login-card" id="loginBlock">
-        <h2 style="color:#0284c7;">BỆNH VIỆN ĐA KHOA KHU VỰC HỒNG NGỰ</h2>
-        <div class="form-group">
-            <label>Nhập Token phòng ban:</label>
-            <input type="password" id="txtToken" placeholder="Mã khoa phòng...">
-        </div>
-        <button class="btn btn-blue" style="width:100%;" onclick="loginSystem()">ĐĂNG NHẬP</button>
-    </div>
-
-    <form class="main-form" id="formReport" onsubmit="sendReportData(event)">
-        <div class="header-area">
-            <div class="header-title">
-                <small style="color: #64748b; font-weight:600;">ĐƠN VỊ BÁO CÁO:</small>
-                <h2 id="txtTenKhoa">-</h2>
+<div class="form-container">
+    <h2>✍️ CẬP NHẬT SỐ LIỆU BÁO CÁO GIAO BAN</h2>
+    <form id="reportForm">
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Chọn Ngày Báo Cáo:</label>
+                <input type="date" id="ngay" required>
             </div>
-            <div>
-                <a href="dashboard.html" class="btn btn-gray" style="margin-right: 8px;">📊 DASHBOARD TỔNG HỢP</a>
-                <button type="button" class="btn btn-red" onclick="logoutSystem()">ĐĂNG XUẤT</button>
-            </div>
-        </div>
-
-        <div id="grLamSang" style="display:none;">
-            <div class="section-title">Số liệu tình hình người bệnh điều trị nội trú</div>
-            <div class="form-grid">
-                <div class="input-item"><label>Bệnh cũ hôm trước</label><input type="number" name="benhCu" value="0" min="0"></div>
-                <div class="input-item"><label>Bệnh mới vào</label><input type="number" name="benhMoi" value="0" min="0"></div>
-                <div class="input-item"><label>Khoa khác chuyển đến</label><input type="number" name="chuyenKhoa" value="0" min="0"></div>
-                <div class="input-item"><label>Xuất viện</label><input type="number" name="xuatVien" value="0" min="0"></div>
-                <div class="input-item"><label>Xin về (Bệnh ổn)</label><input type="number" name="xinVeBenhOn" value="0" min="0"></div>
-                <div class="input-item"><label>Xin về (Bệnh nặng)</label><input type="number" name="xinVeBenhNang" value="0" min="0"></div>
-                <div class="input-item"><label>Chuyển đi các khoa</label><input type="number" name="chuyenDiCacKhoa" value="0" min="0"></div>
-                <div class="input-item"><label>Bỏ viện</label><input type="number" name="boVe" value="0" min="0"></div>
-                <div class="input-item"><label>Tử vong</label><input type="number" name="tuVong" value="0" min="0"></div>
-                <div class="input-item"><label>Chuyển viện</label><input type="number" name="chuyenVien" value="0" min="0"></div>
+            <div class="form-group">
+                <label>Đơn Vị / Khoa Phòng:</label>
+                <select id="khoa" required>
+                    <option value="KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC">KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC</option>
+                    <option value="KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC">KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC</option>
+                    <option value="KHOA NGOẠI TỔNG HỢP">KHOA NGOẠI TỔNG HỢP</option>
+                    <option value="KHOA PHỤ SẢN">KHOA PHỤ SẢN</option>
+                    <option value="KHOA NỘI TỔNG HỢP">KHOA NỘI TỔNG HỢP</option>
+                    <option value="KHOA NỘI TIM MẠCH - LÃO HỌC">KHOA NỘI TIM MẠCH - LÃO HỌC</option>
+                    <option value="KHOA NHI">KHOA NHI</option>
+                    <option value="KHOA TRUYỀN NHIỄM">KHOA TRUYỀN NHIỄM</option>
+                    <option value="KHOA Y DƯỢC CỔ TRUYỀN">KHOA Y DƯỢC CỔ TRUYỀN</option>
+                    <option value="KHOA LIÊN CHUYÊN KHOA">KHOA LIÊN CHUYÊN KHOA</option>
+                    <option value="KHOA KHÁM BỆNH">KHOA KHÁM BỆNH</option>
+                </select>
             </div>
         </div>
 
-        <div id="grKhamBenh" style="display:none;">
-            <div class="section-title">Số liệu hoạt động ngoại trú</div>
-            <div class="form-grid" style="grid-template-columns: 300px;">
-                <div class="input-item">
-                    <label style="font-weight: bold; color: #0284c7;">TỔNG LƯỢT KHÁM NGOẠI TRÚ</label>
-                    <input type="number" name="luotKhamNgoaiTru" value="0" min="0" style="padding:15px; font-size:18px; border:2px solid #0284c7;">
-                </div>
+        <div class="section-title">I. SỐ LIỆU LÂM SÀNG & ĐIỀU TRỊ</div>
+        <div class="form-group" style="margin-top:10px;">
+            <label>Tổng Lượt Khám Ngoại Trú (Chỉ dành cho Khoa Khám Bệnh):</label>
+            <input type="number" id="luotKhamNgoaiTru" value="0" min="0">
+        </div>
+        <div class="grid-3">
+            <div class="form-group">
+                <label>Bệnh Cũ:</label>
+                <input type="number" id="benhCu" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Bệnh Mới:</label>
+                <input type="number" id="benhMoi" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Chuyển Đến:</label>
+                <input type="number" id="chuyenKhoa" value="0" min="0">
+            </div>
+        </div>
+        <div class="grid-3">
+            <div class="form-group">
+                <label>Ra Viện:</label>
+                <input type="number" id="xuatVien" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Xin Về (Ổn định):</label>
+                <input type="number" id="xinVeBenhOn" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Xin Về (Nặng):</label>
+                <input type="number" id="xinVeBenhNang" value="0" min="0">
+            </div>
+        </div>
+        <div class="grid-3">
+            <div class="form-group">
+                <label>Chuyển Khoa Đi:</label>
+                <input type="number" id="chuyenDiCacKhoa" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Bỏ Viện:</label>
+                <input type="number" id="boVe" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Tử Vong:</label>
+                <input type="number" id="tuVong" value="0" min="0">
+            </div>
+        </div>
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Chuyển Viện Tuyển Trên:</label>
+                <input type="number" id="chuyenVien" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Còn Lại Thực Tế:</label>
+                <input type="number" id="conLai" value="0" min="0">
             </div>
         </div>
 
-        <div id="grCanLamSang" style="display:none;">
-            <div id="wrapperBangCLS" style="display:none;">
-                <div class="section-title">Bảng chỉ số xét nghiệm chi tiết theo đơn vị chỉ định</div>
-                <div style="overflow-x: auto;">
-                    <table id="tblInputCLS">
-                        <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th style="text-align:left; min-width:280px;">Khoa Lâm Sàng Chỉ Định</th>
-                                <th>Procalcitonin</th>
-                                <th>BNP</th>
-                                <th>Khí Máu ĐM</th>
-                                <th>XN Ngoại Trú</th>
-                                <th>XN Nội Trú</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbyInputCLS"></tbody>
-                    </table>
-                </div>
+        <div class="section-title">II. SỐ LIỆU CHỈ ĐỊNH CẬN LÂM SÀNG & THỦ THUẬT</div>
+        <div class="grid-3" style="margin-top:10px;">
+            <div class="form-group">
+                <label>Procalcitonin:</label>
+                <input type="number" id="procalcitonin" value="0" min="0">
             </div>
-
-            <div class="section-title" id="titleKhoiTong">Số liệu báo cáo tổng toàn viện</div>
-            <div class="form-grid" id="containerKhoiTong"></div>
+            <div class="form-group">
+                <label>BNP:</label>
+                <input type="number" id="bnp" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>Khí Máu Động Mạch:</label>
+                <input type="number" id="khiMaoDongMach" value="0" min="0">
+            </div>
+        </div>
+        <div class="grid-3">
+            <div class="form-group" style="background:#f0fdf4; padding:5px; border-radius:4px;">
+                <label style="color:#166534;">Tiêm Khớp:</label>
+                <input type="number" id="tiemKhop" value="0" min="0"> </div>
+            <div class="form-group">
+                <label>XN Ngoại Trú:</label>
+                <input type="number" id="xnNgoaiTru" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label>XN Nội Trú:</label>
+                <input type="number" id="xnNoiTru" value="0" min="0">
+            </div>
         </div>
 
-        <div class="btn-box" style="margin-top:30px;">
-            <button type="submit" class="btn btn-blue" style="font-size:15px; padding:14px 45px;">GỬI CẬP NHẬT BÁO CÁO GIAO BAN</button>
-        </div>
+        <button type="submit" id="submitBtn">🚀 GỬI BÁO CÁO GIAO BAN</button>
     </form>
+    
+    <a href="dashboard.html" class="btn-view">📊 Xem màn hình Dashboard tổng hợp</a>
 </div>
 
 <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxFhs9ZLvxVd1BmZk5XDg1xgEVkPtjvrgi5zc7r3DHwQa85ILF2HXfwiZYPY0gnK8Au/exec';
+    // Điền ngày hiện tại làm mặc định
+    document.getElementById('ngay').valueAsDate = new Date();
 
-    const MAP_TOKENS = {
-        "CAPCUU": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "NGOAI": "KHOA NGOẠI TỔNG HỢP", "NHI": "KHOA NHI", 
-        "NOITIMMACH": "KHOA NỘI TIM MẠCH - LÃO HỌC", "NOITONGHOP": "KHOA NỘI TỔNG HỢP", "GMHS": "KHOA PHẪT THUẬT GÂY MÊ HỒI SỨC",
-        "SAN": "KHOA PHỤ SẢN", "TRUYENNHIEM": "KHOA TRUYỀN NHIỄM", "YHCT": "KHOA Y DƯỢC CỔ TRUYỀN", 
-        "LCK": "KHOA LIÊN CHUYÊN KHOA", "KKB": "KHOA KHÁM BỆNH", 
-        "CDHA": "KHOA CHẨN ĐOÁN HÌNH ẢNH", "XETNGHIEM": "KHOA XÉT NGHIỆM", "KHTH": "KẾ HOẠCH TỔNG HỢP"
-    };
+    const FORM_API = 'https://script.google.com/macros/s/AKfycbzSqAMImM51DwBgyJ_tNxZH442osdbtgQm2S0GkP4fKeEjahWJYMMh7ztOI1K27mFea/exec';
 
-    const CLINICAL_KHOAS = [
-        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", "KHOA NGOẠI TỔNG HỢP", "KHOA PHỤ SẢN", 
-        "KHOA NỘI TỔNG HỢP", "KHOA NỘI TIM MẠCH - LÃO HỌC", "KHOA NHI", "KHOA TRUYỀN NHIỄM", "KHOA Y DƯỢC CỔ TRUYỀN", 
-        "KHOA LIÊN CHUYÊN KHOA", "KHOA KHÁM BỆNH", "KẾ HOẠCH TỔNG HỢP"
-    ];
-
-    window.onload = function() {
-        const savedToken = localStorage.getItem('hospital_token');
-        if (savedToken && MAP_TOKENS[savedToken]) { renderFormView(savedToken); }
-    };
-
-    function loginSystem() {
-        const tok = document.getElementById('txtToken').value.trim().toUpperCase();
-        if (MAP_TOKENS[tok]) {
-            localStorage.setItem('hospital_token', tok);
-            renderFormView(tok);
-        } else { alert('Sai mã Token xác thực!'); }
-    }
-
-    function renderFormView(token) {
-        document.getElementById('loginBlock').style.display = 'none';
-        document.getElementById('formReport').style.display = 'block';
-        document.getElementById('txtTenKhoa').innerText = MAP_TOKENS[token];
-        
-        document.getElementById('grLamSang').style.display = 'none';
-        document.getElementById('grKhamBenh').style.display = 'none';
-        document.getElementById('grCanLamSang').style.display = 'none';
-        document.getElementById('wrapperBangCLS').style.display = 'none';
-
-        if (token === "KKB") {
-            document.getElementById('grKhamBenh').style.display = 'block';
-        } else if (token === "XETNGHIEM") {
-            document.getElementById('grCanLamSang').style.display = 'block';
-            document.getElementById('wrapperBangCLS').style.display = 'block';
-            
-            // Xây dựng bảng nhập theo khoa lâm sàng cho Xét nghiệm
-            const tby = document.getElementById('tbyInputCLS');
-            const fieldsXN = ["procalcitonin", "bnp", "khiMauDongMach", "xnNgoaiTru", "xnNoiTru"];
-            let bodyHtml = "";
-            CLINICAL_KHOAS.forEach((khoa, index) => {
-                let rowInputs = "";
-                fieldsXN.forEach(f => { rowInputs += `<td><input type="number" class="table-input" data-khoa="${khoa}" data-field="${f}" value="0" min="0"></td>`; });
-                bodyHtml += `<tr><td>${index+1}</td><td style="text-align:left; font-weight:600;">${khoa}</td>${rowInputs}</tr>`;
-            });
-            tby.innerHTML = bodyHtml;
-
-            // Xây dựng thêm ô nhập Tổng nhóm máu ở dưới
-            document.getElementById('titleKhoiTong').innerText = "Thống kê Tổng số lượng các nhóm máu (Toàn viện)";
-            buildTotalFields(
-                ["nhomMauO", "nhomMauA", "nhomMauB", "nhomMauAB"],
-                ["TỔNG NHÓM MÁU O", "TỔNG NHÓM MÁU A", "TỔNG NHÓM MÁU B", "TỔNG NHÓM MÁU AB"]
-            );
-        } else if (token === "CDHA") {
-            document.getElementById('grCanLamSang').style.display = 'block';
-            document.getElementById('titleKhoiTong').innerText = "Số lượt tổng hoạt động Chẩn Đoán Hình Ảnh toàn viện";
-            buildTotalFields(
-                ["noiSoi", "xqNgoaiTru", "xqNoiTru", "sieuAmNgoaiTru", "sieuAmNoiTru"], 
-                ["TỔNG LƯỢT NỘI SOI", "TỔNG LƯỢT XQ NGOẠI", "TỔNG LƯỢT XQ NỘI", "TỔNG LƯỢT SIÊU ÂM NGOẠI", "TỔNG LƯỢT SIÊU ÂM NỘI"]
-            );
-        } else {
-            document.getElementById('grLamSang').style.display = 'block';
-        }
-    }
-
-    function buildTotalFields(fields, labels) {
-        const container = document.getElementById('containerKhoiTong');
-        let html = "";
-        fields.forEach((f, idx) => {
-            html += `<div class="input-item">
-                <label style="font-weight:bold; color:#0284c7;">${labels[idx]}</label>
-                <input type="number" name="${f}" class="total-field" value="0" min="0" style="padding:12px; font-size:16px;">
-            </div>`;
-        });
-        container.innerHTML = html;
-    }
-
-    async function sendReportData(e) {
+    document.getElementById('reportForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        document.getElementById('loading').style.display = 'flex';
-        const currentToken = localStorage.getItem('hospital_token');
-        const encodedParams = new URLSearchParams();
-        encodedParams.append('khoa', MAP_TOKENS[currentToken]);
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerText = 'Đang gửi dữ liệu lên hệ thống...';
 
-        if (currentToken === "XETNGHIEM") {
-            let dataPayload = [];
-            // 1. Gom dữ liệu chẻ nhỏ theo từng khoa lâm sàng
-            CLINICAL_KHOAS.forEach(khoa => {
-                let obj = { loai: khoa };
-                document.querySelectorAll(`input[data-khoa="${khoa}"]`).forEach(i => { 
-                    obj[i.getAttribute('data-field')] = Number(i.value || 0); 
-                });
-                dataPayload.push(obj);
-            });
-            // 2. Gom dữ liệu lượt tổng nhóm máu lưu vào dòng đặc biệt "TỔNG TOÀN VIỆN"
-            let objTong = { loai: "TỔNG TOÀN VIỆN" };
-            document.querySelectorAll('.total-field').forEach(i => { objTong[i.name] = Number(i.value || 0); });
-            dataPayload.push(objTong);
-            
-            encodedParams.append('payloadData', JSON.stringify(dataPayload));
-        } else if (currentToken === "CDHA") {
-            // Gom toàn bộ chỉ số tổng của CDHA lưu vào dòng "TỔNG TOÀN VIỆN"
-            let dataPayload = [];
-            let objTong = { loai: "TỔNG TOÀN VIỆN" };
-            document.querySelectorAll('.total-field').forEach(i => { objTong[i.name] = Number(i.value || 0); });
-            dataPayload.push(objTong);
-            
-            encodedParams.append('payloadData', JSON.stringify(dataPayload));
-        } else if (currentToken === "KKB") {
-            encodedParams.append('luotKhamNgoaiTru', document.querySelector('input[name="luotKhamNgoaiTru"]').value || 0);
-        } else {
-            document.getElementById('grLamSang').querySelectorAll('input[type="number"]').forEach(i => { 
-                encodedParams.append(i.name, i.value || 0); 
-            });
-        }
+        // Gom dữ liệu từ các ô input
+        const formData = {
+            action: "insertReport",
+            ngay: document.getElementById('ngay').value,
+            khoa: document.getElementById('khoa').value,
+            luotKhamNgoaiTru: document.getElementById('luotKhamNgoaiTru').value,
+            benhCu: document.getElementById('benhCu').value,
+            benhMoi: document.getElementById('benhMoi').value,
+            chuyenKhoa: document.getElementById('chuyenKhoa').value,
+            xuatVien: document.getElementById('xuatVien').value,
+            xinVeBenhOn: document.getElementById('xinVeBenhOn').value,
+            xinVeBenhNang: document.getElementById('xinVeBenhNang').value,
+            chuyenDiCacKhoa: document.getElementById('chuyenDiCacKhoa').value,
+            boVe: document.getElementById('boVe').value,
+            tuVong: document.getElementById('tuVong').value,
+            chuyenVien: document.getElementById('chuyenVien').value,
+            conLai: document.getElementById('conLai').value,
+            procalcitonin: document.getElementById('procalcitonin').value,
+            bnp: document.getElementById('bnp').value,
+            khiMaoDongMach: document.getElementById('khiMaoDongMach').value,
+            tiemKhop: document.getElementById('tiemKhop').value, // <-- ĐẨY LÊN API
+            xnNgoaiTru: document.getElementById('xnNgoaiTru').value,
+            xnNoiTru: document.getElementById('xnNoiTru').value
+        };
 
         try {
-            const res = await fetch(WEB_APP_URL, {
+            // Gửi dữ liệu bằng phương thức POST (hoặc cấu hình Apps Script tương đương của bạn)
+            await fetch(FORM_API, {
                 method: 'POST',
-                mode: 'cors',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: encodedParams.toString()
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
             });
-            if((await res.text()).trim() === "SUCCESS") {
-                alert('Gửi báo cáo thành công!');
-                window.location.href = 'dashboard.html';
-            } else { alert('Lỗi đồng bộ dữ liệu.'); }
-        } catch (error) { alert('Lỗi kết nối mạng.'); }
-        finally { document.getElementById('loading').style.display = 'none'; }
-    }
-
-    function logoutSystem() { localStorage.removeItem('hospital_token'); location.reload(); }
+            alert('🎉 Gửi báo cáo khoa thành công!');
+            // Reset các ô số về 0
+            document.querySelectorAll('input[type="number"]').forEach(input => input.value = 0);
+        } catch (error) {
+            alert('Lỗi kết nối! Vui lòng thử lại.');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = '🚀 GỬI BÁO CÁO GIAO BAN';
+        }
+    });
 </script>
 </body>
 </html>
