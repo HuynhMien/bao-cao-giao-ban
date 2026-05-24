@@ -3,129 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Nhập Báo Cáo Giao Ban - Bệnh Viện Hồng Ngự</title>
+    <title>Hệ Thống Nhập Báo Cáo Giao Ban - Bệnh Viện ĐK KV Hồng Ngự</title>
     <style>
-        :root { 
-            --primary: #0284c7; 
-            --bg: #f1f5f9; 
-            --card-bg: #ffffff; 
-            --text: #1e293b; 
-            --border: #cbd5e1; 
-        }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 20px; 
-        }
-        .container { max-width: 1300px; margin: 0 auto; }
-        .login-card { 
-            max-width: 450px; 
-            margin: 80px auto; 
-            background: var(--card-bg); 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); 
-            text-align: center; 
-        }
-        .login-card h2 { color: var(--primary); margin-bottom: 20px; font-size: 20px; }
+        :root { --primary: #0284c7; --bg: #f1f5f9; --card-bg: #ffffff; --text: #1e293b; --border: #cbd5e1; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1350px; margin: 0 auto; }
+        .login-card { max-width: 450px; margin: 80px auto; background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); text-align: center; }
+        .login-card h2 { color: var(--primary); margin-bottom: 20px; font-size: 19px; text-transform: uppercase; letter-spacing: 0.5px; }
         .form-group { text-align: left; margin-bottom: 15px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
-        .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; }
-        .main-form { 
-            display: none; 
-            background: var(--card-bg); 
-            padding: 30px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
-        }
-        .header-area { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 2px solid #e2e8f0; 
-            padding-bottom: 15px; 
-            margin-bottom: 25px; 
-        }
+        .form-group input { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; }
+        .main-form { display: none; background: var(--card-bg); padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .header-area { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 25px; }
         .header-title h2 { margin: 0; color: var(--primary); font-size: 22px; text-transform: uppercase; }
-        .section-title { 
-            font-size: 15px; 
-            font-weight: bold; 
-            color: #334155; 
-            border-left: 4px solid var(--primary); 
-            padding-left: 10px; 
-            margin: 25px 0 15px 0; 
-            text-transform: uppercase; 
-        }
+        .section-title { font-size: 15px; font-weight: bold; color: #334155; border-left: 4px solid var(--primary); padding-left: 10px; margin: 25px 0 15px 0; text-transform: uppercase; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
         .input-item { display: flex; flex-direction: column; }
         .input-item label { font-size: 12px; color: #64748b; margin-bottom: 5px; font-weight: 500; }
-        .input-item input { 
-            padding: 10px; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 6px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            background-color: #f8fafc; 
-            text-align: center; 
-        }
+        .input-item input { padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; font-weight: bold; background-color: #f8fafc; text-align: center; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
-        th { background-color: #f1f5f9; }
-        .td-left { text-align: left; font-weight: bold; background-color: #f8fafc; }
-        .table-input { width: 100px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: bold; text-align: center; }
+        th, td { border: 1px solid var(--border); padding: 10px; text-align: center; }
+        th { background-color: #f1f5f9; color: #334155; font-weight: bold; }
+        .td-left { text-align: left; font-weight: bold; background-color: #f8fafc; color: #1e293b; }
+        .table-input { width: 90px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: bold; text-align: center; }
         .btn-box { margin-top: 30px; }
-        .btn { 
-            padding: 12px 24px; 
-            border: none; 
-            border-radius: 6px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            font-size: 13px; 
-            text-decoration: none; 
-            display: inline-flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
         .btn-blue { background-color: #0284c7; color: white; }
         .btn-gray { background-color: #64748b; color: white; }
         .btn-red { background-color: #ef4444; color: white; }
-        #loading { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(255,255,255,0.9); 
-            display: none; 
-            justify-content: center; 
-            align-items: center; 
-            font-weight: bold; 
-            color: var(--primary); 
-            font-size: 16px; 
-            z-index: 9999; 
-        }
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); display: none; justify-content: center; align-items: center; font-weight: bold; color: var(--primary); font-size: 16px; z-index: 9999; }
     </style>
 </head>
 <body>
 
-<div id="loading">Đang thực hiện truyền tải dữ liệu đồng bộ lên Google Sheets...</div>
+<div id="loading">🚀 HỆ THỐNG ĐANG TIẾN HÀNH CHUẨN HÓA ĐỊNH DẠNG VÀ ĐỒNG BỘ SỐ LIỆU LÊN GOOGLE SHEETS...</div>
 
 <div class="container">
     <div class="login-card" id="loginBlock">
-        <h2>HỆ THỐNG GIAO BAN BỆNH VIỆN</h2>
+        <h2 style="margin-top:0; color:#0284c7;">BỆNH VIỆN ĐA KHOA KHU VỰC HỒNG NGỰ</h2>
         <div class="form-group">
-            <label>Nhập Token xác thực khoa phòng:</label>
-            <input type="password" id="txtToken" placeholder="Mã bảo mật...">
+            <label>Nhập Token xác thực quyền truy cập Khoa phòng:</label>
+            <input type="password" id="txtToken" placeholder="Mã xác thực không kèm năm...">
         </div>
-        <button class="btn btn-blue" style="width:100%" onclick="loginSystem()">ĐĂNG NHẬP</button>
+        <button class="btn btn-blue" style="width:100%; font-size:14px; padding:12px;" onclick="loginSystem()">ĐĂNG NHẬP HỆ THỐNG</button>
     </div>
 
     <form class="main-form" id="formReport" onsubmit="sendReportData(event)">
         <div class="header-area">
             <div class="header-title">
-                <small style="color: #64748b; font-weight: 600;">ĐƠN VỊ ĐANG BÁO CÁO:</small>
+                <small style="color: #64748b; font-weight: 600; text-transform: uppercase;">Đơn vị thực hiện báo cáo:</small>
                 <h2 id="txtTenKhoa">-</h2>
             </div>
             <div>
@@ -135,10 +61,10 @@
         </div>
 
         <div id="grLamSang" style="display:none;">
-            <div class="section-title">Số liệu lâm sàng bệnh nhân nội trú</div>
+            <div class="section-title">Số liệu tình hình người bệnh điều trị nội trú</div>
             <div class="form-grid">
                 <div class="input-item"><label>Bệnh cũ hôm trước</label><input type="number" name="benhCu" value="0" min="0"></div>
-                <div class="input-item"><label>Bệnh nhân mới vào</label><input type="number" name="benhMoi" value="0" min="0"></div>
+                <div class="input-item"><label>Bệnh mới vào</label><input type="number" name="benhMoi" value="0" min="0"></div>
                 <div class="input-item"><label>Khoa khác chuyển đến</label><input type="number" name="chuyenKhoa" value="0" min="0"></div>
                 <div class="input-item"><label>Xuất viện</label><input type="number" name="xuatVien" value="0" min="0"></div>
                 <div class="input-item"><label>Xin về</label><input type="number" name="xinVe" value="0" min="0"></div>
@@ -149,54 +75,38 @@
         </div>
 
         <div id="grCanLamSang" style="display:none;">
-            <div class="section-title">Bảng nhập chi tiết hoạt động cận lâm sàng cho các khoa phòng</div>
+            <div class="section-title">Bảng ghi nhận chỉ số cận lâm sàng chi tiết theo từng đơn vị chỉ định</div>
             <div style="overflow-x: auto;">
                 <table id="tblInputCLS">
-                    <thead>
-                        <tr id="thrCLS"></tr>
-                    </thead>
+                    <thead><tr id="thrCLS"></tr></thead>
                     <tbody id="tbyInputCLS"></tbody>
                 </table>
             </div>
         </div>
 
         <div class="btn-box">
-            <button type="submit" class="btn btn-blue" style="font-size: 15px; padding: 12px 40px;">GỬI / CẬP NHẬT BÁO CÁO MỚI NHẤT</button>
+            <button type="submit" class="btn btn-blue" style="font-size: 15px; padding: 14px 45px;">GỬI / CẬP NHẬT BÁO CÁO MỚI NHẤT</button>
         </div>
     </form>
 </div>
 
 <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx-EFPIemJu0Ryxw0kEkjenW4MWihGig9W8VHj7LK-H0Reb3nnCOeuJ2XtAhR8cfORG/exec';
+    // URL Web App sau khi bạn Deploy lại bản dựng mới
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxSMsudKFyRg2qeBdjRcC7zyIY464d4aja7-iAomFfq0_APoSjRzzh1AU7r4NOT3SDV/exec';
 
+    // Mảng Token đã bỏ năm 2026
     const MAP_TOKENS = {
-        "CAPCUU2026": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
-        "NGOAI2026": "KHOA NGOẠI TỔNG HỢP",
-        "NHI2026": "KHOA NHI", 
-        "NOITIMMACH2026": "KHOA NỘI TIM MẠCH - LÃO HỌC",
-        "NOITONGHOP2026": "KHOA NỘI TỔNG HỢP", 
-        "GMHS2026": "KHOA PHẪT THUẬT GÂY MÊ HỒI SỨC",
-        "SAN2026": "KHOA PHỤ SẢN", 
-        "TRUYENNHIEM2026": "KHOA TRUYỀN NHIỄM",
-        "YHCT2026": "KHOA Y DƯỢC CỔ TRUYỀN", 
-        "LCK2026": "KHOA LIÊN CHUYÊN KHOA",
-        "KKB2026": "KHOA KHÁM BỆNH (TỔNG LƯỢT KHÁM NGOẠI TRÚ)", 
-        "CDHA2026": "KHOA CHẨN ĐOÁN HÌNH ẢNH",
-        "XETNGHIEM2026": "KHOA XÉT NGHIỆM"
+        "CAPCUU": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "NGOAI": "KHOA NGOẠI TỔNG HỢP", "NHI": "KHOA NHI", 
+        "NOITIMMACH": "KHOA NỘI TIM MẠCH - LÃO HỌC", "NOITONGHOP": "KHOA NỘI TỔNG HỢP", "GMHS": "KHOA PHẪT THUẬT GÂY MÊ HỒI SỨC",
+        "SAN": "KHOA PHỤ SẢN", "TRUYENNHIEM": "KHOA TRUYỀN NHIỄM", "YHCT": "KHOA Y DƯỢC CỔ TRUYỀN", 
+        "LCK": "KHOA LIÊN CHUYÊN KHOA", "KKB": "KHOA KHÁM BỆNH (TỔNG LƯỢT KHÁM NGOẠI TRÚ)", 
+        "CDHA": "KHOA CHẨN ĐOÁN HÌNH ẢNH", "XETNGHIEM": "KHOA XÉT NGHIỆM"
     };
 
     const CLINICAL_KHOAS = [
-        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", 
-        "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", 
-        "KHOA NGOẠI TỔNG HỢP",
-        "KHOA PHỤ SẢN", 
-        "KHOA NỘI TỔNG HỢP", 
-        "KHOA NỘI TIM MẠCH - LÃO HỌC", 
-        "KHOA NHI",
-        "KHOA TRUYỀN NHIỄM", 
-        "KHOA Y DƯỢC CỔ TRUYỀN", 
-        "KHOA LIÊN CHUYÊN KHOA", 
-        "KHOA KHÁM BỆNH (TỔNG LƯỢT KHÁM NGOẠI TRÚ)"
+        "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", "KHOA NGOẠI TỔNG HỢP", "KHOA PHỤ SẢN", 
+        "KHOA NỘI TỔNG HỢP", "KHOA NỘI TIM MẠCH - LÃO HỌC", "KHOA NHI", "KHOA TRUYỀN NHIỄM", "KHOA Y DƯỢC CỔ TRUYỀN", 
+        "KHOA LIÊN CHUYÊN KHOA", "KHOA KHÁM BỆNH (TỔNG LƯỢT KHÁM NGOẠI TRÚ)"
     ];
 
     window.onload = function() {
@@ -210,7 +120,7 @@
             localStorage.setItem('hospital_token', tok);
             renderFormView(tok);
         } else {
-            alert('Mã bảo mật Token đơn vị không chính xác!');
+            alert('Mã xác thực Token không chính xác!');
         }
     }
 
@@ -218,21 +128,20 @@
         document.getElementById('loginBlock').style.display = 'none';
         document.getElementById('formReport').style.display = 'block';
         document.getElementById('txtTenKhoa').innerText = MAP_TOKENS[token];
-
         document.getElementById('grLamSang').style.display = 'none';
         document.getElementById('grCanLamSang').style.display = 'none';
 
-        if (token === "CDHA2026") {
+        if (token === "CDHA") {
             document.getElementById('grCanLamSang').style.display = 'block';
             buildParaclinicalTable(
                 ["noiSoi", "xqNgoaiTru", "xqNoiTru", "sieuAmNgoaiTru", "sieuAmNoiTru"], 
-                ["Nội Soi", "XQ Ngoại Trú", "XQ Nội Trú", "Siêu Âm Ngoại Trú", "Siêu Âm Nội Trú"]
+                ["Nội Soi Thực Quản - Dạ Dày", "Số Lần Chụp XQ Ngoại Trú", "Số Lần Chụp XQ Nội Trú", "Số Lần Siêu Âm Ngoại Trú", "Số Lần Siêu Âm Nội Trú"]
             );
-        } else if (token === "XETNGHIEM2026") {
+        } else if (token === "XETNGHIEM") {
             document.getElementById('grCanLamSang').style.display = 'block';
             buildParaclinicalTable(
                 ["procalcitonin", "bnp", "khiMauDongMach", "xnNgoaiTru", "xnNoiTru"], 
-                ["Procalcitonin", "BNP", "Khí Máu ĐM", "Xét Nghiệm Ngoại", "Xét Nghiệm Nội Trú"]
+                ["1. Procalcitonin", "2. BNP", "3. Khí Máu Động Mạch", "7. Số Lần Xét Nghiệm Ngoại Trú", "7. Số Lần Xét Nghiệm Nội Trú"]
             );
         } else {
             document.getElementById('grLamSang').style.display = 'block';
@@ -242,17 +151,14 @@
     function buildParaclinicalTable(fields, labels) {
         const thr = document.getElementById('thrCLS');
         const tby = document.getElementById('tbyInputCLS');
-        
-        let headerHtml = `<th>STT</th><th style="text-align:left; min-width:280px;">Khoa Lâm Sàng Chỉ Định</th>`;
+        let headerHtml = `<th>STT</th><th style="text-align:left; min-width:320px;">Khoa Lâm Sàng Chỉ Định Dữ Liệu</th>`;
         labels.forEach(l => { headerHtml += `<th>${l}</th>`; });
         thr.innerHTML = headerHtml;
 
         let bodyHtml = "";
         CLINICAL_KHOAS.forEach((khoa, index) => {
             let rowInputs = "";
-            fields.forEach(f => {
-                rowInputs += `<td><input type="number" class="table-input" data-khoa="${khoa}" data-field="${f}" value="0" min="0"></td>`;
-            });
+            fields.forEach(f => { rowInputs += `<td><input type="number" class="table-input" data-khoa="${khoa}" data-field="${f}" value="0" min="0"></td>`; });
             bodyHtml += `<tr><td>${index+1}</td><td class="td-left">${khoa}</td>${rowInputs}</tr>`;
         });
         tby.innerHTML = bodyHtml;
@@ -266,13 +172,14 @@
         const encodedParams = new URLSearchParams();
         encodedParams.append('khoa', MAP_TOKENS[currentToken]);
 
-        if (currentToken === "CDHA2026" || currentToken === "XETNGHIEM2026") {
+        if (currentToken === "CDHA" || currentToken === "XETNGHIEM") {
             let dataPayload = [];
             CLINICAL_KHOAS.forEach(khoa => {
                 let obj = { loai: khoa };
                 let inputs = document.querySelectorAll(`input[data-khoa="${khoa}"]`);
-                inputs.forEach(i => {
-                    obj[i.getAttribute('data-field')] = Number(i.value || 0);
+                inputs.forEach(i => { 
+                    var fName = i.getAttribute('data-field');
+                    obj[fName] = Number(i.value || 0); 
                 });
                 dataPayload.push(obj);
             });
@@ -292,14 +199,14 @@
             });
             const statusText = await res.text();
             if(statusText.trim() === "SUCCESS") {
-                alert('Đã đồng bộ thành công số liệu giao ban lên hệ thống!');
+                alert('Đồng bộ số liệu thành công! Đã cập nhật tăng tiến số lần báo cáo.');
                 window.location.href = 'dashboard.html';
             } else {
-                alert('Gặp lỗi hệ thống: ' + statusText);
+                alert('Lỗi hệ thống: ' + statusText);
             }
         } catch (error) {
             console.error(error);
-            alert('Lỗi kết nối! Xin vui lòng kiểm tra lại URL Web App hoặc phân quyền Deploy.');
+            alert('Lỗi kết nối đường truyền đến Web App.');
         } finally {
             document.getElementById('loading').style.display = 'none';
         }
