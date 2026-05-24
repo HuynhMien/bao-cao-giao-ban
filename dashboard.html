@@ -27,7 +27,7 @@
 
 <div class="dashboard-container">
     <div class="top-bar">
-        <h1>📊 DASHBOARD BÁO CÁO GIAO BAN - BỆNH VIỆN ĐKKV HỒNG NGỰ</h1>
+        <h1>📊 DASHBOARD BÁO CÁO GIAO BAN - BỆNH VIỆN ĐK KV HỒNG NGỰ</h1>
         <div class="filter-box">
             <span>NGÀY XEM:</span>
             <input type="date" id="targetDatePicker" onchange="loadDashboardCoreData()">
@@ -59,31 +59,31 @@
     </div>
 
     <div class="table-section">
-        <div class="section-h2">II. Số liệu hoạt động cận lâm sàng toàn viện</div>
+        <div class="section-h2">II. Số liệu hoạt động cận lâm sàng & thủ thuật toàn viện</div>
         <table>
             <thead>
                 <tr>
                     <th rowspan="2">STT</th>
                     <th rowspan="2" style="min-width: 230px;">Khoa Lâm Sàng Chỉ Định</th>
-                    <th colspan="5">Khoa Xét Nghiệm (Theo Khoa)</th>
+                    <th colspan="6">Khoa Xét Nghiệm / Thủ Thuật (Theo Khoa Chỉ Định)</th>
                     <th colspan="4">Nhóm Máu (Lượt Tổng)</th>
                     <th colspan="5">Khoa Chẩn Đoán Hình Ảnh (Lượt Tổng)</th>
                 </tr>
                 <tr>
-                    <th>Procalcitonin</th><th>BNP</th><th>Khí Máu ĐM</th><th>XN Ngoại</th><th>XN Nội</th>
+                    <th>Procalcitonin</th><th>BNP</th><th>Khí Máu ĐM</th><th style="background:#f0fdf4; color:#166534;">Tiêm Khớp</th><th>XN Ngoại</th><th>XN Nội</th>
                     <th style="color:#b91c1c;">Máu O</th><th style="color:#b91c1c;">Máu A</th><th style="color:#b91c1c;">Máu B</th><th style="color:#b91c1c;">Máu AB</th>
                     <th>Nội Soi</th><th>XQ Ngoại</th><th>XQ Nội</th><th>Siêu Âm Ngoại</th><th>Siêu Âm Nội</th>
                 </tr>
             </thead>
             <tbody id="bodyCanLamSang">
-                <tr><td colspan="16">Đang kết xuất sơ đồ cận lâm sàng...</td></tr>
+                <tr><td colspan="17">Đang kết xuất sơ đồ cận lâm sàng...</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxFhs9ZLvxVd1BmZk5XDg1xgEVkPtjvrgi5zc7r3DHwQa85ILF2HXfwiZYPY0gnK8Au/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzSqAMImM51DwBgyJ_tNxZH442osdbtgQm2S0GkP4fKeEjahWJYMMh7ztOI1K27mFea/exec';
 
     const CLINICAL_KHOAS = [
         "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", "KHOA NGOẠI TỔNG HỢP", "KHOA PHỤ SẢN", 
@@ -122,7 +122,7 @@
 
         CLINICAL_KHOAS.forEach((khoa, index) => {
             let matches = data.lamSang.filter(r => r.ngay === searchDate && r.khoa.toUpperCase() === khoa.toUpperCase());
-            let act = { luotKhamNgoaiTru:0, benhCu:0, benhMoi:0, chuyenKhoa:0, xuatVien:0, xinVeBenhOn:0, xinVeBenhNang:0, chuyenDiCacKhoa:0, boVe:0, tuVong:0, chuyenVien:0, conLai:0, lanGui:"-" };
+            let act = { luotKhamNgoaiTru:0, benhCu:0, benhMoi:0, chuyenKhoa:0, xuatVien:0, xinVeBenhOn:0, xinVeBenhNang:0, chuyenDiCacKhoa:0, boVe:0, tuVong:0, chuyenVien:0, conLai:0 };
             
             if (matches.length > 0) {
                 matches.sort((a, b) => Number(b.lanGui || 0) - Number(a.lanGui || 0));
@@ -131,7 +131,6 @@
 
             let isKKB = khoa.includes("KHÁM BỆNH");
 
-            // Cộng dồn hàng tổng toàn viện (Nếu là khoa khám bệnh thì không cộng nội trú)
             sums.nt += Number(act.luotKhamNgoaiTru || 0);
             sums.bc += isKKB ? 0 : Number(act.benhCu || 0);
             sums.bm += isKKB ? 0 : Number(act.benhMoi || 0);
@@ -172,10 +171,10 @@
         </tr>`;
         tbodyLS.innerHTML = htmlLS;
 
-        // 2. RENDER MẢNG CẬN LÂM SÀNG
+        // 2. RENDER MẢNG CẬN LÂM SÀNG & THỦ THUẬT
         const tbodyCLS = document.getElementById('bodyCanLamSang');
         let htmlCLS = "";
-        let totalCLS = { pro:0, bnp:0, khi:0, xnNg:0, xnNo:0 };
+        let totalCLS = { pro:0, bnp:0, khi:0, tiemKhop:0, xnNg:0, xnNo:0 };
 
         let rowTongXN = data.canLamSang.filter(r => r.ngay === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
         let rowTongCDHA = data.canLamSang.filter(r => r.ngay === searchDate && r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
@@ -187,13 +186,18 @@
             totalCLS.pro += Number(rXN.procalcitonin || 0); 
             totalCLS.bnp += Number(rXN.bnp || 0); 
             totalCLS.khi += Number(rXN.khiMauDongMach || 0);
+            totalCLS.tiemKhop += Number(rXN.tiemKhop || 0); // Cộng dồn tiêm khớp toàn viện
             totalCLS.xnNg += Number(rXN.xnNgoaiTru || 0); 
             totalCLS.xnNo += Number(rXN.xnNoiTru || 0);
 
             htmlCLS += `<tr>
                 <td>${index + 1}</td>
                 <td class="text-left">${khoa}</td>
-                <td>${rXN.procalcitonin || 0}</td><td>${rXN.bnp || 0}</td><td>${rXN.khiMauDongMach || 0}</td><td>${rXN.xnNgoaiTru || 0}</td><td>${rXN.xnNoiTru || 0}</td>
+                <td>${rXN.procalcitonin || 0}</td>
+                <td>${rXN.bnp || 0}</td>
+                <td>${rXN.khiMauDongMach || 0}</td>
+                <td style="font-weight:bold; color:#16a34a; background:#f0fdf4;">${rXN.tiemKhop || 0}</td> <td>${rXN.xnNgoaiTru || 0}</td>
+                <td>${rXN.xnNoiTru || 0}</td>
                 <td>-</td><td>-</td><td>-</td><td>-</td>
                 <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
             </tr>`;
@@ -201,7 +205,8 @@
 
         htmlCLS += `<tr class="sum-row">
             <td colspan="2">TỔNG CẬN LÂM SÀNG TOÀN VIỆN</td>
-            <td>${totalCLS.pro}</td><td>${totalCLS.bnp}</td><td>${totalCLS.khi}</td><td>${totalCLS.xnNg}</td><td>${totalCLS.xnNo}</td>
+            <td>${totalCLS.pro}</td><td>${totalCLS.bnp}</td><td>${totalCLS.khi}</td>
+            <td style="background:#dcfce7; color:#15803d;">${totalCLS.tiemKhop}</td> <td>${totalCLS.xnNg}</td><td>${totalCLS.xnNo}</td>
             <td style="background:#fee2e2;">${rowTongXN.nhomMauO || 0}</td><td style="background:#fee2e2;">${rowTongXN.nhomMauA || 0}</td><td style="background:#fee2e2;">${rowTongXN.nhomMauB || 0}</td><td style="background:#fee2e2;">${rowTongXN.nhomMauAB || 0}</td>
             <td style="background:#dbeafe;">${rowTongCDHA.noiSoi || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.xqNgoaiTru || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.xqNoiTru || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.sieuAmNgoaiTru || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.sieuAmNoiTru || 0}</td>
         </tr>`;
