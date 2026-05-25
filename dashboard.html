@@ -14,13 +14,14 @@
         .filter-box input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-weight: bold; }
         .table-section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 25px; overflow-x: auto; }
         .section-h2 { font-size: 18px; text-transform: uppercase; margin-top: 0; margin-bottom: 15px; color: #334155; border-left: 4px solid var(--primary); padding-left: 10px; }
-        table { width: 100%; border-collapse: collapse; font-size: 18px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; font-size: 16px; text-align: center; }
         th, td { border: 1px solid var(--border); padding: 9px 6px; }
         th { background: #f1f5f9; color: #334155; font-weight: bold; }
         .text-left { text-align: left; font-weight: 600; background: #f8fafc; }
         .sum-row { background: #f0fdf4; font-weight: bold; color: #166534; }
-        .badge { background: #e0f2fe; color: #0369a1; padding: 2px 5px; border-radius: 10px; font-size: 11px; }
         .btn-nav { padding: 8px 16px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-weight: bold; }
+        .btn-excel { padding: 8px 16px; background: #16a34a; color: white; border-radius: 6px; text-decoration: none; font-weight: bold; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-excel:hover { background: #15803d; }
     </style>
 </head>
 <body>
@@ -31,13 +32,14 @@
         <div class="filter-box">
             <span>NGÀY XEM:</span>
             <input type="date" id="targetDatePicker" onchange="renderDashboardTables(cacheRawData)">
+            <button class="btn-excel" onclick="exportDashboardToExcel()">📥 XUẤT FILE EXCEL</button>
             <a href="index.html" class="btn-nav">✍️ NHẬP BÁO CÁO</a>
         </div>
     </div>
 
     <div class="table-section">
         <div class="section-h2">I. Tình hình người bệnh điều trị nội trú & ngoại trú các khoa lâm sàng</div>
-        <table>
+        <table id="tblLamSang">
             <thead>
                 <tr>
                     <th rowspan="2">STT</th>
@@ -60,7 +62,7 @@
 
     <div class="table-section">
         <div class="section-h2">II. Số liệu hoạt động cận lâm sàng</div>
-        <table>
+        <table id="tblCanLamSang">
             <thead>
                 <tr>
                     <th rowspan="2">STT</th>
@@ -83,7 +85,7 @@
 
     <div class="table-section">
         <div class="section-h2">III. Số liệu Phẫu thuật - Thủ thuật</div>
-        <table style="max-width: 600px;">
+        <table id="tblPhauThuatThuThuat" style="max-width: 600px;">
             <thead>
                 <tr>
                     <th style="width: 60px;">STT</th>
@@ -150,12 +152,10 @@
         
         const searchDate = convertDateToDMY(document.getElementById('targetDatePicker').value).trim();
 
-        // 1. RENDER MẢNG LÂM SÀNG (ĐÃ BỎ CỘT TIÊM KHỚP)
+        // 1. RENDER MẢNG LÂM SÀNG
         const tbodyLS = document.getElementById('bodyLamSang');
         let htmlLS = "";
         let sums = { nt:0, bc:0, bm:0, ck:0, xv:0, v_on:0, v_nang:0, c_khoa:0, bv:0, tv:0, cv:0, cl:0, tk:0 };
-
-        // Tạo chuỗi HTML cho mục III (Phẫu thuật - Thủ thuật) đồng thời khi duyệt qua các khoa
         let htmlPTTT = "";
 
         CLINICAL_KHOAS.forEach((khoa, index) => {
@@ -187,7 +187,6 @@
             sums.cl += isKKB ? 0 : Number(act.conLai || 0);
             sums.tk += isKKB ? 0 : Number(act.tiemKhop || 0);
 
-            // Ghi dữ liệu bảng I Lâm sàng
             htmlLS += `<tr>
                 <td>${index + 1}</td>
                 <td class="text-left">${khoa}</td>
@@ -205,7 +204,6 @@
                 <td style="font-weight:bold; color:#854d0e; background:#fef9c3;">${isKKB ? '-' : (act.conLai || 0)}</td>
             </tr>`;
 
-            // Ghi dữ liệu bảng III Phẫu thuật - Thủ thuật mới
             htmlPTTT += `<tr>
                 <td>${index + 1}</td>
                 <td class="text-left">${khoa}</td>
@@ -222,7 +220,6 @@
         </tr>`;
         tbodyLS.innerHTML = htmlLS;
 
-        // Thêm hàng tổng kết cho bảng Mục III
         htmlPTTT += `<tr class="sum-row">
             <td colspan="2">TỔNG TOÀN VIỆN</td>
             <td style="background:#dcfce7; color:#15803d;">${sums.tk}</td>
@@ -233,7 +230,7 @@
         // 2. RENDER MẢNG CẬN LÂM SÀNG (MỤC II)
         const tbodyCLS = document.getElementById('bodyCanLamSang');
         let htmlCLS = "";
-        let totalCLS = { pro:0, bnp:0, khi:0, xnNg:0, xnNo:0 };
+        let totalCLS = { pro:0, bnp:0, khi:0 };
 
         let rowTongXN = (data.canLamSang || []).filter(r => r.ngay && r.ngay.toString().trim() === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
         let rowTongCDHA = (data.canLamSang || []).filter(r => r.ngay && r.ngay.toString().trim() === searchDate && r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
@@ -253,17 +250,16 @@
             totalCLS.pro += Number(rXN.procalcitonin || 0); 
             totalCLS.bnp += Number(rXN.bnp || 0); 
             totalCLS.khi += Number(rXN.khiMauDongMach || 0);
-            totalCLS.xnNg += Number(rXN.xnNgoaiTru || 0); 
-            totalCLS.xnNo += Number(rXN.xnNoiTru || 0);
 
+            // Chỉnh chi tiết khoa thành dấu "-" đối với cột XN Ngoại Trú, XN Nội Trú
             htmlCLS += `<tr>
                 <td>${index + 1}</td>
                 <td class="text-left">${khoa}</td>
                 <td>${rXN.procalcitonin || 0}</td>
                 <td>${rXN.bnp || 0}</td>
                 <td>${rXN.khiMauDongMach || 0}</td>
-                <td>${rXN.xnNgoaiTru || 0}</td>
-                <td>${rXN.xnNoiTru || 0}</td>
+                <td>-</td>
+                <td>-</td>
                 <td>-</td><td>-</td><td>-</td><td>-</td>
                 <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
             </tr>`;
@@ -272,12 +268,43 @@
         htmlCLS += `<tr class="sum-row">
             <td colspan="2">TỔNG CẬN LÂM SÀNG TOÀN VIỆN</td>
             <td>${totalCLS.pro}</td><td>${totalCLS.bnp}</td><td>${totalCLS.khi}</td>
-            <td>${totalCLS.xnNg}</td><td>${totalCLS.xnNo}</td>
+            <td style="background:#e0f2fe; color:#0369a1;">${rowTongXN.xnNgoaiTru || 0}</td>
+            <td style="background:#e0f2fe; color:#0369a1;">${rowTongXN.xnNoiTru || 0}</td>
             <td style="background:#fee2e2;">${rowTongXN.nhomMauO || 0}</td><td style="background:#fee2e2;">${rowTongXN.nhomMauA || 0}</td><td style="background:#fee2e2;">${rowTongXN.nhomMauB || 0}</td><td style="background:#fee2e2;">${rowTongXN.nhomMauAB || 0}</td>
             <td style="background:#dbeafe;">${rowTongCDHA.noiSoi || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.xqNgoaiTru || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.xqNoiTru || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.sieuAmNgoaiTru || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.sieuAmNoiTru || 0}</td>
         </tr>`;
         
         tbodyCLS.innerHTML = htmlCLS;
+    }
+
+    // Hàm xử lý xuất dữ liệu ra định dạng Excel XML tương thích 100% cấu trúc ô
+    function exportDashboardToExcel() {
+        const selectedDate = document.getElementById('targetDatePicker').value || "BaoCao";
+        const fileName = `Bao_Cao_Giao_Ban_${selectedDate}.xls`;
+        
+        let excelTemplate = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">`;
+        excelTemplate += `<head><meta charset="UTF-8"><style>table { border-collapse:collapse; text-align:center; font-family:'Segoe UI', sans-serif; } th, td { border:1px solid #cbd5e1; padding:6px; font-size:13px; } th { background-color:#f1f5f9; font-weight:bold; color:#334155; } .sum-row { background-color:#f0fdf4; font-weight:bold; color:#166534; } .text-left { text-align:left; }</style></head><body>`;
+        
+        excelTemplate += `<h2>BÁO CÁO TỔNG HỢP GIAO BAN NGÀY: ${convertDateToDMY(selectedDate)}</h2><br/>`;
+        
+        excelTemplate += `<h3>I. TÌNH HÌNH NGƯỜI BỆNH ĐIỀU TRỊ NỘI TRÚ & NGOẠI TRÚ CÁC KHOA LÂM SÀNG</h3>`;
+        excelTemplate += `<table>${document.getElementById('tblLamSang').innerHTML}</table><br/><br/>`;
+        
+        excelTemplate += `<h3>II. SỐ LIỆU HOẠT ĐỘNG CẬN LÂM SÀNG</h3>`;
+        excelTemplate += `<table>${document.getElementById('tblCanLamSang').innerHTML}</table><br/><br/>`;
+        
+        excelTemplate += `<h3>III. SỐ LIỆU PHẪU THUẬT - THỦ THUẬT</h3>`;
+        excelTemplate += `<table>${document.getElementById('tblPhauThuatThuThuat').innerHTML}</table>`;
+        
+        excelTemplate += `</body></html>`;
+
+        const blob = new Blob([excelTemplate], { type: "application/vnd.ms-excel;charset=utf-8" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     loadDashboardCoreData();
