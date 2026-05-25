@@ -20,10 +20,8 @@
         .text-left { text-align: left; font-weight: 600; background: #f8fafc; }
         .sum-row { background: #f0fdf4; font-weight: bold; color: #166534; }
         .badge { background: #e0f2fe; color: #0369a1; padding: 2px 5px; border-radius: 10px; font-size: 11px; }
-        .btn-nav { padding: 8px 16px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-weight: bold; cursor: pointer; border: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px; }
-        .btn-green { background-color: #16a34a; }
+        .btn-nav { padding: 8px 16px; background: var(--primary); color: white; border-radius: 6px; text-decoration: none; font-weight: bold; }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -33,14 +31,13 @@
         <div class="filter-box">
             <span>NGÀY XEM:</span>
             <input type="date" id="targetDatePicker" onchange="renderDashboardTables(cacheRawData)">
-            <button onclick="exportAllTablesToExcel()" class="btn-nav btn-green">📥 XUẤT EXCEL</button>
             <a href="index.html" class="btn-nav">✍️ NHẬP BÁO CÁO</a>
         </div>
     </div>
 
     <div class="table-section">
-        <div class="section-h2" id="titleBảngI">I. Tình hình người bệnh điều trị nội trú & ngoại trú các khoa lâm sàng</div>
-        <table id="tableLamSang">
+        <div class="section-h2">I. Tình hình người bệnh điều trị nội trú & ngoại trú các khoa lâm sàng</div>
+        <table>
             <thead>
                 <tr>
                     <th rowspan="2">STT</th>
@@ -62,8 +59,8 @@
     </div>
 
     <div class="table-section">
-        <div class="section-h2" id="titleBảngII">II. Số liệu hoạt động cận lâm sàng</div>
-        <table id="tableCanLamSang">
+        <div class="section-h2">II. Số liệu hoạt động cận lâm sàng</div>
+        <table>
             <thead>
                 <tr>
                     <th rowspan="2">STT</th>
@@ -85,8 +82,8 @@
     </div>
 
     <div class="table-section">
-        <div class="section-h2" id="titleBảngIII">III. Số liệu Phẫu thuật - Thủ thuật</div>
-        <table id="tablePhauThuatThuThuat" style="max-width: 600px;">
+        <div class="section-h2">III. Số liệu Phẫu thuật - Thủ thuật</div>
+        <table style="max-width: 600px;">
             <thead>
                 <tr>
                     <th style="width: 60px;">STT</th>
@@ -153,10 +150,12 @@
         
         const searchDate = convertDateToDMY(document.getElementById('targetDatePicker').value).trim();
 
-        // 1. RENDER MẢNG LÂM SÀNG
+        // 1. RENDER MẢNG LÂM SÀNG (ĐÃ BỎ CỘT TIÊM KHỚP)
         const tbodyLS = document.getElementById('bodyLamSang');
         let htmlLS = "";
         let sums = { nt:0, bc:0, bm:0, ck:0, xv:0, v_on:0, v_nang:0, c_khoa:0, bv:0, tv:0, cv:0, cl:0, tk:0 };
+
+        // Tạo chuỗi HTML cho mục III (Phẫu thuật - Thủ thuật) đồng thời khi duyệt qua các khoa
         let htmlPTTT = "";
 
         CLINICAL_KHOAS.forEach((khoa, index) => {
@@ -188,6 +187,7 @@
             sums.cl += isKKB ? 0 : Number(act.conLai || 0);
             sums.tk += isKKB ? 0 : Number(act.tiemKhop || 0);
 
+            // Ghi dữ liệu bảng I Lâm sàng
             htmlLS += `<tr>
                 <td>${index + 1}</td>
                 <td class="text-left">${khoa}</td>
@@ -205,6 +205,7 @@
                 <td style="font-weight:bold; color:#854d0e; background:#fef9c3;">${isKKB ? '-' : (act.conLai || 0)}</td>
             </tr>`;
 
+            // Ghi dữ liệu bảng III Phẫu thuật - Thủ thuật mới
             htmlPTTT += `<tr>
                 <td>${index + 1}</td>
                 <td class="text-left">${khoa}</td>
@@ -221,6 +222,7 @@
         </tr>`;
         tbodyLS.innerHTML = htmlLS;
 
+        // Thêm hàng tổng kết cho bảng Mục III
         htmlPTTT += `<tr class="sum-row">
             <td colspan="2">TỔNG TOÀN VIỆN</td>
             <td style="background:#dcfce7; color:#15803d;">${sums.tk}</td>
@@ -228,7 +230,7 @@
         document.getElementById('bodyPhauThuatThuThuat').innerHTML = htmlPTTT;
 
 
-        // 2. RENDER MẢNG CẬN LÂM SÀNG
+        // 2. RENDER MẢNG CẬN LÂM SÀNG (MỤC II)
         const tbodyCLS = document.getElementById('bodyCanLamSang');
         let htmlCLS = "";
         let totalCLS = { pro:0, bnp:0, khi:0, xnNg:0, xnNo:0 };
@@ -276,65 +278,6 @@
         </tr>`;
         
         tbodyCLS.innerHTML = htmlCLS;
-    }
-
-    // HÀM XỬ LÝ XUẤT EXCEL TỔNG HỢP CẢ 3 BẢNG VÀO 1 WORKSHEET
-    function exportAllTablesToExcel() {
-        const selectedDate = document.getElementById('targetDatePicker').value;
-        if(!selectedDate) {
-            alert("Vui lòng chọn ngày trước khi xuất!");
-            return;
-        }
-        
-        // Tạo một Workbook mới trống
-        const wb = XLSX.utils.book_new();
-        
-        // Khởi tạo mảng chứa dữ liệu thô dạng ma trận
-        let wsData = [];
-        
-        // 1. Thêm Tiêu đề lớn cho file báo cáo
-        wsData.push([`BÁO CÁO TỔNG HỢP GIAO BAN NGÀY: ${convertDateToDMY(selectedDate)}`]);
-        wsData.push([]); // Dòng trống cách hàng
-
-        // --- HÀM PHỤ TRỢ: CHUYỂN ĐỔI BẢNG HTML THÀNH ĐỐI TƯỢNG DATA ---
-        function appendTableToData(tableId, titleText) {
-            wsData.push([titleText]); // Đặt tên tiêu đề mục
-            
-            const table = document.getElementById(tableId);
-            const rows = table.querySelectorAll('tr');
-            
-            rows.forEach(row => {
-                let rowData = [];
-                const cells = row.querySelectorAll('th, td');
-                cells.forEach(cell => {
-                    // Nếu là ô trống gạch nối thì chuyển sang ô trống rỗng hoặc ép kiểu số nếu có
-                    let val = cell.innerText.trim();
-                    if(val === "-") val = "";
-                    else if(!isNaN(val) && val !== "") val = Number(val);
-                    rowData.push(val);
-                });
-                wsData.push(rowData);
-            });
-            wsData.push([]); // Thêm dòng trống ngăn cách sau mỗi bảng
-            wsData.push([]);
-        }
-
-        // 2. Đẩy lần lượt dữ liệu của 3 bảng vào chung mảng ma trận dữ liệu
-        appendTableToData('tableLamSang', document.getElementById('titleBảngI').innerText);
-        appendTableToData('tableCanLamSang', document.getElementById('titleBảngII').innerText);
-        appendTableToData('tablePhauThuatThuThuat', document.getElementById('titleBảngIII').innerText);
-
-        // 3. Chuyển đổi dữ liệu ma trận thành Worksheet chính thức
-        const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-        // 4. Đồng bộ lại các thiết lập merge ô (rowspan/colspan) tự động dựa trên HTML của từng bảng
-        // Vì gộp chung vào 1 Sheet, việc tính toán merge thủ công tương đối phức tạp nên SheetJS hỗ trợ gom cấu trúc qua AOA một cách tuần tự gọn gàng nhất.
-        
-        // Đính kèm worksheet vào workbook với tên Sheet là ngày được xem
-        XLSX.utils.book_append_sheet(wb, ws, `GiaoBan_${convertDateToDMY(selectedDate)}`);
-        
-        // Thực hiện xuất tải xuống máy Client
-        XLSX.writeFile(wb, `BaoCaoGiaoBan_BV_HongNgu_${selectedDate}.xlsx`);
     }
 
     loadDashboardCoreData();
