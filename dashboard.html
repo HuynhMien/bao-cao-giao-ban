@@ -85,7 +85,7 @@
 </div>
 
 <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxE1nTT3bdrLZ361cJFQIERFr4gZdvKbgALqpFma9og8bl0LnNCj5E_ZAfKSSsiPzll/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbz2Yf9BNKB2JHqpvH8Y30a-xx8S707p_vVugKbNFghcYD3k9VOaSb1MVc_D6dvcshBl/exec';
 
     const CLINICAL_KHOAS = [
         "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", "KHOA NGOẠI TỔNG HỢP", "KHOA PHỤ SẢN", 
@@ -94,7 +94,13 @@
     ];
 
     let cacheRawData = null;
-    document.getElementById('targetDatePicker').valueAsDate = new Date();
+
+    // Thiết lập ngày mặc định ban đầu là ngày hiện tại của hệ thống máy tính
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    document.getElementById('targetDatePicker').value = `${yyyy}-${mm}-${dd}`;
 
     async function loadDashboardCoreData() {
         try {
@@ -116,7 +122,7 @@
         }
     }
 
-    // Hàm chuyển đổi dữ liệu từ yyyy-MM-dd sang dd-MM-yyyy để khớp database
+    // Hàm chuyển đổi dữ liệu từ yyyy-MM-dd sang dd-MM-yyyy để khớp chính xác chuỗi database
     function convertDateToDMY(dateString) {
         if(!dateString) return "";
         const parts = dateString.split('-');
@@ -126,21 +132,27 @@
     function renderDashboardTables(data) {
         if (!data) return;
         
-        // Đã đồng bộ: Chuyển ngày sang chuẩn định dạng dd-MM-yyyy
-        const searchDate = convertDateToDMY(document.getElementById('targetDatePicker').value);
+        // Đã đồng bộ: Chuyển ngày sang chuẩn định dạng chuỗi dd-MM-yyyy
+        const searchDate = convertDateToDMY(document.getElementById('targetDatePicker').value).trim();
 
-        // 1. RENDER MẢNG LÂM SÀNG
+        // 1. RENDER MẢNG LÂM SÀNG (LẤY LẦN GỬI MỚI NHẤT)
         const tbodyLS = document.getElementById('bodyLamSang');
         let htmlLS = "";
         let sums = { nt:0, bc:0, bm:0, ck:0, xv:0, v_on:0, v_nang:0, c_khoa:0, bv:0, tv:0, cv:0, cl:0, tk:0 };
 
         CLINICAL_KHOAS.forEach((khoa, index) => {
-            let matches = (data.lamSang || []).filter(r => r.ngay === searchDate && r.khoa.toUpperCase() === khoa.toUpperCase());
-            let act = { luotKhamNgoaiTru:0, benhCu:0, benhMoi:0, chuyenKhoa:0, xuatVien:0, xinVeBenhOn:0, xinVeBenhNang:0, chuyenDiCacKhoa:0, boVe:0, tuVong:0, chuyenVien:0, conLai:0, tiemKhop:0 };
+            // Lọc toàn bộ các lần gửi trong ngày của khoa hiện tại
+            let matches = (data.lamSang || []).filter(r => 
+                r.ngay && r.ngay.toString().trim() === searchDate && 
+                r.khoa && r.khoa.toString().toUpperCase() === khoa.toUpperCase()
+            );
             
+            let act = { luotKhamNgoaiTru:0, benhCu:0, benhMoi:0, chuyenKhoa:0, xuatVien:0, xinVeBenhOn:0, xinVeBenhNang:0, chuyenDiCacKhoa:0, boVe:0, tuVong:0, chuyenVien:0, conLai:0, tiemKhop:0, lanGui:0 };
+            
+            // CẬP NHẬT: Sắp xếp giảm dần theo lanGui để phần tử đầu tiên [0] luôn là bản ghi mới nhất
             if (matches.length > 0) {
                 matches.sort((a, b) => Number(b.lanGui || 0) - Number(a.lanGui || 0));
-                act = matches[0];
+                act = matches[0]; 
             }
 
             let isKKB = khoa.includes("KHÁM BỆNH");
@@ -188,49 +200,13 @@
         </tr>`;
         tbodyLS.innerHTML = htmlLS;
 
-        // 2. RENDER MẢNG CẬN LÂM SÀNG & THỦ THUẬT
+        // 2. RENDER MẢNG CẬN LÂM SÀNG & THỦ THUẬT (LẤY LẦN GỬI MỚI NHẤT)
         const tbodyCLS = document.getElementById('bodyCanLamSang');
         let htmlCLS = "";
         let totalCLS = { pro:0, bnp:0, khi:0, xnNg:0, xnNo:0 };
 
-        let rowTongXN = (data.canLamSang || []).filter(r => r.ngay === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
-        let rowTongCDHA = (data.canLamSang || []).filter(r => r.ngay === searchDate && r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
+        // Lấy hàng tổng toàn viện của Xét nghiệm và CDHA (Lọc lấy lanGui mới nhất)
+        let rowTongXN = (data.canLamSang || []).filter(r => r.ngay && r.ngay.toString().trim() === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
+        let rowTongCDHA = (data.canLamSang || []).filter(r => r.ngay && r.ngay.toString().trim() === searchDate && r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
 
-        CLINICAL_KHOAS.forEach((khoa, index) => {
-            let matchesXN = (data.canLamSang || []).filter(r => r.ngay === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === khoa).sort((a,b) => Number(b.lanGui||0) - Number(a.lanGui||0));
-            let rXN = matchesXN[0] || {};
-
-            totalCLS.pro += Number(rXN.procalcitonin || 0); 
-            totalCLS.bnp += Number(rXN.bnp || 0); 
-            totalCLS.khi += Number(rXN.khiMauDongMach || 0);
-            totalCLS.xnNg += Number(rXN.xnNgoaiTru || 0); 
-            totalCLS.xnNo += Number(rXN.xnNoiTru || 0);
-
-            htmlCLS += `<tr>
-                <td>${index + 1}</td>
-                <td class="text-left">${khoa}</td>
-                <td>${rXN.procalcitonin || 0}</td>
-                <td>${rXN.bnp || 0}</td>
-                <td>${rXN.khiMauDongMach || 0}</td>
-                <td>${rXN.xnNgoaiTru || 0}</td>
-                <td>${rXN.xnNoiTru || 0}</td>
-                <td>-</td><td>-</td><td>-</td><td>-</td>
-                <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
-            </tr>`;
-        });
-
-        htmlCLS += `<tr class="sum-row">
-            <td colspan="2">TỔNG CẬN LÂM SÀNG TOÀN VIỆN</td>
-            <td>${totalCLS.pro}</td><td>${totalCLS.bnp}</td><td>${totalCLS.khi}</td>
-            <td>${totalCLS.xnNg}</td><td>${totalCLS.xnNo}</td>
-            <td style="background:#fee2e2;">${rowTongXN.nhomMauO || 0}</td><td style="background:#fee2e2;">${rowTongXN.nhomMauA || 0}</td><td style="background:#fee2e2;">${rowTongXN.nhomMauB || 0}</td><td style="background:#fee2e2;">${rowTongXN.nhomMauAB || 0}</td>
-            <td style="background:#dbeafe;">${rowTongCDHA.noiSoi || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.xqNgoaiTru || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.xqNoiTru || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.sieuAmNgoaiTru || 0}</td><td style="background:#dbeafe;">${rowTongCDHA.sieuAmNoiTru || 0}</td>
-        </tr>`;
-        
-        tbodyCLS.innerHTML = htmlCLS;
-    }
-
-    loadDashboardCoreData();
-</script>
-</body>
-</html>
+        CLINICAL_K
