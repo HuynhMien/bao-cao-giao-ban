@@ -71,6 +71,9 @@
                 <div class="input-item"><label>Tử vong</label><input type="number" name="tuVong" value="0" min="0"></div>
                 <div class="input-item"><label>Chuyển viện</label><input type="number" name="chuyenVien" value="0" min="0"></div>
             </div>
+
+            <div class="section-title" style="color: #0369a1; border-left-color: #0369a1;">Số liệu phẫu thuật - thủ thuật tại khoa</div>
+            <div class="form-grid" id="containerThủThuatLamSang"></div>
         </div>
 
         <div id="grKhamBenh" style="display:none;">
@@ -88,17 +91,7 @@
                 <div class="section-title">Bảng chỉ số chi tiết theo đơn vị chỉ định</div>
                 <div style="overflow-x: auto;">
                     <table id="tblInputCLS">
-                        <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th style="text-align:left; min-width:280px;">Khoa Lâm Sàng Chỉ Định</th>
-                                <th>Procalcitonin</th>
-                                <th>BNP</th>
-                                <th>Khí Máu ĐM</th>
-                                <th style="color: #166534; background-color: #f0fdf4;">Tiêm Khớp</th> <th>XN Ngoại Trú</th>
-                                <th>XN Nội Trú</th>
-                            </tr>
-                        </thead>
+                        <thead id="thdInputCLS"></thead>
                         <tbody id="tbyInputCLS"></tbody>
                     </table>
                 </div>
@@ -115,7 +108,31 @@
 </div>
 
 <script>
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxFhs9ZLvxVd1BmZk5XDg1xgEVkPtjvrgi5zc7r3DHwQa85ILF2HXfwiZYPY0gnK8Au/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxJiK63P9G3LfdKCyjh3Ak4il9ugm7iPB6AxCzvW866B4mKcHzznQpr0MyF3whBKyJ1/exec';
+
+    // DANH SÁCH MỞ RỘNG PHÁT SINH DỊCH VỤ - CHỈ CẦN KHAI BÁO THÊM TẠI ĐÂY LÀ XONG
+    const CLINICAL_PROCEDURES = [
+        { field: "tiemKhop", label: "TIÊM KHỚP" },
+        { field: "boBot", label: "BÓ BỘT" },
+        { field: "thayBang", label: "THAY BĂNG" }
+    ];
+
+    const CLS_SERVICES = {
+        "XETNGHIEM": [
+            { field: "procalcitonin", label: "Procalcitonin" },
+            { field: "bnp", label: "BNP" },
+            { field: "khiMauDongMach", label: "Khí Máu ĐM" },
+            { field: "xnNgoaiTru", label: "XN Ngoại Trú" },
+            { field: "xnNoiTru", label: "XN Nội Trú" }
+        ],
+        "CDHA": [
+            { field: "noiSoi", label: "Tổng Lượt Nội Soi" },
+            { field: "xqNgoaiTru", label: "Tổng XQ Ngoại" },
+            { field: "xqNoiTru", label: "Tổng XQ Nội" },
+            { field: "sieuAmNgoaiTru", label: "Tổng Siêu Âm Ngoại" },
+            { field: "sieuAmNoiTru", label: "Tổng Siêu Âm Nội" }
+        ]
+    };
 
     const MAP_TOKENS = {
         "CAPCUU": "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "NGOAI": "KHOA NGOẠI TỔNG HỢP", "NHI": "KHOA NHI", 
@@ -160,35 +177,42 @@
             document.getElementById('grCanLamSang').style.display = 'block';
             document.getElementById('wrapperBangCLS').style.display = 'block';
             
-            // Xây dựng bảng nhập tự động cho Khoa Xét Nghiệm (Bổ sung trường tiemKhop)
+            const thd = document.getElementById('thdInputCLS');
             const tby = document.getElementById('tbyInputCLS');
-            const fieldsXN = ["procalcitonin", "bnp", "khiMauDongMach", "tiemKhop", "xnNgoaiTru", "xnNoiTru"];
+            const services = CLS_SERVICES[token];
+
+            thd.innerHTML = `<tr><th>STT</th><th style="text-align:left; min-width:280px;">Khoa Lâm Sàng Chỉ Định</th>${services.map(s => `<th>${s.label}</th>`).join('')}</tr>`;
+
             let bodyHtml = "";
             CLINICAL_KHOAS.forEach((khoa, index) => {
                 let rowInputs = "";
-                fieldsXN.forEach(f => { 
-                    let customBg = f === "tiemKhop" ? 'style="background-color: #f0fdf4;"' : '';
-                    rowInputs += `<td><input type="number" class="table-input" data-khoa="${khoa}" data-field="${f}" value="0" min="0" ${customBg}></td>`; 
-                });
+                services.forEach(s => { rowInputs += `<td><input type="number" class="table-input" data-khoa="${khoa}" data-field="${s.field}" value="0" min="0"></td>`; });
                 bodyHtml += `<tr><td>${index+1}</td><td style="text-align:left; font-weight:600;">${khoa}</td>${rowInputs}</tr>`;
             });
             tby.innerHTML = bodyHtml;
 
-            // Xây dựng thêm ô nhập Tổng nhóm máu ở dưới
             document.getElementById('titleKhoiTong').innerText = "Thống kê Tổng số lượng các nhóm máu (Toàn viện)";
-            buildTotalFields(
-                ["nhomMauO", "nhomMauA", "nhomMauB", "nhomMauAB"],
-                ["TỔNG NHÓM MÁU O", "TỔNG NHÓM MÁU A", "TỔNG NHÓM MÁU B", "TỔNG NHÓM MÁU AB"]
-            );
+            buildTotalFields(["nhomMauO", "nhomMauA", "nhomMauB", "nhomMauAB"], ["TỔNG NHÓM MÁU O", "TỔNG NHÓM MÁU A", "TỔNG NHÓM MÁU B", "TỔNG NHÓM MÁU AB"]);
         } else if (token === "CDHA") {
             document.getElementById('grCanLamSang').style.display = 'block';
             document.getElementById('titleKhoiTong').innerText = "Số lượt tổng hoạt động Chẩn Đoán Hình Ảnh toàn viện";
-            buildTotalFields(
-                ["noiSoi", "xqNgoaiTru", "xqNoiTru", "sieuAmNgoaiTru", "sieuAmNoiTru"], 
-                ["TỔNG LƯỢT NỘI SOI", "TỔNG LƯỢT XQ NGOẠI", "TỔNG LƯỢT XQ NỘI", "TỔNG LƯỢT SIÊU ÂM NGOẠI", "TỔNG LƯỢT SIÊU ÂM NỘI"]
-            );
+            
+            const fieldsCDHA = CLS_SERVICES[token].map(s => s.field);
+            const labelsCDHA = CLS_SERVICES[token].map(s => s.label.toUpperCase());
+            buildTotalFields(fieldsCDHA, labelsCDHA);
         } else {
             document.getElementById('grLamSang').style.display = 'block';
+            
+            // Tự động dựng các ô PTTT phát sinh tại Khoa Lâm Sàng
+            const containerTT = document.getElementById('containerThủThuatLamSang');
+            let htmlTT = "";
+            CLINICAL_PROCEDURES.forEach(p => {
+                htmlTT += `<div class="input-item">
+                    <label style="font-weight: bold; color: #0369a1;">${p.label} TRONG NGÀY</label>
+                    <input type="number" name="${p.field}" value="0" min="0" style="background-color: #f0f9ff; border: 2px solid #bae6fd; padding:12px; font-size:16px;">
+                </div>`;
+            });
+            containerTT.innerHTML = htmlTT;
         }
     }
 
@@ -213,33 +237,25 @@
 
         if (currentToken === "XETNGHIEM") {
             let dataPayload = [];
-            // 1. Gom dữ liệu theo từng khoa lâm sàng (Vòng lặp tự động bốc trường "tiemKhop" mới thêm)
             CLINICAL_KHOAS.forEach(khoa => {
                 let obj = { loai: khoa };
-                document.querySelectorAll(`input[data-khoa="${khoa}"]`).forEach(i => { 
-                    obj[i.getAttribute('data-field')] = Number(i.value || 0); 
-                });
+                document.querySelectorAll(`input[data-khoa="${khoa}"]`).forEach(i => { obj[i.getAttribute('data-field')] = Number(i.value || 0); });
                 dataPayload.push(obj);
             });
-            // 2. Gom dữ liệu lượt tổng nhóm máu lưu vào dòng đặc biệt "TỔNG TOÀN VIỆN"
             let objTong = { loai: "TỔNG TOÀN VIỆN" };
             document.querySelectorAll('.total-field').forEach(i => { objTong[i.name] = Number(i.value || 0); });
             dataPayload.push(objTong);
-            
             encodedParams.append('payloadData', JSON.stringify(dataPayload));
         } else if (currentToken === "CDHA") {
             let dataPayload = [];
             let objTong = { loai: "TỔNG TOÀN VIỆN" };
             document.querySelectorAll('.total-field').forEach(i => { objTong[i.name] = Number(i.value || 0); });
             dataPayload.push(objTong);
-            
             encodedParams.append('payloadData', JSON.stringify(dataPayload));
         } else if (currentToken === "KKB") {
             encodedParams.append('luotKhamNgoaiTru', document.querySelector('input[name="luotKhamNgoaiTru"]').value || 0);
         } else {
-            document.getElementById('grLamSang').querySelectorAll('input[type="number"]').forEach(i => { 
-                encodedParams.append(i.name, i.value || 0); 
-            });
+            document.getElementById('grLamSang').querySelectorAll('input[type="number"]').forEach(i => { encodedParams.append(i.name, i.value || 0); });
         }
 
         try {
