@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Tổng Hợp Giao Ban - BV Hồng Ngự</title>
+    <title>Số liệu Giao Ban - Bệnh viện ĐKKV Hồng Ngự</title>
     <style>
         :root { --primary: #0284c7; --bg: #f8fafc; --text: #0f172a; --border: #cbd5e1; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
@@ -13,8 +13,8 @@
         .filter-box { display: flex; align-items: center; gap: 10px; font-weight: bold; }
         .filter-box input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-weight: bold; }
         .table-section { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 25px; overflow-x: auto; }
-        .section-h2 { font-size: 14px; text-transform: uppercase; margin-top: 0; margin-bottom: 15px; color: #334155; border-left: 4px solid var(--primary); padding-left: 10px; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; }
+        .section-h2 { font-size: 18px; text-transform: uppercase; margin-top: 0; margin-bottom: 15px; color: #334155; border-left: 4px solid var(--primary); padding-left: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 18px; text-align: center; }
         th, td { border: 1px solid var(--border); padding: 9px 6px; }
         th { background: #f1f5f9; color: #334155; font-weight: bold; }
         .text-left { text-align: left; font-weight: 600; background: #f8fafc; }
@@ -27,7 +27,7 @@
 
 <div class="dashboard-container">
     <div class="top-bar">
-        <h1>📊 DASHBOARD BÁO CÁO GIAO BAN - BỆNH VIỆN ĐK KV HỒNG NGỰ</h1>
+        <h1>📊 BÁO CÁO GIAO BAN - BỆNH VIỆN ĐK KV HỒNG NGỰ</h1>
         <div class="filter-box">
             <span>NGÀY XEM:</span>
             <input type="date" id="targetDatePicker" onchange="renderDashboardTables(cacheRawData)">
@@ -53,7 +53,7 @@
                 </tr>
             </thead>
             <tbody id="bodyLamSang">
-                <tr><td colspan="14">Đang đồng bộ dữ liệu trực tuyến...</td></tr>
+                <tr><td colspan="14">Đang đồng bộ dữ liệu...</td></tr>
             </tbody>
         </table>
     </div>
@@ -76,7 +76,7 @@
                 </tr>
             </thead>
             <tbody id="bodyCanLamSang">
-                <tr><td colspan="16">Đang kết xuất sơ đồ cận lâm sàng...</td></tr>
+                <tr><td colspan="16">Đang tải số liệu cận lâm sàng...</td></tr>
             </tbody>
         </table>
     </div>
@@ -87,7 +87,7 @@
             <thead>
                 <tr>
                     <th style="width: 60px;">STT</th>
-                    <th style="min-width: 250px;">Tên Đơn Vị Khoa Phòng</th>
+                    <th style="min-width: 250px;">Tên Khoa Phòng</th>
                     <th style="background:#f0fdf4; color:#166534; width: 180px;">Tiêm Khớp</th>
                 </tr>
             </thead>
