@@ -23,7 +23,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
         th, td { border: 1px solid var(--border); padding: 10px; text-align: center; }
         th { background-color: #f1f5f9; color: #334155; font-weight: bold; }
-        .table-input { width: 90px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: bold; text-align: center; }
+        .table-input { width: 85px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-weight: bold; text-align: center; }
         .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
         .btn-blue { background-color: #0284c7; color: white; }
         .btn-gray { background-color: #64748b; color: white; }
@@ -88,7 +88,7 @@
 
         <div id="grCanLamSang" style="display:none;">
             <div id="wrapperBangCLS" style="display:none;">
-                <div class="section-title">Bảng chỉ số chi tiết theo đơn vị chỉ định</div>
+                <div class="section-title">Bảng chỉ số chi tiết theo khoa lâm sàng chỉ định</div>
                 <div style="overflow-x: auto;">
                     <table id="tblInputCLS">
                         <thead id="thdInputCLS"></thead>
@@ -114,20 +114,31 @@
         { field: "tiemKhop", label: "TIÊM KHỚP" }
     ];
 
-    const CLS_SERVICES = {
+    // Cấu hình danh mục dịch vụ nhập chi tiết tại bảng
+    const CLS_TABLE_SERVICES = {
         "XETNGHIEM": [
             { field: "procalcitonin", label: "Procalcitonin" },
             { field: "bnp", label: "BNP" },
-            { field: "khiMauDongMach", label: "Khí Máu ĐM" },
-            { field: "xnNgoaiTru", label: "XN Ngoại Trú" },
-            { field: "xnNoiTru", label: "XN Nội Trú" }
+            { field: "khiMauDongMach", label: "Khí Máu ĐM" }
+        ]
+    };
+
+    // Cấu hình danh mục dịch vụ nhập gộp dạng Ô TỔNG toàn viện
+    const CLS_TOTAL_SERVICES = {
+        "XETNGHIEM": [
+            { field: "xnNgoaiTru", label: "TỔNG XN NGOẠI TRÚ" },
+            { field: "xnNoiTru", label: "TỔNG XN NỘI TRÚ" },
+            { field: "nhomMauO", label: "TỔNG NHÓM MÁU O" },
+            { field: "nhomMauA", label: "TỔNG NHÓM MÁU A" },
+            { field: "nhomMauB", label: "TỔNG NHÓM MÁU B" },
+            { field: "nhomMauAB", label: "TỔNG NHÓM MÁU AB" }
         ],
         "CDHA": [
-            { field: "noiSoi", label: "Tổng Lượt Nội Soi" },
-            { field: "xqNgoaiTru", label: "Tổng XQ Ngoại" },
-            { field: "xqNoiTru", label: "Tổng XQ Nội" },
-            { field: "sieuAmNgoaiTru", label: "Tổng Siêu Âm Ngoại" },
-            { field: "sieuAmNoiTru", label: "Tổng Siêu Âm Nội" }
+            { field: "noiSoi", label: "TỔNG LƯỢT NỘI SOI" },
+            { field: "xqNgoaiTru", label: "TỔNG XQ NGOẠI" },
+            { field: "xqNoiTru", label: "TỔNG XQ NỘI" },
+            { field: "sieuAmNgoaiTru", label: "TỔNG SIÊU ÂM NGOẠI" },
+            { field: "sieuAmNoiTru", label: "TỔNG SIÊU ÂM NỘI" }
         ]
     };
 
@@ -145,24 +156,22 @@
         "KHOA LIÊN CHUYÊN KHOA", "KHOA KHÁM BỆNH", "KẾ HOẠCH TỔNG HỢP"
     ];
 
-    // Kiểm tra Token tự động khi load trang
     window.onload = function() {
         const savedToken = localStorage.getItem('hospital_token');
         if (savedToken) {
             if (savedToken === "KHTH") {
-                window.location.href = 'dashboard.html'; // Chuyển thẳng sang dashboard nếu là KHTH
+                window.location.href = 'dashboard.html';
             } else if (MAP_TOKENS[savedToken]) { 
                 renderFormView(savedToken); 
             }
         }
     };
 
-    // Kiểm tra Token khi click nút Đăng Nhập
     function loginSystem() {
         const tok = document.getElementById('txtToken').value.trim().toUpperCase();
         if (tok === "KHTH") {
             localStorage.setItem('hospital_token', tok);
-            window.location.href = 'dashboard.html'; // Chuyển thẳng sang dashboard
+            window.location.href = 'dashboard.html';
         } else if (MAP_TOKENS[tok]) {
             localStorage.setItem('hospital_token', tok);
             renderFormView(tok);
@@ -185,30 +194,37 @@
             document.getElementById('grKhamBenh').style.display = 'block';
         } else if (token === "XETNGHIEM") {
             document.getElementById('grCanLamSang').style.display = 'block';
-            document.getElementById('wrapperBangCLS').style.display = 'block';
+            document.getElementById('wrapperBangCLS').style.display = 'block'; // Hiện bảng chi tiết
             
+            // 1. Dựng bảng nhập chi tiết cho Procalcitonin, BNP, Khí Máu
             const thd = document.getElementById('thdInputCLS');
             const tby = document.getElementById('tbyInputCLS');
-            const services = CLS_SERVICES[token];
+            const tableServices = CLS_TABLE_SERVICES[token];
 
-            thd.innerHTML = `<tr><th>STT</th><th style="text-align:left; min-width:280px;">Khoa Lâm Sàng Chỉ Định</th>${services.map(s => `<th>${s.label}</th>`).join('')}</tr>`;
+            thd.innerHTML = `<tr><th>STT</th><th style="text-align:left; min-width:280px;">Khoa Lâm Sàng Chỉ Định</th>${tableServices.map(s => `<th>${s.label}</th>`).join('')}</tr>`;
 
             let bodyHtml = "";
             CLINICAL_KHOAS.forEach((khoa, index) => {
                 let rowInputs = "";
-                services.forEach(s => { rowInputs += `<td><input type="number" class="table-input" data-khoa="${khoa}" data-field="${s.field}" value="0" min="0"></td>`; });
+                tableServices.forEach(s => { 
+                    rowInputs += `<td><input type="number" class="table-input" data-khoa="${khoa}" data-field="${s.field}" value="0" min="0"></td>`; 
+                });
                 bodyHtml += `<tr><td>${index+1}</td><td style="text-align:left; font-weight:600;">${khoa}</td>${rowInputs}</tr>`;
             });
             tby.innerHTML = bodyHtml;
 
-            document.getElementById('titleKhoiTong').innerText = "Thống kê Tổng số lượng các nhóm máu (Toàn viện)";
-            buildTotalFields(["nhomMauO", "nhomMauA", "nhomMauB", "nhomMauAB"], ["TỔNG NHÓM MÁU O", "TỔNG NHÓM MÁU A", "TỔNG NHÓM MÁU B", "TỔNG NHÓM MÁU AB"]);
+            // 2. Dựng các ô nhập số liệu TỔNG TOÀN VIỆN phía dưới (XN Ngoại, XN Nội, Nhóm máu)
+            document.getElementById('titleKhoiTong').innerText = "Số liệu báo cáo TỔNG TOÀN VIỆN (Xét nghiệm ngoại/nội trú & Nhóm máu)";
+            const fieldsXN = CLS_TOTAL_SERVICES[token].map(s => s.field);
+            const labelsXN = CLS_TOTAL_SERVICES[token].map(s => s.label);
+            buildTotalFields(fieldsXN, labelsXN);
+
         } else if (token === "CDHA") {
             document.getElementById('grCanLamSang').style.display = 'block';
             document.getElementById('titleKhoiTong').innerText = "Số lượt tổng hoạt động Chẩn Đoán Hình Ảnh toàn viện";
             
-            const fieldsCDHA = CLS_SERVICES[token].map(s => s.field);
-            const labelsCDHA = CLS_SERVICES[token].map(s => s.label.toUpperCase());
+            const fieldsCDHA = CLS_TOTAL_SERVICES[token].map(s => s.field);
+            const labelsCDHA = CLS_TOTAL_SERVICES[token].map(s => s.label);
             buildTotalFields(fieldsCDHA, labelsCDHA);
         } else {
             document.getElementById('grLamSang').style.display = 'block';
@@ -246,25 +262,41 @@
 
         if (currentToken === "XETNGHIEM") {
             let dataPayload = [];
+            // Thu thập dữ liệu chi tiết của 11 khoa từ bảng (Procalcitonin, bnp, khiMauDongMach)
             CLINICAL_KHOAS.forEach(khoa => {
                 let obj = { loai: khoa };
-                document.querySelectorAll(`input[data-khoa="${khoa}"]`).forEach(i => { obj[i.getAttribute('data-field')] = Number(i.value || 0); });
+                document.querySelectorAll(`input[data-khoa="${khoa}"]`).forEach(i => { 
+                    obj[i.getAttribute('data-field')] = Number(i.value || 0); 
+                });
+                // Thiết lập mặc định 0 cho ngoại/nội trú tại các khoa lẻ để không bị rỗng cấu trúc
+                obj.xnNgoaiTru = 0;
+                obj.xnNoiTru = 0;
                 dataPayload.push(obj);
             });
+
+            // Thu thập dữ liệu ô Tổng Toàn Viện (XN Ngoại trú, XN Nội trú, Nhóm máu)
             let objTong = { loai: "TỔNG TOÀN VIỆN" };
-            document.querySelectorAll('.total-field').forEach(i => { objTong[i.name] = Number(i.value || 0); });
+            document.querySelectorAll('.total-field').forEach(i => { 
+                objTong[i.name] = Number(i.value || 0); 
+            });
             dataPayload.push(objTong);
+            
             encodedParams.append('payloadData', JSON.stringify(dataPayload));
+
         } else if (currentToken === "CDHA") {
             let dataPayload = [];
             let objTong = { loai: "TỔNG TOÀN VIỆN" };
-            document.querySelectorAll('.total-field').forEach(i => { objTong[i.name] = Number(i.value || 0); });
+            document.querySelectorAll('.total-field').forEach(i => { 
+                objTong[i.name] = Number(i.value || 0); 
+            });
             dataPayload.push(objTong);
             encodedParams.append('payloadData', JSON.stringify(dataPayload));
         } else if (currentToken === "KKB") {
             encodedParams.append('luotKhamNgoaiTru', document.querySelector('input[name="luotKhamNgoaiTru"]').value || 0);
         } else {
-            document.getElementById('grLamSang').querySelectorAll('input[type="number"]').forEach(i => { encodedParams.append(i.name, i.value || 0); });
+            document.getElementById('grLamSang').querySelectorAll('input[type="number"]').forEach(i => { 
+                encodedParams.append(i.name, i.value || 0); 
+            });
         }
 
         try {
