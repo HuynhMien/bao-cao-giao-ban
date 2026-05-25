@@ -46,16 +46,14 @@
                     <th colspan="3">Đang Điều Trị Nội Trú</th>
                     <th colspan="7">Kết Thúc Điều Trị / Ra Viện Trong Ngày</th>
                     <th rowspan="2" style="background:#fef08a; color:#854d0e;">Còn Lại</th>
-                    <th colspan="1" style="background:#f0fdf4; color:#166534;">Phẫu Thuật - Thủ Thuật</th>
                 </tr>
                 <tr>
                     <th>Bệnh Cũ</th><th>Bệnh Mới</th><th>Chuyển Đến</th>
                     <th>Ra Viện</th><th>Xin Về (Ổn)</th><th>Xin Về (Nặng)</th><th>Chuyển Khoa Đi</th><th>Bỏ Viện</th><th>Tử Vong</th><th>Chuyển Viện</th>
-                    <th style="background:#f0fdf4; color:#166534;">Tiêm Khớp</th>
                 </tr>
             </thead>
             <tbody id="bodyLamSang">
-                <tr><td colspan="15">Đang đồng bộ dữ liệu trực tuyến...</td></tr>
+                <tr><td colspan="14">Đang đồng bộ dữ liệu trực tuyến...</td></tr>
             </tbody>
         </table>
     </div>
@@ -82,6 +80,22 @@
             </tbody>
         </table>
     </div>
+
+    <div class="table-section">
+        <div class="section-h2">III. Số liệu Phẫu thuật - Thủ thuật</div>
+        <table style="max-width: 600px;">
+            <thead>
+                <tr>
+                    <th style="width: 60px;">STT</th>
+                    <th style="min-width: 250px;">Tên Đơn Vị Khoa Phòng</th>
+                    <th style="background:#f0fdf4; color:#166534; width: 180px;">Tiêm Khớp</th>
+                </tr>
+            </thead>
+            <tbody id="bodyPhauThuatThuThuat">
+                <tr><td colspan="3">Đang tải dữ liệu phẫu thuật - thủ thuật...</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
@@ -95,7 +109,6 @@
 
     let cacheRawData = null;
 
-    // SỬA ĐỔI CHÍNH XÁC: Thiết lập ngày mặc định dạng yyyy-MM-dd không bị rỗng ô chọn ngày
     const chuẩnHóaNgàyHômNay = () => {
         const d = new Date();
         const year = d.getFullYear();
@@ -120,8 +133,9 @@
             renderDashboardTables(cacheRawData);
         } catch (error) {
             console.error("Lỗi chi tiết:", error);
-            document.getElementById('bodyLamSang').innerHTML = `<tr><td colspan="15" style="color:red; font-weight:bold; padding: 20px;">Lỗi xử lý dữ liệu! (Chi tiết: ${error.message})</td></tr>`;
+            document.getElementById('bodyLamSang').innerHTML = `<tr><td colspan="14" style="color:red; font-weight:bold; padding: 20px;">Lỗi xử lý dữ liệu! (Chi tiết: ${error.message})</td></tr>`;
             document.getElementById('bodyCanLamSang').innerHTML = `<tr><td colspan="16" style="color:red; font-weight:bold; padding: 20px;">Không thể tải danh mục Cận lâm sàng.</td></tr>`;
+            document.getElementById('bodyPhauThuatThuThuat').innerHTML = `<tr><td colspan="3" style="color:red; font-weight:bold; padding: 20px;">Không thể tải danh mục Phẫu thuật - Thủ thuật.</td></tr>`;
         }
     }
 
@@ -136,10 +150,13 @@
         
         const searchDate = convertDateToDMY(document.getElementById('targetDatePicker').value).trim();
 
-        // 1. RENDER MẢNG LÂM SÀNG
+        // 1. RENDER MẢNG LÂM SÀNG (ĐÃ BỎ CỘT TIÊM KHỚP)
         const tbodyLS = document.getElementById('bodyLamSang');
         let htmlLS = "";
         let sums = { nt:0, bc:0, bm:0, ck:0, xv:0, v_on:0, v_nang:0, c_khoa:0, bv:0, tv:0, cv:0, cl:0, tk:0 };
+
+        // Tạo chuỗi HTML cho mục III (Phẫu thuật - Thủ thuật) đồng thời khi duyệt qua các khoa
+        let htmlPTTT = "";
 
         CLINICAL_KHOAS.forEach((khoa, index) => {
             let matches = (data.lamSang || []).filter(r => 
@@ -149,7 +166,6 @@
             
             let act = { luotKhamNgoaiTru:0, benhCu:0, benhMoi:0, chuyenKhoa:0, xuatVien:0, xinVeBenhOn:0, xinVeBenhNang:0, chuyenDiCacKhoa:0, boVe:0, tuVong:0, chuyenVien:0, conLai:0, tiemKhop:0, lanGui:0 };
             
-            // XỬ LÝ: Sắp xếp lấy bản ghi có số lần gửi lớn nhất lên đầu bảng
             if (matches.length > 0) {
                 matches.sort((a, b) => Number(b.lanGui || 0) - Number(a.lanGui || 0));
                 act = matches[0];
@@ -171,6 +187,7 @@
             sums.cl += isKKB ? 0 : Number(act.conLai || 0);
             sums.tk += isKKB ? 0 : Number(act.tiemKhop || 0);
 
+            // Ghi dữ liệu bảng I Lâm sàng
             htmlLS += `<tr>
                 <td>${index + 1}</td>
                 <td class="text-left">${khoa}</td>
@@ -186,6 +203,12 @@
                 <td>${isKKB ? '-' : (act.tuVong || 0)}</td>
                 <td>${isKKB ? '-' : (act.chuyenVien || 0)}</td>
                 <td style="font-weight:bold; color:#854d0e; background:#fef9c3;">${isKKB ? '-' : (act.conLai || 0)}</td>
+            </tr>`;
+
+            // Ghi dữ liệu bảng III Phẫu thuật - Thủ thuật mới
+            htmlPTTT += `<tr>
+                <td>${index + 1}</td>
+                <td class="text-left">${khoa}</td>
                 <td style="font-weight:bold; color:#16a34a; background:#f0fdf4;">${isKKB ? '-' : (act.tiemKhop || 0)}</td>
             </tr>`;
         });
@@ -196,11 +219,18 @@
             <td>${sums.bc}</td><td>${sums.bm}</td><td>${sums.ck}</td>
             <td>${sums.xv}</td><td>${sums.v_on}</td><td>${sums.v_nang}</td><td>${sums.c_khoa}</td><td>${sums.bv}</td><td>${sums.tv}</td><td>${sums.cv}</td>
             <td style="background:#fef08a;">${sums.cl}</td>
-            <td style="background:#dcfce7; color:#15803d;">${sums.tk}</td>
         </tr>`;
         tbodyLS.innerHTML = htmlLS;
 
-        // 2. RENDER MẢNG CẬN LÂM SÀNG
+        // Thêm hàng tổng kết cho bảng Mục III
+        htmlPTTT += `<tr class="sum-row">
+            <td colspan="2">TỔNG TOÀN VIỆN</td>
+            <td style="background:#dcfce7; color:#15803d;">${sums.tk}</td>
+        </tr>`;
+        document.getElementById('bodyPhauThuatThuThuat').innerHTML = htmlPTTT;
+
+
+        // 2. RENDER MẢNG CẬN LÂM SÀNG (MỤC II)
         const tbodyCLS = document.getElementById('bodyCanLamSang');
         let htmlCLS = "";
         let totalCLS = { pro:0, bnp:0, khi:0, xnNg:0, xnNo:0 };
