@@ -30,7 +30,7 @@
         <h1>📊 DASHBOARD BÁO CÁO GIAO BAN - BỆNH VIỆN ĐK KV HỒNG NGỰ</h1>
         <div class="filter-box">
             <span>NGÀY XEM:</span>
-            <input type="date" id="targetDatePicker" onchange="loadDashboardCoreData()">
+            <input type="date" id="targetDatePicker" onchange="renderDashboardTables(cacheRawData)">
             <a href="index.html" class="btn-nav">✍️ NHẬP BÁO CÁO</a>
         </div>
     </div>
@@ -85,7 +85,7 @@
 </div>
 
 <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxJiK63P9G3LfdKCyjh3Ak4il9ugm7iPB6AxCzvW866B4mKcHzznQpr0MyF3whBKyJ1/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyHSmTBNBrv5jhUiHfeuMKtZsj-eagH5tlO_7Ru7IHHEDk2ixX_4KIDm918yIrVABv1/exec';
 
     const CLINICAL_KHOAS = [
         "KHOA CẤP CỨU - HSTC - CHỐNG ĐỘC", "KHOA PHẪU THUẬT GÂY MÊ HỒI SỨC", "KHOA NGOẠI TỔNG HỢP", "KHOA PHỤ SẢN", 
@@ -98,16 +98,25 @@
 
     async function loadDashboardCoreData() {
         try {
-            if (!cacheRawData) {
-                const response = await fetch(API_URL);
-                cacheRawData = await response.json();
+            const response = await fetch(API_URL);
+            if (!response.ok) {
+                throw new Error("Mã phản hồi HTTP: " + response.status);
             }
+            cacheRawData = await response.json();
+            
+            if (cacheRawData.error) {
+                throw new Error(cacheRawData.error);
+            }
+            
             renderDashboardTables(cacheRawData);
         } catch (error) {
-            document.getElementById('bodyLamSang').innerHTML = `<tr><td colspan="15" style="color:red; font-weight:bold;">Lỗi kết nối cơ sở dữ liệu!</td></tr>`;
+            console.error("Lỗi chi tiết:", error);
+            document.getElementById('bodyLamSang').innerHTML = `<tr><td colspan="15" style="color:red; font-weight:bold; padding: 20px;">Lỗi xử lý dữ liệu! (Chi tiết: ${error.message})</td></tr>`;
+            document.getElementById('bodyCanLamSang').innerHTML = `<tr><td colspan="16" style="color:red; font-weight:bold; padding: 20px;">Không thể tải danh mục Cận lâm sàng.</td></tr>`;
         }
     }
 
+    // Hàm chuyển đổi dữ liệu từ yyyy-MM-dd sang dd-MM-yyyy để khớp database
     function convertDateToDMY(dateString) {
         if(!dateString) return "";
         const parts = dateString.split('-');
@@ -115,6 +124,9 @@
     }
 
     function renderDashboardTables(data) {
+        if (!data) return;
+        
+        // Đã đồng bộ: Chuyển ngày sang chuẩn định dạng dd-MM-yyyy
         const searchDate = convertDateToDMY(document.getElementById('targetDatePicker').value);
 
         // 1. RENDER MẢNG LÂM SÀNG
@@ -123,7 +135,7 @@
         let sums = { nt:0, bc:0, bm:0, ck:0, xv:0, v_on:0, v_nang:0, c_khoa:0, bv:0, tv:0, cv:0, cl:0, tk:0 };
 
         CLINICAL_KHOAS.forEach((khoa, index) => {
-            let matches = data.lamSang.filter(r => r.ngay === searchDate && r.khoa.toUpperCase() === khoa.toUpperCase());
+            let matches = (data.lamSang || []).filter(r => r.ngay === searchDate && r.khoa.toUpperCase() === khoa.toUpperCase());
             let act = { luotKhamNgoaiTru:0, benhCu:0, benhMoi:0, chuyenKhoa:0, xuatVien:0, xinVeBenhOn:0, xinVeBenhNang:0, chuyenDiCacKhoa:0, boVe:0, tuVong:0, chuyenVien:0, conLai:0, tiemKhop:0 };
             
             if (matches.length > 0) {
@@ -145,7 +157,7 @@
             sums.tv += isKKB ? 0 : Number(act.tuVong || 0);
             sums.cv += isKKB ? 0 : Number(act.chuyenVien || 0);
             sums.cl += isKKB ? 0 : Number(act.conLai || 0);
-            sums.tk += isKKB ? 0 : Number(act.tiemKhop || 0); // Cộng dồn số ca Tiêm Khớp khối Lâm sàng
+            sums.tk += isKKB ? 0 : Number(act.tiemKhop || 0);
 
             htmlLS += `<tr>
                 <td>${index + 1}</td>
@@ -181,11 +193,11 @@
         let htmlCLS = "";
         let totalCLS = { pro:0, bnp:0, khi:0, xnNg:0, xnNo:0 };
 
-        let rowTongXN = data.canLamSang.filter(r => r.ngay === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
-        let rowTongCDHA = data.canLamSang.filter(r => r.ngay === searchDate && r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
+        let rowTongXN = (data.canLamSang || []).filter(r => r.ngay === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
+        let rowTongCDHA = (data.canLamSang || []).filter(r => r.ngay === searchDate && r.khoa === "KHOA CHẨN ĐOÁN HÌNH ẢNH" && r.loai === "TỔNG TOÀN VIỆN").sort((a,b)=>Number(b.lanGui||0)-Number(a.lanGui||0))[0] || {};
 
         CLINICAL_KHOAS.forEach((khoa, index) => {
-            let matchesXN = data.canLamSang.filter(r => r.ngay === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === khoa).sort((a,b) => Number(b.lanGui||0) - Number(a.lanGui||0));
+            let matchesXN = (data.canLamSang || []).filter(r => r.ngay === searchDate && r.khoa === "KHOA XÉT NGHIỆM" && r.loai === khoa).sort((a,b) => Number(b.lanGui||0) - Number(a.lanGui||0));
             let rXN = matchesXN[0] || {};
 
             totalCLS.pro += Number(rXN.procalcitonin || 0); 
