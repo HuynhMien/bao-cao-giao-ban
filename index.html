@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nhập Báo Cáo Giao Ban - BV ĐK KV Hồng Ngự</title>
+    <title>Nhập Báo Cáo Giao Ban - BV ĐKKV Hồng Ngự</title>
     <style>
         :root { --primary: #0284c7; --bg: #f1f5f9; --card-bg: #ffffff; --text: #1e293b; --border: #cbd5e1; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
@@ -33,13 +33,13 @@
 </head>
 <body>
 
-<div id="loading">🚀 ĐANG TIẾN HÀNH XỬ LÝ DỮ LIỆU VÀ ĐỒNG BỘ LÊN GOOGLE SHEETS...</div>
+<div id="loading">🚀 Đang gửi báo cáo...</div>
 
 <div class="container">
     <div class="login-card" id="loginBlock">
         <h2 style="color:#0284c7;">BỆNH VIỆN ĐA KHOA KHU VỰC HỒNG NGỰ</h2>
         <div class="form-group">
-            <label>Nhập Token phòng ban:</label>
+            <label>Nhập tài khoản:</label>
             <input type="password" id="txtToken" placeholder="Mã khoa phòng...">
         </div>
         <button class="btn btn-blue" style="width:100%;" onclick="loginSystem()">ĐĂNG NHẬP</button>
@@ -52,7 +52,7 @@
                 <h2 id="txtTenKhoa">-</h2>
             </div>
             <div>
-                <a href="dashboard.html" class="btn btn-gray" style="margin-right: 8px;">📊 DASHBOARD TỔNG HỢP</a>
+                <a href="dashboard.html" class="btn btn-gray" style="margin-right: 8px;">📊 SỐ LIỆU TỔNG HỢP</a>
                 <button type="button" class="btn btn-red" onclick="logoutSystem()">ĐĂNG XUẤT</button>
             </div>
         </div>
@@ -102,7 +102,7 @@
         </div>
 
         <div class="btn-box" style="margin-top:30px;">
-            <button type="submit" class="btn btn-blue" style="font-size:15px; padding:14px 45px;">GỬI CẬP NHẬT BÁO CÁO GIAO BAN</button>
+            <button type="submit" class="btn btn-blue" style="font-size:15px; padding:14px 45px;">GỬI BÁO CÁO</button>
         </div>
     </form>
 </div>
@@ -112,9 +112,9 @@
 
     // DANH SÁCH MỞ RỘNG PHÁT SINH DỊCH VỤ - CHỈ CẦN KHAI BÁO THÊM TẠI ĐÂY LÀ XONG
     const CLINICAL_PROCEDURES = [
-        { field: "tiemKhop", label: "TIÊM KHỚP" },
-        { field: "boBot", label: "BÓ BỘT" },
-        { field: "thayBang", label: "THAY BĂNG" }
+        //{ field: "thayBang", label: "THAY BĂNG" },
+        //{ field: "boBot", label: "BÓ BỘT" },
+        { field: "tiemKhop", label: "TIÊM KHỚP" }
     ];
 
     const CLS_SERVICES = {
